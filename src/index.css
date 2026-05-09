@@ -1,1 +1,49 @@
+html {
+  scroll-behavior: auto;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @import "tailwindcss";
+
+
+@theme {
+  --color-nav01: #FFEDDE;
+  --color-nav02: #FFF4EB;
+  --color-primary: #FFFFFF;
+  --color-primary-dark: #000000;
+  --color-secondary: #343434;
+  --color-btn01: #EF7F23;
+  --color-btn02: #E74728;
+  --color-btn-light: #E74728;
+}
+
+
+.animated-text {
+  display: inline-block;
+  background: linear-gradient(90deg, #38bdf8, #a855f7, #f97316, #14b8a6);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shimmer 3s ease infinite;
+}
+
+@keyframes text-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
