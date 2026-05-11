@@ -1,6 +1,5 @@
 import {
   CalendarDays,
-  ChevronRight,
   Flag,
   HeartHandshake,
   Home,
@@ -19,6 +18,7 @@ import {
   Trees,
   Utensils,
 } from "lucide-react";
+import RightArrow from "../components/icons/RightArrow";
 
 export const Icons = {
   // Main icons
@@ -29,7 +29,7 @@ export const Icons = {
   calendar: CalendarDays,
   search: Search,
   map: MapPin,
-  rightArrow: ChevronRight,
+  rightArrow: RightArrow,
 
   // Filter icons
   watch: Clock3,

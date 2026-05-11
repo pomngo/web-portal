@@ -31,7 +31,7 @@ const TopNav = () => {
   }, [location.pathname]);
 
   return (
-    <div className="bg-linear-to-b from-nav01 via-nav02 to-[10%_15%] px-16 py-4">
+    <div className="bg-linear-to-b from-nav01 via-nav02 to-[10%_15%] px-4  sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4">
       {/* top */}
       <div className="flex items-center justify-between">
         {/* Logo */}
@@ -51,7 +51,7 @@ const TopNav = () => {
           />
 
           {/* Nav Items */}
-          <div className="relative flex items-center gap-2">
+          <div className="hidden relative sm:flex items-center gap-2">
             {navItems.map((item, index) => {
               const Icon = item.icon;
 
@@ -81,7 +81,7 @@ const TopNav = () => {
                       )}
 
                       <span
-                        className={`transition-all text-[16px] duration-300 ${
+                        className={`transition-all text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] duration-300 ${
                           isActive
                             ? "bg-linear-to-tr from-btn01 to-btn02 bg-clip-text text-transparent font-semibold"
                             : "text-secondary/70 group-hover:text-black text-[15px] font-medium"
@@ -95,11 +95,13 @@ const TopNav = () => {
               );
             })}
           </div>
+
+          
         </div>
 
         {/* Button */}
         <div>
-          <button className="rounded-full bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer">
+          <button className="text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] text-nowrap  rounded-full bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer">
             Become Organizer
           </button>
         </div>

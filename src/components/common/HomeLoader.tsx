@@ -16,7 +16,7 @@ const HomeLoader = () => {
       </div>
 
       {/* Activities Skeleton */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {Array.from({ length: 5 }).map((_, index) => (
           <div
             key={index}
@@ -50,6 +50,7 @@ const HomeLoader = () => {
           </div>
         ))}
       </div>
+
 
       {/* Filter Buttons Skeleton */}
       <div className="mt-16 flex flex-wrap justify-center gap-4">

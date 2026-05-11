@@ -14,8 +14,8 @@ type ExploreActivitiesCardProps = {
 
 const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
   return (
-    <div className="flex flex-col gap-3 overflow-hidden">
-      <div className="w-64 h-52 overflow-hidden rounded-2xl">
+    <div className="flex flex-col gap-3 ">
+      <div className="w-full h-52 overflow-hidden rounded-2xl">
         <img
           src={activity.image}
           alt={activity.title}
@@ -35,7 +35,7 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
 
           <p className="text-secondary text-[12px] flex items-center gap-1">
             <Icons.users size={14} />
-            {activity.members} members going
+            {activity.members} members
           </p>
         </div>
       </div>

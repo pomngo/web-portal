@@ -12,8 +12,8 @@ type NearbyActivitiesProps = {
 
 const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
   return (
-    <div className="flex flex-col gap-3 overflow-hidden">
-      <div className="w-64 h-52 overflow-hidden rounded-2xl">
+    <div className="flex flex-col gap-3 ">
+      <div className="w-full lg:w-64 h-52 overflow-hidden rounded-2xl">
         <img
           src={activity.image}
           alt={activity.title}
@@ -29,11 +29,11 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
         </p>
         <p className="text-secondary text-[12px] flex items-center gap-1">
           {" "}
-          <Icons.users size={14} /> {activity.membersGoing} members going
+          <Icons.users size={14} /> {activity.membersGoing} members
         </p>
       </div>
 
-      <button className="w-64 rounded-xl bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer mt-5">
+      <button className="w-full rounded-xl bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer mt-5">
         Join Now
       </button>
     </div>

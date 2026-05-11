@@ -1,14 +1,12 @@
 import Skeleton from "@mui/material/Skeleton";
-import Stack from "@mui/material/Stack";
 
 const SkeletonLoader = () => {
   return (
-    <main className="min-h-screen px-16 py-10 flex flex-col gap-20">
+    <main className="min-h-screen flex flex-col gap-20">
       {/* Filter Buttons */}
-      <section className="flex justify-center gap-4 flex-wrap">
-        {Array.from({ length: 7 }).map((_, index) => (
+      <div className="flex flex-col gap-10">
+        <section className="flex items-center justify-between gap-4 flex-wrap">
           <Skeleton
-            key={index}
             variant="rounded"
             width={140}
             height={48}
@@ -16,8 +14,39 @@ const SkeletonLoader = () => {
               borderRadius: "999px",
             }}
           />
-        ))}
-      </section>
+          <div className="flex gap-6 items-center">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                variant="rounded"
+                width={140}
+                height={48}
+                sx={{
+                  borderRadius: "999px",
+                }}
+              />
+            ))}
+          </div>
+          <Skeleton
+            variant="rounded"
+            width={140}
+            height={48}
+            sx={{
+              borderRadius: "999px",
+            }}
+          />
+        </section>
+        <div className="flex justify-center items-center">
+          <Skeleton
+            variant="rounded"
+            width={700}
+            height={80}
+            sx={{
+              borderRadius: "999px",
+            }}
+          />
+        </div>
+      </div>
 
       {/* Community Flocks */}
       <section>

@@ -1,3 +1,6 @@
+import CompassIcon from "../components/icons/CompassIcon";
+import HomeIcon from "../components/icons/HomeIcon";
+import UsersIcon from "../components/icons/UsersIcon";
 import { Icons } from "./icons";
 
 
@@ -65,17 +68,17 @@ export const navItems = [
   {
     name: "Home",
     path: "/",
-    icon: Icons.home,
+    icon: HomeIcon,
   },
   {
     name: "Flocks",
     path: "/flocks",
-    icon: Icons.watch,
+    icon: CompassIcon,
   },
   {
     name: "Activities",
     path: "/activities",
-    icon: Icons.users,
+    icon: UsersIcon,
   },
 ];
 
