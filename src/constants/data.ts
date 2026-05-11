@@ -68,16 +68,19 @@ export const navItems = [
   {
     name: "Home",
     path: "/",
+    matchPaths: ["/"],
     icon: HomeIcon,
   },
   {
     name: "Flocks",
     path: "/flocks",
+    matchPaths: ["/flock"],
     icon: CompassIcon,
   },
   {
     name: "Activities",
     path: "/activities",
+    matchPaths: ["/activities"],
     icon: UsersIcon,
   },
 ];
