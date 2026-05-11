@@ -49,7 +49,7 @@ const Home = () => {
           </div>
           <div className="">
             <Link
-              to="/flocks"
+              to="/activities/nearby-activities"
               className="bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 flex items-center gap-1 text-nowrap"
             >
               View All <Icons.rightArrow className="text-btn01" />
@@ -88,7 +88,7 @@ const Home = () => {
           </div>
           <div className="">
             <Link
-              to="/flocks"
+              to="/flocks/community-flocks"
               className="bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 flex items-center gap-1"
             >
               View All <Icons.rightArrow className="text-btn01" />

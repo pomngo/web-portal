@@ -19,6 +19,7 @@ import {
   Utensils,
 } from "lucide-react";
 import RightArrow from "../components/icons/RightArrow";
+import LeftArrow from "../components/icons/LeftArrow";
 
 export const Icons = {
   // Main icons
@@ -30,6 +31,7 @@ export const Icons = {
   search: Search,
   map: MapPin,
   rightArrow: RightArrow,
+  leftArrow: LeftArrow,
 
   // Filter icons
   watch: Clock3,

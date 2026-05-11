@@ -16,11 +16,15 @@ const TopNav = () => {
   });
 
   useEffect(() => {
-    const activeIndex = navItems.findIndex(
-      (item) => item.path === location.pathname,
-    );
+    const activeIndex = navItems.findIndex((item) => {
+      if (item.path === "/") {
+        return location.pathname === "/";
+      }
 
-    const activeItem = navRefs.current[activeIndex] as HTMLElement;
+      return location.pathname.startsWith(item.path);
+    });
+
+    const activeItem = activeIndex >= 0 ? navRefs.current[activeIndex] : null;
 
     if (activeItem) {
       setSliderStyle({
@@ -95,8 +99,6 @@ const TopNav = () => {
               );
             })}
           </div>
-
-          
         </div>
 
         {/* Button */}
