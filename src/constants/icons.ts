@@ -4,8 +4,6 @@ import {
   HeartHandshake,
   Home,
   MapPin,
-  Search,
-  Users,
   Clock3,
   Heart,
   MapPinned,
@@ -17,21 +15,28 @@ import {
   Film,
   Trees,
   Utensils,
+  Link,
+  Search,
 } from "lucide-react";
 import RightArrow from "../components/icons/RightArrow";
 import LeftArrow from "../components/icons/LeftArrow";
+import UsersIcon from "../components/icons/UsersIcon";
+import CompassIcon from "../components/icons/CompassIcon";
+import SearchIcon from "../components/icons/SearchIcon";
 
 export const Icons = {
   // Main icons
   home: Home,
-  users: Users,
+  users: UsersIcon,
   flag: Flag,
   heartHandshake: HeartHandshake,
   calendar: CalendarDays,
-  search: Search,
+  search: SearchIcon,
+  serarch1: Search,
   map: MapPin,
   rightArrow: RightArrow,
   leftArrow: LeftArrow,
+  campass: CompassIcon,
 
   // Filter icons
   watch: Clock3,
@@ -46,4 +51,5 @@ export const Icons = {
   film: Film,
   trees: Trees,
   utensils: Utensils,
+  link: Link,
 };

@@ -1,9 +1,10 @@
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { Icons } from "../../../../constants/icons";
 import { nearbyActivities } from "../../../../constants/data";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
+import TitleText from "../../../../components/common/TitleText";
 
 const AllFlocks = () => {
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,10 @@ const AllFlocks = () => {
     }, 2000);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    document.title = "All Flocks | Flockn Go";
   }, []);
 
   if (loading) {
@@ -32,15 +37,16 @@ const AllFlocks = () => {
         {/* Heading */}
         <div className="flex justify-between items-center mb-4">
           <div className="">
-            <h2 className="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-bold">
-              {search_by
+            <TitleText
+              title={`
+              ${search_by
                 ?.split("-")
                 .map(
                   (word) =>
                     word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
                 )
-                .join(" ")}
-            </h2>
+                .join(" ")}`}
+            />
           </div>
           <div className="">
             <button
@@ -53,9 +59,11 @@ const AllFlocks = () => {
         </div>
 
         {/* Activities List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-x-4 gap-y-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 gap-x-4 gap-y-16">
           {nearbyActivities.map((activity) => (
-            <NearbyActivities key={activity.id} activity={activity} />
+            <Link key={activity.id} to={`/flocks/${activity.id}/detail`}>
+              <NearbyActivities activity={activity} />
+            </Link>
           ))}
         </div>
       </section>

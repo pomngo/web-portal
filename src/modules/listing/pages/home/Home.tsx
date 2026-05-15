@@ -6,12 +6,13 @@ import {
   filterOptions,
   nearbyActivities,
 } from "../../../../constants/data";
-import FilterButton from "../../components/home/FilterButton";
-import { Icons } from "../../../../constants/icons";
+import FilterButton from "../../components/common/FilterButton";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
+import TitleText from "../../../../components/common/TitleText";
+import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,10 @@ const Home = () => {
     }, 2000);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    document.title = "Home | Flockn Go";
   }, []);
 
   if (loading) {
@@ -38,34 +43,55 @@ const Home = () => {
       {/* Nearby Activities */}
       <section className="">
         {/* Heading */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between mb-4">
           <div className="">
-            <h2 className="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-bold">
-              Nearby Activities
-            </h2>
+            <TitleText title="Nearby Activities" />
             <p className="text-secondary text-base">
               Enable your location to get personalized results.
             </p>
           </div>
           <div className="">
-            <Link
-              to="/activities/nearby-activities"
-              className="bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 flex items-center gap-1 text-nowrap"
-            >
-              View All <Icons.rightArrow className="text-btn01" />
-            </Link>
+            <GradientLinkButton to="/activities/nearby-activities" />
           </div>
         </div>
 
+        <div
+          className="
+    flex gap-4 overflow-x-auto
+    snap-x snap-mandatory
+    scrollbar-hide
+    lg:hidden
+    pb-2
+  "
+        >
+          {nearbyActivities.map((activity) => (
+            <div
+              key={activity.id}
+              className="
+        min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
+        snap-center
+        flex-shrink-0
+      "
+            >
+              <NearbyActivities activity={activity} />
+            </div>
+          ))}
+        </div>
+
         {/* Activities List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 md:gap-4">
+        <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
           {nearbyActivities.slice(0, 5).map((activity) => (
-            <NearbyActivities key={activity.id} activity={activity} />
+            <Link
+              key={activity.id}
+              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+            >
+              <NearbyActivities activity={activity} />
+            </Link>
           ))}
         </div>
 
         {/* Filter button */}
-        <div className="flex justify-center mt-16 gap-4 overflow-x-scroll overflow-y-hidden mx-auto scrollbar-hide">
+        <div className="flex overflow-scroll mt-16 gap-4 overflow-y-hidden scrollbar-hide">
           {filterOptions.map((item, index) => (
             <FilterButton
               key={index}
@@ -79,23 +105,44 @@ const Home = () => {
       </section>
 
       {/* Community Flocks */}
-      <section className="">
+      <section>
         <div className="flex justify-between items-center mb-4">
-          <div className="">
-            <h2 className="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-bold">
-              Community Flocks
-            </h2>
+          <div>
+            <TitleText title="Community Flocks" />
           </div>
-          <div className="">
-            <Link
-              to="/flocks/community-flocks"
-              className="bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 flex items-center gap-1"
-            >
-              View All <Icons.rightArrow className="text-btn01" />
-            </Link>
+
+          <div>
+            <GradientLinkButton to="/flocks/community-flocks" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-auto">
+
+        {/* Mobile Carousel */}
+        <div
+          className="
+      flex gap-4 overflow-x-auto
+      snap-x snap-mandatory
+      scrollbar-hide
+      lg:hidden
+      pb-2
+    "
+        >
+          {communityFlocks.slice(0, 5).map((flock) => (
+            <div
+              key={flock.id}
+              className="
+          min-w-[90%]
+          sm:min-w-[70%]
+          snap-center
+          flex-shrink-0
+        "
+            >
+              <CommunityFlocksCard card={flock} />
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Grid */}
+        <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
           {communityFlocks.slice(0, 5).map((flock) => (
             <CommunityFlocksCard key={flock.id} card={flock} />
           ))}
@@ -103,30 +150,57 @@ const Home = () => {
       </section>
 
       {/* Explore Activities */}
-      <section className="">
-        <div className="flex justify-between items-center mb-4">
+      <section className="mb-20 lg:mb-0">
+        <div className="flex justify-between mb-4">
           <div className="">
-            <h2 className="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-bold">
-              Explore Activities
-            </h2>
+            <TitleText title="Explore Activities" />
             <p className="text-secondary text-xs sm:text-sm md:text-base">
               Explore these amazing flocks and fetch your interest
             </p>
           </div>
           <div className="">
-            <Link
-              to="/activities"
-              className="bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 flex items-center gap-1"
-            >
-              View All <Icons.rightArrow className="text-btn01" />
-            </Link>
+            <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-
-        {/* Activities List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 md:gap-4">
+        {/* Mobile Carousel */}
+        <div
+          className="
+    flex gap-4 overflow-x-auto
+    snap-x snap-mandatory
+    scrollbar-hide
+    lg:hidden
+    pb-2
+  "
+        >
           {exploreActivities.slice(0, 5).map((activity) => (
-            <ExploreActivitiesCard key={activity.id} activity={activity} />
+            <div
+              key={activity.id}
+              className="
+        min-w-[85%]
+        sm:min-w-[65%]
+        md:min-w-[45%]
+        snap-center
+        flex-shrink-0
+      "
+            >
+              <Link
+                to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+              >
+                <ExploreActivitiesCard activity={activity} />
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Grid */}
+        <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+          {exploreActivities.slice(0, 5).map((activity) => (
+            <Link
+              key={activity.id}
+              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+            >
+              <ExploreActivitiesCard activity={activity} />
+            </Link>
           ))}
         </div>
       </section>

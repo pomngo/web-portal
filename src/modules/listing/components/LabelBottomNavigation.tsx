@@ -29,7 +29,7 @@ export default function LabelBottomNavigation() {
   }, [value]);
 
   return (
-    <div className="fixed bottom-5 right-0 left-0 bg-linear-to-b from-nav01 to-nav02 to-60% p-2 w-[80%] mx-auto rounded-full h-20 z-999">
+    <div className="fixed bottom-5 right-0 left-0 bg-linear-to-b from-nav01 to-nav02 to-60% p-2 w-[80%] mx-auto rounded-full h-20 z-50">
       {/* Sliding Background */}
       <div
         className="absolute top-1 h-[56px] rounded-xl bg-orange-100 transition-all duration-300 ease-in-out"
@@ -41,7 +41,7 @@ export default function LabelBottomNavigation() {
 
       <BottomNavigation
         value={value}
-        onChange={(event, newValue) => {
+        onChange={(_, newValue) => {
           setValue(newValue);
         }}
         sx={{
@@ -65,7 +65,7 @@ export default function LabelBottomNavigation() {
               onClick={() => navigate(item.path)}
               icon={
                 <Icon
-                  className={`h-5 w-5 transition-colors duration-300 ${
+                  className={`h-5 w-5 transition-colors duration-300 stroke-2 ${
                     value === item.path ? "text-orange-500" : "text-gray-500"
                   }`}
                 />

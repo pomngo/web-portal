@@ -5,6 +5,8 @@ import Flocks from "../pages/flocks/Flocks";
 import Activities from "../pages/activities/Activities";
 import AllFlocks from "../pages/flocks/AllFlocks";
 import AllActivities from "../pages/activities/AllActivities";
+import FlocksDetails from "../pages/flocks/FlocksDetails";
+import ActivitiesDetails from "../pages/activities/ActivitiesDetails";
 
 const ListingRoute = () => {
   return (
@@ -16,7 +18,11 @@ const ListingRoute = () => {
         <Route path="flocks/:search_by" element={<AllFlocks />} />
         <Route path="activities/:search_by" element={<AllActivities />} />
       </Route>
-      <Route />
+      <Route path="/flocks/:id/detail" element={<FlocksDetails />} />
+      <Route
+        path="/flocks/:id/activities/:id/detail"
+        element={<ActivitiesDetails />}
+      />
     </Routes>
   );
 };

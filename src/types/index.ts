@@ -1,0 +1,1 @@
+export type CardType = "large" | "small" | "wide" | "tall";

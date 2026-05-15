@@ -1,13 +1,15 @@
 type IconProps = {
   className?: string;
+  height?: number;
+  width?: number;
 };
 
-const UsersIcon = ({ className }: IconProps) => {
+const UsersIcon = ({ className, height = 16, width = 16 }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
+      width={width}
+      height={height}
       viewBox="0 0 16 16"
       fill="none"
       className={className}
