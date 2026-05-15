@@ -25,8 +25,8 @@ const LeftArrow = ({ className }: IconProps) => {
           y2="7.84023"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#EF7F23" />
-          <stop offset="1" stop-color="#E74728" />
+          <stop stopColor="#EF7F23" />
+          <stop offset="1" stopColor="#E74728" />
         </linearGradient>
       </defs>
     </svg>

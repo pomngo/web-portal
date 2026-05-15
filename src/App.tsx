@@ -15,13 +15,13 @@ const App = () => {
 
   if (loader) {
     return (
-      <div className="min-h-screen px-16 flex flex-col gap-16 py-10">
+      <div className="min-h-screen px-16 flex flex-col gap-16 py-10 tracking-tight">
         <SkeletonLoader />
       </div>
     );
   }
   return (
-    <div className="min-h-screen overflow-hidden bg-primary text-secondary ">
+    <div className="min-h-screen overflow-hidden bg-primary text-secondary scrollbar-hide">
       <ScrollManager />
       <MainRouting />
     </div>

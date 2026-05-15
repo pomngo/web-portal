@@ -2,6 +2,7 @@ import CompassIcon from "../components/icons/CompassIcon";
 import HomeIcon from "../components/icons/HomeIcon";
 import UsersIcon from "../components/icons/UsersIcon";
 import { Icons } from "./icons";
+import type { CardType } from "../types";
 
 
 export const filterOptions = [
@@ -30,7 +31,7 @@ export const filterOptions = [
     label: "Culinary",
   },
   {
-    icon: Icons.search,
+    icon: Icons.calendar,
     label: "History",
   },
   {
@@ -178,7 +179,7 @@ export const nearbyActivities = [
   },
 ];
 
-export const communityFlocks = [
+export const communityFlocks: { id: number; title: string; description: string; image: string; type: CardType; }[] = [
   {
     id: 1,
     title: "Road Trip Organizers",
@@ -303,4 +304,322 @@ export const exploreActivities = [
     image:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
   }
+];
+
+export const flockDetail = {
+  id: 1,
+  name: "Road Trip Organizers",
+  description:
+    "We plan unique bike rides, highway adventures, weekend tours, and community meetups for passionate riders.",
+
+  coverImage:
+    "https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=1600&auto=format&fit=crop",
+
+  profileImage:
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+
+  category: "Motorcycle Community",
+
+  location: "Pune, Maharashtra",
+
+  membersCount: 234,
+  totalActivities: 18,
+
+  createdBy: {
+    id: 1,
+    name: "Akash Shukla",
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+  },
+
+  socialLinks: {
+    instagram: "https://instagram.com/flockgo",
+    whatsapp: "https://chat.whatsapp.com/example",
+  },
+
+  tags: ["Adventure", "Bike Rides", "Road Trips"],
+
+  createdAt: "2026-01-10",
+};
+
+export const flockActivities = [
+  {
+    id: 1,
+    flockId: 1,
+
+    title: "Diwali Ride Meetup",
+
+    description:
+      "Celebrate Diwali with a night ride and rider community gathering.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Lonavala, Pune",
+
+    startDate: "2026-04-03T07:00:00",
+    endDate: "2026-04-03T21:00:00",
+
+    status: "draft",
+
+    attendees: 54,
+
+    reminders: 12,
+
+    category: "Ride",
+
+    tags: ["Festival", "Night Ride"],
+  },
+
+  {
+    id: 2,
+    flockId: 1,
+
+    title: "Monsoon Highway Ride",
+
+    description:
+      "Long scenic ride through mountain roads during monsoon season.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Mulshi, Pune",
+
+    startDate: "2026-04-07T06:00:00",
+    endDate: "2026-04-07T18:00:00",
+
+    status: "scheduled",
+
+    attendees: 248,
+
+    reminders: 38,
+
+    category: "Adventure",
+
+    tags: ["Adventure", "Highway"],
+  },
+
+  {
+    id: 3,
+    flockId: 1,
+
+    title: "Royal Enfield Breakfast Ride",
+
+    description:
+      "Early morning breakfast ride with Royal Enfield enthusiasts.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1521334884684-d80222895322?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Lavasa Road, Pune",
+
+    startDate: "2026-04-11T05:30:00",
+    endDate: "2026-04-11T11:00:00",
+
+    status: "scheduled",
+
+    attendees: 180,
+
+    reminders: 21,
+
+    category: "Meetup",
+
+    tags: ["Breakfast Ride", "Weekend"],
+  },
+
+  {
+    id: 4,
+    flockId: 1,
+
+    title: "Sunset Coastal Ride",
+
+    description:
+      "Weekend coastal highway ride with sunset photography stops.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Alibaug, Maharashtra",
+
+    startDate: "2026-04-15T08:00:00",
+    endDate: "2026-04-15T22:00:00",
+
+    status: "live",
+
+    attendees: 312,
+
+    reminders: 44,
+
+    category: "Photography",
+
+    tags: ["Photography", "Coastal"],
+  },
+
+  {
+    id: 5,
+    flockId: 1,
+
+    title: "Night City Ride",
+
+    description:
+      "Late-night city ride with food stops and rider networking.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Pune City",
+
+    startDate: "2026-04-20T21:00:00",
+    endDate: "2026-04-21T02:00:00",
+
+    status: "completed",
+
+    attendees: 143,
+
+    reminders: 17,
+
+    category: "Community",
+
+    tags: ["Night Ride", "Community"],
+  },
+
+  {
+    id: 6,
+    flockId: 1,
+
+    title: "Weekend Camping Adventure",
+
+    description:
+      "Camping under the stars with bike riders and outdoor activities.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Pawna Lake",
+
+    startDate: "2026-04-25T09:00:00",
+    endDate: "2026-04-26T14:00:00",
+
+    status: "scheduled",
+
+    attendees: 280,
+
+    reminders: 52,
+
+    category: "Camping",
+
+    tags: ["Camping", "Adventure"],
+  },
+
+  {
+    id: 7,
+    flockId: 1,
+
+    title: "Street Food Ride",
+
+    description:
+      "Ride through the city exploring Pune’s best street food spots.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop",
+
+    location: "FC Road, Pune",
+
+    startDate: "2026-05-02T18:00:00",
+    endDate: "2026-05-02T23:00:00",
+
+    status: "live",
+
+    attendees: 410,
+
+    reminders: 63,
+
+    category: "Food",
+
+    tags: ["Food", "Night Out"],
+  },
+
+  {
+    id: 8,
+    flockId: 1,
+
+    title: "Morning Yoga Ride",
+
+    description:
+      "Start your morning with yoga, meditation, and a short ride.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Kothrud, Pune",
+
+    startDate: "2026-05-08T06:00:00",
+    endDate: "2026-05-08T10:00:00",
+
+    status: "scheduled",
+
+    attendees: 132,
+
+    reminders: 18,
+
+    category: "Wellness",
+
+    tags: ["Yoga", "Morning"],
+  },
+
+  {
+    id: 9,
+    flockId: 1,
+
+    title: "Photography Ride Tour",
+
+    description:
+      "Capture beautiful landscapes while riding through scenic routes.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Sinhagad Fort",
+
+    startDate: "2026-05-14T07:00:00",
+    endDate: "2026-05-14T19:00:00",
+
+    status: "draft",
+
+    attendees: 221,
+
+    reminders: 26,
+
+    category: "Photography",
+
+    tags: ["Photography", "Nature"],
+  },
+
+  {
+    id: 10,
+    flockId: 1,
+
+    title: "Bike Maintenance Workshop",
+
+    description:
+      "Learn basic bike maintenance and long-ride preparation tips.",
+
+    coverImage:
+      "https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1200&auto=format&fit=crop",
+
+    location: "Wakad, Pune",
+
+    startDate: "2026-05-21T11:00:00",
+    endDate: "2026-05-21T16:00:00",
+
+    status: "scheduled",
+
+    attendees: 94,
+
+    reminders: 14,
+
+    category: "Workshop",
+
+    tags: ["Workshop", "Learning"],
+  },
 ];

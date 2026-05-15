@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 
 import { images } from "../../../constants/images";
 import { navItems } from "../../../constants/data";
 import SearchBar from "./common/SearchBar";
+import LoginPopup from "./common/LoginPopup";
 
 const TopNav = () => {
   const location = useLocation();
+  const [open, setOpen] = useState(false);
 
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
@@ -39,9 +41,9 @@ const TopNav = () => {
       {/* top */}
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <div>
+        <Link to={"/"}>
           <img src={images.logo} alt="Logo" className="h-16" />
-        </div>
+        </Link>
 
         {/* Navigation */}
         <div className="relative">
@@ -63,9 +65,9 @@ const TopNav = () => {
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  ref={(el) =>
-                    (navRefs.current[index] = el as HTMLAnchorElement | null)
-                  }
+                  ref={(el) => {
+                    navRefs.current[index] = el as HTMLAnchorElement | null;
+                  }}
                   className={({ isActive }) =>
                     `group relative z-10 flex h-14 items-center justify-center rounded-full px-6 text-sm font-medium transition-all duration-300 ${
                       isActive ? "" : "text-secondary/70 hover:text-black"
@@ -102,10 +104,14 @@ const TopNav = () => {
         </div>
 
         {/* Button */}
-        <div>
-          <button className="text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] text-nowrap  rounded-full bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer">
+        <div className="relative">
+          <button
+            onClick={() => setOpen(true)}
+            className="text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] text-nowrap  rounded-full bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+          >
             Become Organizer
           </button>
+          <LoginPopup isOpen={open} onClose={() => setOpen(false)} />
         </div>
       </div>
 
