@@ -17,7 +17,9 @@ const Home = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(listFlocks("?is_discoverable=true&page=1"));
+    if(flocks.length === 0){
+      dispatch(listFlocks("?is_discoverable=true"));
+    }
   }, [dispatch]);
 
   useEffect(() => {

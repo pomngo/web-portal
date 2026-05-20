@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { CardType } from "../../../../types";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
+import { images } from "../../../../constants/images";
 
 type CommunityFlocksCardProps = { 
   card: { 
@@ -64,7 +65,7 @@ const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
         ${classes}
       `}
       style={{
-        backgroundImage: `url(${card.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card?.cover_image_s3key) : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Objeomz7IceAvda_z3fdIwZo7_WiG_eHfg&s"})`,
+        backgroundImage: `url(${card.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card?.cover_image_s3key) : images.not_found})`,
       }}
     >
       {/* Dark Animated Overlay */}

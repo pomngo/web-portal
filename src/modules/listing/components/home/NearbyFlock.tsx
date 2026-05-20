@@ -1,4 +1,5 @@
 import { Icons } from "../../../../constants/icons";
+import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 
 type NearbyFlockProps = {
@@ -30,7 +31,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
       {/* Image */}
       <div className="w-full h-52 overflow-hidden rounded-2xl">
         <img
-          src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Objeomz7IceAvda_z3fdIwZo7_WiG_eHfg&s"}`}
+          src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.not_found}`}
           alt={flock.flock_name}
           loading="lazy"
           className="
@@ -39,6 +40,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
             rounded-2xl
             hover:scale-110
             transition-all duration-500
+            
           "
         />
       </div>

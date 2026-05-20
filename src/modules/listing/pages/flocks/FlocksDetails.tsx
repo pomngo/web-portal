@@ -9,12 +9,13 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getFlockDetails } from "../../../../store/slices/flockSlice";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
+import { images } from "../../../../constants/images";
 
 const FlocksDetails = () => {
   const { id } = useParams();
   const { selected_flock, selected_flock_loading } = useAppSelector((state) => state.flock);
   const dispatch = useAppDispatch();
-  
+
     useEffect(() => {
       dispatch(getFlockDetails(Number(id)));
     }, [dispatch]);
@@ -34,15 +35,13 @@ const FlocksDetails = () => {
       <div className="min-h-screen bg-[#F9F9F9]">
         {/* COVER IMAGE */}
         <div
-          className="relative h-[300px] overflow-hidden bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${selected_flock?.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_flock?.cover_image_s3key) : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Objeomz7IceAvda_z3fdIwZo7_WiG_eHfg&s"})`,
-            backgroundPosition: "center",
-            backgroundPositionY: "center",
-          }}
+          className="relative h-96 overflow-hidden bg-cover bg-center flex justify-center items-center bg-linear-to-b from-[10%_15%] via-nav02 to-nav01"
         >
-          {/* <img src={selected_flock.coverImage} alt="" className="h-full w-full" /> */}
-          <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent" />
+          <img src={selected_flock?.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_flock?.cover_image_s3key) : images.not_found} alt={selected_flock?.flock_name} className="h-full w-full lg:w-[90%] lg:rounded-b-xl" />
+          {
+            selected_flock?.cover_image_s3key ? <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent lg:w-[90%]  lg:left-[5%] lg:rounded-b-xl" />:<div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/40 to-primary-dark/90 " />
+          }
+          
         </div>
 
         {/* FLOCK INFO */}
@@ -68,7 +67,7 @@ const FlocksDetails = () => {
                 />
 
                 <span className="underline underline-offset-4">
-                  {selected_flock?.participants_count} Members
+                  {selected_flock?.participants_count || 0} Members
                 </span>
               </div>
             </div>
@@ -147,13 +146,13 @@ const FlocksDetails = () => {
 
                       {/* IMAGE */}
                       <img
-                        src={activity?.cover_image[0] || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Objeomz7IceAvda_z3fdIwZo7_WiG_eHfg&s"}
+                        src={activity?.cover_image[0] || images.not_found}
                         alt={activity?.name}
                         className="h-24 w-24 rounded-2xl object-cover"
                       />
                       <div className="">
                           <div className="flex flex-col items-start justify-between gap-2">
-                            <h3 className="text-lg font-semibold">
+                            <h3 className="text-lg text-nowrap font-semibold">
                               {activity?.name.slice(0, 12).trim() }{activity?.name.toString().length > 12 && "..."}
                             </h3>
 
