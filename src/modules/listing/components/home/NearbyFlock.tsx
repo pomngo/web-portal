@@ -48,17 +48,17 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
       {/* Content */}
       <div className="flex flex-col gap-1 mt-1">
         <h2 className="text-[16px] font-semibold line-clamp-1">
-          {flock.flock_name}
+          {flock.flock_name || "Title not found"}
         </h2>
 
         <p className="text-secondary text-[12px] flex items-center gap-1">
           <Icons.map height={14} width={14} />
-          {flock.location}
+          {flock.location || "location not found"}
         </p>
 
         <p className="text-secondary text-[12px] flex items-center gap-1">
           <Icons.users height={14} width={14} />
-          {flock.participants_count} members
+          {flock.participants_count || 0} members
         </p>
       </div>
 
