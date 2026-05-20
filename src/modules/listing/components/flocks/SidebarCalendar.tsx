@@ -41,7 +41,6 @@ const events = {
 
 const SidebarCalendar = () => {
   const [selected, setSelected] = useState<Date | undefined>(new Date());
-  console.log(selected);
 
   const [month, setMonth] = useState(new Date());
 

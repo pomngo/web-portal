@@ -1,27 +1,31 @@
-import { useEffect, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
-
-import { flockActivities, flockDetail } from "../../../../constants/data";
+import { useEffect } from "react";
+import dayjs from "dayjs";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
 import SidebarCalendar from "../../components/flocks/SidebarCalendar";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router-dom";
+
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { getFlockDetails } from "../../../../store/slices/flockSlice";
+import { ENDPOINTS } from "../../../../services/api/endpoints";
+import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 
 const FlocksDetails = () => {
-  const [value] = useState<Dayjs | null>(dayjs());
-
-  const filteredActivities = flockActivities.filter((activity) => {
-    if (!value) return true;
-
-    return (
-      dayjs(activity.startDate).format("YYYY-MM-DD") ===
-      value.format("YYYY-MM-DD")
-    );
-  });
+  const { id } = useParams();
+  const { selected_flock, selected_flock_loading } = useAppSelector((state) => state.flock);
+  const dispatch = useAppDispatch();
+  
+    useEffect(() => {
+      dispatch(getFlockDetails(Number(id)));
+    }, [dispatch]);
 
   useEffect(() => {
     document.title = "Flock Details | Flockn Go";
   }, []);
+
+  if(selected_flock_loading){
+    return <FlockDetailsLoader />
+  }
 
   return (
     <>
@@ -32,12 +36,12 @@ const FlocksDetails = () => {
         <div
           className="relative h-[300px] overflow-hidden bg-cover bg-center"
           style={{
-            backgroundImage: `url(${flockDetail.coverImage})`,
+            backgroundImage: `url(${selected_flock?.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_flock?.cover_image_s3key) : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Objeomz7IceAvda_z3fdIwZo7_WiG_eHfg&s"})`,
             backgroundPosition: "center",
             backgroundPositionY: "center",
           }}
         >
-          {/* <img src={flockDetail.coverImage} alt="" className="h-full w-full" /> */}
+          {/* <img src={selected_flock.coverImage} alt="" className="h-full w-full" /> */}
           <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent" />
         </div>
 
@@ -48,11 +52,11 @@ const FlocksDetails = () => {
             <div className="flex flex-col gap-3">
               <div>
                 <h2 className="text-[28px] font-semibold">
-                  {flockDetail?.name}
+                  {selected_flock?.flock_name}
                 </h2>
 
                 <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-primary-dark/70">
-                  {flockDetail?.description}
+                  {selected_flock?.description}
                 </p>
               </div>
 
@@ -64,7 +68,7 @@ const FlocksDetails = () => {
                 />
 
                 <span className="underline underline-offset-4">
-                  {flockDetail.membersCount} Members
+                  {selected_flock?.participants_count} Members
                 </span>
               </div>
             </div>
@@ -122,51 +126,48 @@ const FlocksDetails = () => {
                 <h2 className="text-base font-medium bg-linear-to-bl from-btn-light to-btn01 to-65% bg-clip-text text-transparent">MAY 2026</h2>
 
                 <p className="text-sm text-primary-dark/60">
-                  {filteredActivities.length} Activities Found
+                  {selected_flock?.public_activities?.length} Activities Found
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-                {Array.from({ length: 50 }).map((_, index) => {
-                  const activity =
-                    flockActivities[index % flockActivities.length];
-
+                {selected_flock?.public_activities?.map((activity: any, index: number) => {
                   return (
-                    <div
+                    <Link to={`/flocks/${id}/activities/${activity?.id}/detail`}
                       key={index}
-                      className="flex flex-col gap-4 rounded-3xl hover:scale-105 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+                      className="flex flex-col gap-4 rounded-3xl hover:scale-105 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:p-2"
                     >
 
                       <div className="">
                       <p className="font-semibold text-base">
-                        {dayjs(activity.endDate).format("ddd, MMM D")}
+                        {dayjs(activity?.created_at).format("ddd, MMM D")}
                       </p>
                       </div>
                       <div className="flex items-center gap-4">
 
                       {/* IMAGE */}
                       <img
-                        src={activity.coverImage}
-                        alt={activity.title}
+                        src={activity?.cover_image[0] || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Objeomz7IceAvda_z3fdIwZo7_WiG_eHfg&s"}
+                        alt={activity?.name}
                         className="h-24 w-24 rounded-2xl object-cover"
                       />
                       <div className="">
                           <div className="flex flex-col items-start justify-between gap-2">
                             <h3 className="text-lg font-semibold">
-                              {activity.title.slice(0, 12).trim() }{activity.title.toString().length > 12 && "..."}
+                              {activity?.name.slice(0, 12).trim() }{activity?.name.toString().length > 12 && "..."}
                             </h3>
 
-                            <span className={`rounded-full ${activity.status === "draft" ? "bg-btn-biget03/50 border-2 border-btn-biget03" : activity.status === "scheduled" ? "bg-btn-biget01/50 border-2 border-btn-biget01" : "bg-btn-biget02/50 border-2 border-btn-biget02" } px-3 py-1 text-xs font-medium text-secondary`}>
-                              {activity.status}
+                            <span className={`rounded-full ${activity?.current_tab === "draft" ? "bg-btn-biget03/50 border-2 border-btn-biget03" : activity?.current_tab === "ONGOING" ? "bg-btn-biget01/50 border-2 border-btn-biget01" : "bg-btn-biget02/50 border-2 border-btn-biget02" } px-3 py-1 text-xs font-medium text-secondary`}>
+                              {activity?.current_tab}
                             </span>
                           </div>
                       </div>
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
 
-                {filteredActivities.length === 0 && (
+                {selected_flock?.public_activities?.length === 0 && (
                   <div className="rounded-3xl border bg-primary p-10 text-center shadow-sm">
                     <p className="text-primary-dark/60">
                       No activities found for selected date.

@@ -5,6 +5,7 @@ import SkeletonLoader from "./components/common/SkeletonLoader";
 
 const App = () => {
   const [loader, setLoader] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoader(false);

@@ -1,9 +1,13 @@
-import React from "react";
 import Modal from "react-modal";
+
+type LoginPopupProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
 
 Modal.setAppElement("#root");
 
-const LoginPopup = ({ isOpen, onClose }) => {
+const LoginPopup = ({ isOpen, onClose }: LoginPopupProps) => {
   return (
     <Modal
       isOpen={isOpen}

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { useLocation, useNavigationType } from "react-router";
+import { useLocation, useNavigationType } from "react-router-dom";
 
 const ScrollManager = (): null => {
   const location = useLocation();

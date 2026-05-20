@@ -1,11 +1,6 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import {
-  communityFlocks,
-  exploreActivities,
-  filterOptions,
-  nearbyActivities,
-} from "../../../../constants/data";
+import { exploreActivities, filterOptions, nearbyActivities } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
@@ -13,18 +8,17 @@ import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
+import { listFlocks } from "../../../../store/slices/flockSlice";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 
 const Home = () => {
-  const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("");
+  const { flocks, loading } = useAppSelector((state) => state.flock);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    dispatch(listFlocks("?is_discoverable=true&page=1"));
+  }, [dispatch]);
 
   useEffect(() => {
     document.title = "Home | Flockn Go";
@@ -126,7 +120,7 @@ const Home = () => {
       pb-2
     "
         >
-          {communityFlocks.slice(0, 5).map((flock) => (
+          {flocks?.slice(0, 5).map((flock: any, index: number) => (
             <div
               key={flock.id}
               className="
@@ -136,15 +130,15 @@ const Home = () => {
           flex-shrink-0
         "
             >
-              <CommunityFlocksCard card={flock} />
+              <CommunityFlocksCard card={flock} index={index} />
             </div>
           ))}
         </div>
 
         {/* Desktop Grid */}
         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
-          {communityFlocks.slice(0, 5).map((flock) => (
-            <CommunityFlocksCard key={flock.id} card={flock} />
+          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+            <CommunityFlocksCard key={flock.id} card={flock} index={index} />
           ))}
         </div>
       </section>

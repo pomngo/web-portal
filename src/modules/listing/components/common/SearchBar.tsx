@@ -8,7 +8,7 @@ import CalendarIcon from "../../../../components/icons/CalendarIcon";
 import LocationIcon from "../../../../components/icons/LocationIcon";
 import HeartIcon from "../../../../components/icons/HeartIcon";
 import { Icons } from "../../../../constants/icons";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const SearchBar = () => {
   const { location } = useUserLocation();

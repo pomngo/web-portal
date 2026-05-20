@@ -1,23 +1,21 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Icons } from "../../../../constants/icons";
-import { nearbyActivities } from "../../../../constants/data";
-import NearbyActivities from "../../components/home/NearbyActivities";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { listFlocks } from "../../../../store/slices/flockSlice";
+import NearbyFlock from "../../components/home/NearbyFlock";
 
 const AllFlocks = () => {
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { search_by } = useParams();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    const { flocks, loading } = useAppSelector((state) => state.flock);
+    const dispatch = useAppDispatch();
+  
+    useEffect(() => {
+      dispatch(listFlocks("?is_discoverable=true&page=1&offset=10"));
+    }, [dispatch]);
 
   useEffect(() => {
     document.title = "All Flocks | Flockn Go";
@@ -60,9 +58,9 @@ const AllFlocks = () => {
 
         {/* Activities List */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 gap-x-4 gap-y-16">
-          {nearbyActivities.map((activity) => (
-            <Link key={activity.id} to={`/flocks/${activity.id}/detail`}>
-              <NearbyActivities activity={activity} />
+          {flocks?.map((flock: any) => (
+            <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
+              <NearbyFlock flock={flock} />
             </Link>
           ))}
         </div>

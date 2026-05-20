@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 import TopNav from "./TopNav";
 import LabelBottomNavigation from "./LabelBottomNavigation";
 

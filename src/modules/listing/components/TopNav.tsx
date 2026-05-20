@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { images } from "../../../constants/images";
 import { navItems } from "../../../constants/data";

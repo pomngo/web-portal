@@ -1,28 +1,23 @@
-import { Link } from "react-router";
-import {
-  communityFlocks,
-  filterOptions,
-  nearbyActivities,
-} from "../../../../constants/data";
-import NearbyActivities from "../../components/home/NearbyActivities";
+import { Link } from "react-router-dom";
+import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
 import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { listFlocks } from "../../../../store/slices/flockSlice";
+import NearbyFlock from "../../components/home/NearbyFlock";
 
 const Flocks = () => {
-  const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    const { flocks, loading } = useAppSelector((state) => state.flock);
+    const dispatch = useAppDispatch();
+  
+    useEffect(() => {
+      dispatch(listFlocks());
+    }, [dispatch]);
 
   useEffect(() => {
     document.title = "Flocks | Flockn Go";
@@ -48,7 +43,7 @@ const Flocks = () => {
             </p>
           </div>
           <div className="">
-            <GradientLinkButton to="/activities/nearby-activities" />
+            <GradientLinkButton to="/flocks/nearby-flocks" />
           </div>
         </div>
 
@@ -61,28 +56,30 @@ const Flocks = () => {
     pb-2
   "
         >
-          {nearbyActivities.map((activity) => (
-            <div
-              key={activity.id}
+          {flocks?.slice(0, 5).map((flock: any) => (
+            <Link
+              key={flock.id}
+              to={`/flocks/${flock.id}/detail`}
+            
               className="
         min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
         snap-center
         flex-shrink-0
       "
             >
-              <NearbyActivities activity={activity} />
-            </div>
+              <NearbyFlock flock={flock} />
+            </Link>
           ))}
         </div>
 
         {/* Activities List */}
         <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {nearbyActivities.slice(0, 5).map((activity) => (
+          {flocks?.slice(0, 5).map((flock: any) => (
             <Link
-              key={activity.id}
-              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+              key={flock.id}
+              to={`/flocks/${flock.id}/detail`}
             >
-              <NearbyActivities activity={activity} />
+              <NearbyFlock flock={flock} />
             </Link>
           ))}
         </div>
@@ -123,7 +120,7 @@ const Flocks = () => {
       pb-2
     "
         >
-          {communityFlocks.slice(0, 5).map((flock) => (
+          {flocks?.slice(0, 5).map((flock: any, index: number) => (
             <div
               key={flock.id}
               className="
@@ -133,15 +130,15 @@ const Flocks = () => {
           flex-shrink-0
         "
             >
-              <CommunityFlocksCard card={flock} />
+              <CommunityFlocksCard card={flock} index={index} />
             </div>
           ))}
         </div>
 
         {/* Desktop Grid */}
         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
-          {communityFlocks.slice(0, 5).map((flock) => (
-            <CommunityFlocksCard key={flock.id} card={flock} />
+          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+            <CommunityFlocksCard key={flock.id} card={flock} index={index} />
           ))}
         </div>
       </section>

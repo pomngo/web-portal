@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Icons } from "../../../../constants/icons";
 import { nearbyActivities } from "../../../../constants/data";
 import NearbyActivities from "../../components/home/NearbyActivities";
