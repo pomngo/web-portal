@@ -10,25 +10,43 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { listFlocks } from "../../../../store/slices/flockSlice";
 import NearbyFlock from "../../components/home/NearbyFlock";
 
+import ErrorState from "../../../../components/common/ErrorState";
+
 const Flocks = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-    const { flocks, loading } = useAppSelector((state) => state.flock);
-    const dispatch = useAppDispatch();
-  
-    useEffect(() => {
-      if(flocks.length === 0){
-      dispatch(listFlocks("?is_discoverable=true&page=0"));
+  const { flocks, loading, error } = useAppSelector((state) => state.flock);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if(flocks.length === 0){
+      dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
     }
-    }, [dispatch]);
+  }, [dispatch, flocks.length]);
 
   useEffect(() => {
     document.title = "Flocks | Flockn Go";
   }, []);
 
-  if (loading) {
+  const handleRetry = () => {
+    dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
+  };
+
+  if (loading && flocks.length === 0) {
     return (
-      <div className="min-h-screen px-16 flex flex-col gap-16 py-10">
-        <HomeLoader />
+      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+        <HomeLoader type="flocks" />
+      </div>
+    );
+  }
+
+  if (error && flocks.length === 0) {
+    return (
+      <div className="min-h-screen px-16 flex items-center justify-center py-10">
+        <ErrorState
+          title="Unable to load Flocks"
+          message={error}
+          onRetry={handleRetry}
+        />
       </div>
     );
   }

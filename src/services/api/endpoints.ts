@@ -9,4 +9,8 @@ export const ENDPOINTS = {
     LIST: "/public/flocks/?is_discoverable=true",
     DETAILS: (id: string | number) => `/public/flocks/?flock_id=${id}`,
   },
+  ACTIVITY: {
+    LIST: "/public/activities/",
+    DETAILS: (id: string | number) => `/public/activities/?activity_id=${id}`,
+  },
 };

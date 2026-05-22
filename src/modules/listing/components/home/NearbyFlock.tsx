@@ -34,6 +34,9 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
           src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.not_found}`}
           alt={flock.flock_name}
           loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = images.not_found;
+          }}
           className="
             w-full h-full object-cover
             bg-primary-dark

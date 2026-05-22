@@ -1,42 +1,81 @@
-import { useEffect } from "react";
-import { flockDetail } from "../../../../constants/data";
+import { useEffect, useState } from "react";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { getActivitiesDetails } from "../../../../store/slices/activitySlice";
+import { ENDPOINTS } from "../../../../services/api/endpoints";
+import { images } from "../../../../constants/images";
+import dayjs from "dayjs";
+import { useParams } from "react-router-dom";
+import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
+import ErrorState from "../../../../components/common/ErrorState";
 
 const ActivitiesDetails = () => {
+  const { id } = useParams();
+  const activityId = Number(id);
+  const { selected_activities, selected_activities_id, selected_activities_loading, error } = useAppSelector((state) => state.activities);
+  const dispatch = useAppDispatch();
+
+  const [isCoverFallback, setIsCoverFallback] = useState(false);
+  const isFallback = !selected_activities?.cover_image?.[0] || isCoverFallback;
+
+  useEffect(() => {
+    if (selected_activities_id !== activityId) {
+      dispatch(getActivitiesDetails(activityId));
+    }
+  }, [dispatch, activityId, selected_activities_id]);
+
   useEffect(() => {
     document.title = "Activities Details | Flockn Go";
   }, []);
+
+  if (selected_activities_loading) {
+    return <ActivityDetailsLoader />;
+  }
+
+  if (error && !selected_activities) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+        <ErrorState
+          title="Activity Details Unavailable"
+          message={error}
+          onRetry={() => dispatch(getActivitiesDetails(activityId))}
+        />
+      </div>
+    );
+  }
   return (
     <>
       <DetailsTopNav />
 
       <div className="min-h-screen bg-[#F9F9F9]">
-        {/* COVER IMAGE */}
         <div
-          className="relative h-[300px] overflow-hidden bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${flockDetail.coverImage})`,
-            backgroundPosition: "center",
-            backgroundPositionY: "center",
-          }}
+          className="relative h-96 overflow-hidden bg-cover bg-center flex justify-center items-center bg-linear-to-b from-[10%_15%] via-nav02 to-nav01"
         >
-          {/* <img src={flockDetail.coverImage} alt="" className="h-full w-full" /> */}
-          <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent" />
+          <img
+            src={selected_activities?.cover_image?.[0] ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.cover_image[0]) : images.not_found}
+            alt={selected_activities?.name}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = images.not_found;
+              setIsCoverFallback(true);
+            }}
+            className={`h-full w-full lg:w-[90%] lg:rounded-b-xl ${isFallback ? "object-contain bg-slate-50 p-6" : "object-cover"}`}
+          />
+          {
+            selected_activities?.cover_image?.[0] && <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent lg:w-[90%]  lg:left-[5%] lg:rounded-b-xl" />}
+
         </div>
 
-        {/* FLOCK INFO */}
         <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-            {/* LEFT */}
             <div className="flex flex-col gap-3">
               <div>
                 <h2 className="text-[24px] font-bold text-primary-dark/80">
-                  {flockDetail?.name}
+                  {selected_activities?.name}
                 </h2>
 
                 <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-black/70">
-                  {flockDetail?.description}
+                  {selected_activities?.description}
                 </p>
               </div>
 
@@ -50,7 +89,7 @@ const ActivitiesDetails = () => {
                   <div className="flex items-center gap-1">
                     {" "}
                     <Icons.watch size={17} />{" "}
-                    <span className="">13 May, 2026 6AM</span>
+                    <span className="">{dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}</span>
                   </div>
                 </div>
                 <div className=""></div>
@@ -64,12 +103,11 @@ const ActivitiesDetails = () => {
                 />
 
                 <span className="underline underline-offset-4">
-                  {flockDetail.membersCount} Members
+                  {selected_activities?.flock_members_count || 0} Members
                 </span>
               </div>
             </div>
 
-            {/* RIGHT ACTIONS */}
             <div className="flex items-center gap-5">
               {[
                 {
@@ -104,48 +142,50 @@ const ActivitiesDetails = () => {
           </div>
         </div>
 
-        {/* CONTENT */}
-        <div className=" py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-2">
+        <div className="px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-2">
           <div className="flex gap-6">
-            {/* ACTIVITIES */}
-            <main className="flex-1 rounded-xl bg-primary p-8 flex flex-col lg:flex-row justify-between">
-              <div className="mb-6 flex items-center text-md gap-8 justify-between">
-                <div className="flex flex-col lg:flex-row items-center gap-8 text-base font-normal text-black/80">
-                  <div className="flex flex-col lg:flex-row text-center gap-2 items-center">
+            <main className="flex-1 rounded-xl bg-primary p-6 md:p-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-xs">
+              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center text-md gap-6 sm:gap-8 md:gap-12 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-base font-normal text-black/80">
+                  <div className="flex items-center gap-2">
                     <Icons.users
                       width={22}
                       height={22}
                       className="text-secondary"
                     />
-
-                    <span className=" text-secondary/80">Max Participants</span>
+                    <span className="text-secondary/80">Max Participants</span>
                   </div>
-                  <p className=" font-medium">Unlimited</p>
+                  <p className="font-medium pl-8 sm:pl-0">
+                    {selected_activities?.max_participants || selected_activities?.max_size || "N/A"}
+                  </p>
                 </div>
-                <div className="flex flex-col lg:flex-row items-center gap-8 text-base font-normal text-black/80">
-                  <div className="flex flex-col lg:flex-row text-center items-center gap-2">
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-base font-normal text-black/80">
+                  <div className="flex items-center gap-2">
                     <Icons.calendar
                       width={22}
                       height={22}
                       className="text-secondary"
                     />
-
-                    <span className=" text-secondary/80">
-                      Last Date to Join
-                    </span>
+                    <span className="text-secondary/80">Last Date to Join</span>
                   </div>
-                  <p className="font-medium text-nowrap">10 May, 2025</p>
+                  <p className="font-medium pl-8 sm:pl-0 text-nowrap">
+                    {selected_activities?.end_date_time
+                      ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY")
+                      : "N/A"}
+                  </p>
                 </div>
-                <div className="flex flex-col lg:flex-row text-center items-center gap-2 text-base font-normal text-black/80">
-                  <Icons.link size={17} className="text-secondary" />
 
-                  <span className="underline underline-offset-4 text-nowrap">
+                <div className="flex items-center gap-2 text-base font-normal text-black/80">
+                  <Icons.link size={17} className="text-secondary" />
+                  <span className="underline underline-offset-4 text-nowrap cursor-pointer hover:text-btn01 transition-colors">
                     Social Links
                   </span>
                 </div>
               </div>
-              <div className="mb-6 flex items-center justify-between">
-                <button className="bg-linear-to-tl from-btn01 to-btn02 to-75% rounded-xl p-2.5 w-full lg:w-sm text-white text-md font-medium">
+
+              <div className="w-full lg:w-sm flex justify-end">
+                <button className="bg-linear-to-tl from-btn01 to-btn02 to-75% rounded-xl py-3 px-6 w-full text-white text-md font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-xs">
                   Join
                 </button>
               </div>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import { exploreActivities, filterOptions, nearbyActivities } from "../../../../constants/data";
+import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
@@ -10,26 +10,50 @@ import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import { listFlocks } from "../../../../store/slices/flockSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { listActivities } from "../../../../store/slices/activitySlice";
+
+import ErrorState from "../../../../components/common/ErrorState";
 
 const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { flocks, loading } = useAppSelector((state) => state.flock);
+  const { flocks, loading: flockLoading, error: flockError } = useAppSelector((state) => state.flock);
+  const { activities, loading: activityLoading, error: activityError } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if(flocks.length === 0){
       dispatch(listFlocks("?is_discoverable=true"));
     }
-  }, [dispatch]);
+    if(activities.length === 0){
+      dispatch(listActivities());
+    }
+  }, [dispatch, flocks.length, activities.length]);
 
   useEffect(() => {
     document.title = "Home | Flockn Go";
   }, []);
 
-  if (loading) {
+  const handleRetry = () => {
+    dispatch(listFlocks("?is_discoverable=true"));
+    dispatch(listActivities());
+  };
+
+  if (flockLoading || activityLoading) {
     return (
-      <div className="min-h-screen px-16 flex flex-col gap-16 py-10">
-        <HomeLoader />
+      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+        <HomeLoader type="home" />
+      </div>
+    );
+  }
+
+  if ((flockError || activityError) && flocks.length === 0 && activities.length === 0) {
+    return (
+      <div className="min-h-screen px-16 flex items-center justify-center py-10">
+        <ErrorState
+          title="Unable to load Home Feed"
+          message={flockError || activityError || "An error occurred while fetching the feed."}
+          onRetry={handleRetry}
+        />
       </div>
     );
   }
@@ -60,7 +84,7 @@ const Home = () => {
     pb-2
   "
         >
-          {nearbyActivities.map((activity) => (
+          {activities?.map((activity) => (
             <div
               key={activity.id}
               className="
@@ -76,7 +100,7 @@ const Home = () => {
 
         {/* Activities List */}
         <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {nearbyActivities.slice(0, 5).map((activity) => (
+          {activities?.slice(0, 5).map((activity) => (
             <Link
               key={activity.id}
               to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
@@ -168,7 +192,7 @@ const Home = () => {
     pb-2
   "
         >
-          {exploreActivities.slice(0, 5).map((activity) => (
+          {activities?.slice(0, 5).map((activity) => (
             <div
               key={activity.id}
               className="
@@ -190,7 +214,7 @@ const Home = () => {
 
         {/* Desktop Grid */}
         <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {exploreActivities.slice(0, 5).map((activity) => (
+          {activities?.slice(0, 5).map((activity) => (
             <Link
               key={activity.id}
               to={`/flocks/${activity.id}/activities/${activity.id}/detail`}

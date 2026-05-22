@@ -13,6 +13,7 @@ type FlockPageArgs = {
 interface FlockState {
   flocks: FlockItem[];
   selected_flock: FlockItem | null;
+  selected_flock_id: number | null;
   selected_flock_loading: boolean;
   loading: boolean;
   page: number;
@@ -24,10 +25,11 @@ interface FlockState {
 const initialState: FlockState = {
   flocks: [],
   selected_flock: null,
+  selected_flock_id: null,
   selected_flock_loading: false,
   loading: true,
   page: 1,
-  offset: 10,
+  offset: 5,
   hasMore: true,
   error: null,
 };
@@ -74,7 +76,7 @@ export const fetchFlocksPage = createAsyncThunk<any, FlockPageArgs | void>(
   async (params: FlockPageArgs | void, { rejectWithValue }) => {
     try {
       const page = params?.page ?? 1;
-      const offset = params?.offset ?? 10;
+      const offset = params?.offset ?? 5;
       const filter = params?.filter ? `${params.filter}&page=${page}&offset=${offset}` : `page=${page}&offset=${offset}`;
       const url = buildListUrl(filter);
       const res = await api.get(url);
@@ -126,7 +128,8 @@ export const getFlockDetails = createAsyncThunk(
 const flockSlice = createSlice({
   name: "contact",
   initialState,
-  reducers: {},
+  reducers: {}
+  ,
   extraReducers: (builder) => {
     builder
       .addCase(listFlocks.pending, (state) => {
@@ -169,16 +172,22 @@ const flockSlice = createSlice({
         state.error = typeof payload === "string" ? payload : null;
       })
       .addCase(getFlockDetails.pending, (state) => {
-        state.selected_flock = null;
         state.selected_flock_loading = true;
+        state.error = null;
       })
       .addCase(getFlockDetails.fulfilled, (state, action) => {
-        state.selected_flock =
-          action.payload?.result ?? action.payload?.data ?? action.payload;
+        const flockData = action.payload?.result ?? action.payload?.data ?? action.payload;
+        state.selected_flock = flockData;
+        state.selected_flock_id = flockData?.flock_details?.id ?? null;
         state.selected_flock_loading = false;
+        state.error = null;
+      })
+      .addCase(getFlockDetails.rejected, (state, action) => {
+        state.selected_flock_loading = false;
+        const payload = action.payload;
+        state.error = typeof payload === "string" ? payload : "Failed to load details";
       })
   },
 });
 
-export const {} = flockSlice.actions;
 export default flockSlice.reducer;

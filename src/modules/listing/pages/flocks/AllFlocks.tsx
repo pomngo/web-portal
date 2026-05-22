@@ -8,17 +8,20 @@ import NearbyFlock from "../../components/home/NearbyFlock";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
 
+import ErrorState from "../../../../components/common/ErrorState";
+import HomeLoader from "../../../../components/common/HomeLoader";
+
 const AllFlocks = () => {
   const navigate = useNavigate();
   const { search_by } = useParams();
-  const { flocks, hasMore } = useAppSelector((state) => state.flock);
+  const { flocks, hasMore, loading, error } = useAppSelector((state) => state.flock);
   const [page, setPage] = useState(1);
   const dispatch = useAppDispatch();
 
   const fetchMore = async () => {
     const nextPage = page + 1;
     try {
-      await dispatch(fetchFlocksPage({ page: nextPage, offset: 10 })).unwrap();
+      await dispatch(fetchFlocksPage({ page: nextPage, offset: 5 })).unwrap();
       setPage(nextPage);
     } catch {
       // The hasMore flag is managed by the slice on failure.
@@ -26,13 +29,37 @@ const AllFlocks = () => {
   };
 
   useEffect(() => {
-    setPage(1);
-    dispatch(fetchFlocksPage({ page: 1, offset: 10 }));
+    dispatch(fetchFlocksPage({ page: 1, offset: 5 }));
   }, [dispatch]);
 
   useEffect(() => {
     document.title = "All Flocks | Flockn Go";
   }, []);
+
+  const handleRetry = () => {
+    dispatch(fetchFlocksPage({ page: 1, offset: 5 }));
+    setPage(1);
+  };
+
+  if (loading && flocks.length === 0) {
+    return (
+      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+        <HomeLoader type="all-flocks" />
+      </div>
+    );
+  }
+
+  if (error && flocks.length === 0) {
+    return (
+      <div className="min-h-screen px-16 flex items-center justify-center py-10">
+        <ErrorState
+          title="Unable to load Flocks"
+          message={error}
+          onRetry={handleRetry}
+        />
+      </div>
+    );
+  }
 
   return (
     <main className="h-screen px-4  sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
