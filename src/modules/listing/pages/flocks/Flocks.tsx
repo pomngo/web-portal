@@ -14,14 +14,14 @@ import ErrorState from "../../../../components/common/ErrorState";
 
 const Flocks = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { flocks, loading, error } = useAppSelector((state) => state.flock);
+  const { flocks, loading, error, isInitialized } = useAppSelector((state) => state.flock);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if(flocks.length === 0){
+    if (!isInitialized) {
       dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
     }
-  }, [dispatch, flocks.length]);
+  }, [dispatch, isInitialized]);
 
   useEffect(() => {
     document.title = "Flocks | Flockn Go";

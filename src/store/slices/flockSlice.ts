@@ -21,6 +21,7 @@ interface FlockState {
   hasMore: boolean;
   error: string | null;
   errorStatus: number | null;
+  isInitialized: boolean;
 }
 
 const initialState: FlockState = {
@@ -34,6 +35,7 @@ const initialState: FlockState = {
   hasMore: true,
   error: null,
   errorStatus: null,
+  isInitialized: false,
 };
 
 const buildListUrl = (filter?: string) => {
@@ -147,11 +149,13 @@ const flockSlice = createSlice({
         state.flocks = data?.result ?? data?.results ?? data ?? [];
         state.loading = false;
         state.error = null;
+        state.isInitialized = true;
       })
       .addCase(listFlocks.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload;
         state.error = typeof payload === "string" ? payload : null;
+        state.isInitialized = true;
       })
       .addCase(fetchFlocksPage.pending, (state) => {
         state.loading = true;
@@ -169,12 +173,14 @@ const flockSlice = createSlice({
         state.hasMore = Array.isArray(items) ? items.length === offset : false;
         state.loading = false;
         state.error = null;
+        state.isInitialized = true;
       })
       .addCase(fetchFlocksPage.rejected, (state, action) => {
         state.loading = false;
         state.hasMore = false;
         const payload = action.payload;
         state.error = typeof payload === "string" ? payload : null;
+        state.isInitialized = true;
       })
       .addCase(getFlockDetails.pending, (state) => {
         state.selected_flock_loading = true;

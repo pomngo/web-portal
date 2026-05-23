@@ -9,8 +9,11 @@ import LocationIcon from "../../../../components/icons/LocationIcon";
 import HeartIcon from "../../../../components/icons/HeartIcon";
 import { Icons } from "../../../../constants/icons";
 import { Link } from "react-router-dom";
+import { useAppDispatch } from "../../../../store/hooks";
+import { listActivities } from "../../../../store/slices/activitySlice";
 
 const SearchBar = () => {
+  const dispatch = useAppDispatch();
   const { location } = useUserLocation();
   const [value, setValue] = useState<Dayjs | null>(null);
 
@@ -98,9 +101,24 @@ const SearchBar = () => {
             <CalendarIcon />
             <div className={`flex flex-col`}>
               <p className="text-sm font-medium text-primary-dark">Date</p>
-              <span className="text-xs font-medium text-secondary/40 text-nowrap">
-                {!value ? "Select Date" : value.format("DD MMM YYYY")}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-medium text-secondary/40 text-nowrap">
+                  {!value ? "Select Date" : value.format("DD MMM YYYY")}
+                </span>
+                {value && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setValue(null);
+                      dispatch(listActivities());
+                    }}
+                    className="p-0.5 rounded-full hover:bg-slate-100 text-secondary/60 hover:text-secondary cursor-pointer transition-colors"
+                    title="Clear Date"
+                  >
+                    <Icons.close size={14} className="w-3.5 h-3.5 text-btn01" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           <Popover
@@ -126,7 +144,16 @@ const SearchBar = () => {
             />
           </Popover>
 
-          <button className="h-12 w-12 p-2 bg-btn-light/20 text-primary rounded-full flex justify-center items-center cursor-pointer active:scale-95 transition-all duration-200 animate-pulse">
+          <button
+            onClick={() => {
+              if (value) {
+                dispatch(listActivities(`?created_date=${value.format("YYYY-MM-DD")}`));
+              } else {
+                dispatch(listActivities());
+              }
+            }}
+            className="h-12 w-12 p-2 bg-btn-light/20 text-primary rounded-full flex justify-center items-center cursor-pointer active:scale-95 transition-all duration-200 animate-pulse"
+          >
             {/* <Icons.search className="text-btn01" /> */}
             <SearchIcon />
           </button>

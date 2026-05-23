@@ -16,18 +16,18 @@ import ErrorState from "../../../../components/common/ErrorState";
 
 const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { flocks, loading: flockLoading, error: flockError } = useAppSelector((state) => state.flock);
-  const { activities, loading: activityLoading, error: activityError } = useAppSelector((state) => state.activities);
+  const { flocks, loading: flockLoading, error: flockError, isInitialized: flockInitialized } = useAppSelector((state) => state.flock);
+  const { activities, loading: activityLoading, error: activityError, isInitialized: activityInitialized } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if(flocks.length === 0){
+    if (!flockInitialized) {
       dispatch(listFlocks("?is_discoverable=true"));
     }
-    if(activities.length === 0){
+    if (!activityInitialized) {
       dispatch(listActivities());
     }
-  }, [dispatch, flocks.length, activities.length]);
+  }, [dispatch, flockInitialized, activityInitialized]);
 
   useEffect(() => {
     document.title = "Home | Flockn Go";

@@ -16,14 +16,14 @@ import HomeLoader from "../../../../components/common/HomeLoader";
 
 const Activities = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { activities, loading, error } = useAppSelector((state) => state.activities);
+  const { activities, loading, error, isInitialized } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if(activities.length === 0){
+    if (!isInitialized) {
       dispatch(listActivities());
     }
-  }, [dispatch, activities.length]);
+  }, [dispatch, isInitialized]);
 
   useEffect(() => {
     document.title = "Activities | Flockn Go";

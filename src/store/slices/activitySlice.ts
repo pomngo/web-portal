@@ -31,6 +31,7 @@ interface ActivityState {
   hasMore: boolean;
   error: string | null;
   errorStatus: number | null;
+  isInitialized: boolean;
 }
 
 const initialState: ActivityState = {
@@ -44,6 +45,7 @@ const initialState: ActivityState = {
   hasMore: true,
   error: null,
   errorStatus: null,
+  isInitialized: false,
 };
 
 const buildListUrl = (filter?: string) => {
@@ -158,11 +160,13 @@ const activitiesSlice = createSlice({
         state.activities = data?.result ?? data?.results ?? data ?? [];
         state.loading = false;
         state.error = null;
+        state.isInitialized = true;
       })
       .addCase(listActivities.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload;
         state.error = typeof payload === "string" ? payload : null;
+        state.isInitialized = true;
       })
       .addCase(fetchActivitiesPage.pending, (state) => {
         state.loading = true;
@@ -183,12 +187,14 @@ const activitiesSlice = createSlice({
         state.hasMore = Array.isArray(items) ? items.length === offset : false;
         state.loading = false;
         state.error = null;
+        state.isInitialized = true;
       })
       .addCase(fetchActivitiesPage.rejected, (state, action) => {
         state.loading = false;
         state.hasMore = false;
         const payload = action.payload;
         state.error = typeof payload === "string" ? payload : null;
+        state.isInitialized = true;
       })
       .addCase(getActivitiesDetails.pending, (state) => {
         state.selected_activities_loading = true;
