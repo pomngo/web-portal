@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { listActivities } from "../../../../store/slices/activitySlice";
 
 import ErrorState from "../../../../components/common/ErrorState";
+import EmptyState from "../../../../components/common/EmptyState";
 
 const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
@@ -75,40 +76,46 @@ const Home = () => {
           </div>
         </div>
 
-        <div
-          className="
-    flex gap-4 overflow-x-auto
-    snap-x snap-mandatory
-    scrollbar-hide
-    lg:hidden
-    pb-2
-  "
-        >
-          {activities?.map((activity) => (
+        {activities?.length === 0 ? (
+          <EmptyState message="No nearby activities found" />
+        ) : (
+          <>
             <div
-              key={activity.id}
               className="
-        min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
-        snap-center
-        flex-shrink-0
+        flex gap-4 overflow-x-auto
+        snap-x snap-mandatory
+        scrollbar-hide
+        lg:hidden
+        pb-2
       "
             >
-              <NearbyActivities activity={activity} />
+              {activities?.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="
+            min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
+            snap-center
+            flex-shrink-0
+          "
+                >
+                  <NearbyActivities activity={activity} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Activities List */}
-        <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {activities?.slice(0, 5).map((activity) => (
-            <Link
-              key={activity.id}
-              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-            >
-              <NearbyActivities activity={activity} />
-            </Link>
-          ))}
-        </div>
+            {/* Activities List */}
+            <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+              {activities?.slice(0, 5).map((activity) => (
+                <Link
+                  key={activity.id}
+                  to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+                >
+                  <NearbyActivities activity={activity} />
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Filter button */}
         <div className="flex overflow-scroll mt-16 gap-4 overflow-y-hidden scrollbar-hide">
@@ -182,47 +189,53 @@ const Home = () => {
             <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-        {/* Mobile Carousel */}
-        <div
-          className="
-    flex gap-4 overflow-x-auto
-    snap-x snap-mandatory
-    scrollbar-hide
-    lg:hidden
-    pb-2
-  "
-        >
-          {activities?.slice(0, 5).map((activity) => (
+        {activities?.length === 0 ? (
+          <EmptyState message="No activities found" />
+        ) : (
+          <>
+            {/* Mobile Carousel */}
             <div
-              key={activity.id}
               className="
-        min-w-[85%]
-        sm:min-w-[65%]
-        md:min-w-[45%]
-        snap-center
-        flex-shrink-0
+        flex gap-4 overflow-x-auto
+        snap-x snap-mandatory
+        scrollbar-hide
+        lg:hidden
+        pb-2
       "
             >
-              <Link
-                to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-              >
-                <ExploreActivitiesCard activity={activity} />
-              </Link>
+              {activities?.slice(0, 5).map((activity) => (
+                <div
+                  key={activity.id}
+                  className="
+            min-w-[85%]
+            sm:min-w-[65%]
+            md:min-w-[45%]
+            snap-center
+            flex-shrink-0
+          "
+                >
+                  <Link
+                    to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+                  >
+                    <ExploreActivitiesCard activity={activity} />
+                  </Link>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Desktop Grid */}
-        <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {activities?.slice(0, 5).map((activity) => (
-            <Link
-              key={activity.id}
-              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-            >
-              <ExploreActivitiesCard activity={activity} />
-            </Link>
-          ))}
-        </div>
+            {/* Desktop Grid */}
+            <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+              {activities?.slice(0, 5).map((activity) => (
+                <Link
+                  key={activity.id}
+                  to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+                >
+                  <ExploreActivitiesCard activity={activity} />
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </section>
     </main>
   );
