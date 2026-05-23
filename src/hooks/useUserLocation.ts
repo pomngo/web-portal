@@ -13,10 +13,6 @@ export const useUserLocation = () => {
 
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    initializeLocation();
-  }, []);
-
   const initializeLocation = async () => {
     try {
       // 1. CHECK CACHE FIRST
@@ -34,12 +30,17 @@ export const useUserLocation = () => {
         await locationService.getCurrentLocation();
 
       setLocation(currentLocation);
-    } catch (err) {
+    } catch {
       setError("Unable to get location");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    initializeLocation();
+  }, []);
 
   return {
     location,

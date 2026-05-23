@@ -1,11 +1,6 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import {
-  communityFlocks,
-  exploreActivities,
-  filterOptions,
-  nearbyActivities,
-} from "../../../../constants/data";
+import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
@@ -13,27 +8,53 @@ import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
+import { listFlocks } from "../../../../store/slices/flockSlice";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { listActivities } from "../../../../store/slices/activitySlice";
+
+import ErrorState from "../../../../components/common/ErrorState";
+import EmptyState from "../../../../components/common/EmptyState";
 
 const Home = () => {
-  const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("");
+  const { flocks, loading: flockLoading, error: flockError, isInitialized: flockInitialized } = useAppSelector((state) => state.flock);
+  const { activities, loading: activityLoading, error: activityError, isInitialized: activityInitialized } = useAppSelector((state) => state.activities);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    if (!flockInitialized) {
+      dispatch(listFlocks("?is_discoverable=true"));
+    }
+    if (!activityInitialized) {
+      dispatch(listActivities());
+    }
+  }, [dispatch, flockInitialized, activityInitialized]);
 
   useEffect(() => {
     document.title = "Home | Flockn Go";
   }, []);
 
-  if (loading) {
+  const handleRetry = () => {
+    dispatch(listFlocks("?is_discoverable=true"));
+    dispatch(listActivities());
+  };
+
+  if (flockLoading || activityLoading) {
     return (
-      <div className="min-h-screen px-16 flex flex-col gap-16 py-10">
-        <HomeLoader />
+      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+        <HomeLoader type="home" />
+      </div>
+    );
+  }
+
+  if ((flockError || activityError) && flocks.length === 0 && activities.length === 0) {
+    return (
+      <div className="min-h-screen px-16 flex items-center justify-center py-10">
+        <ErrorState
+          title="Unable to load Home Feed"
+          message={flockError || activityError || "An error occurred while fetching the feed."}
+          onRetry={handleRetry}
+        />
       </div>
     );
   }
@@ -55,40 +76,46 @@ const Home = () => {
           </div>
         </div>
 
-        <div
-          className="
-    flex gap-4 overflow-x-auto
-    snap-x snap-mandatory
-    scrollbar-hide
-    lg:hidden
-    pb-2
-  "
-        >
-          {nearbyActivities.map((activity) => (
+        {activities?.length === 0 ? (
+          <EmptyState message="No nearby activities found" />
+        ) : (
+          <>
             <div
-              key={activity.id}
               className="
-        min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
-        snap-center
-        flex-shrink-0
+        flex gap-4 overflow-x-auto
+        snap-x snap-mandatory
+        scrollbar-hide
+        lg:hidden
+        pb-2
       "
             >
-              <NearbyActivities activity={activity} />
+              {activities?.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="
+            min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
+            snap-center
+            flex-shrink-0
+          "
+                >
+                  <NearbyActivities activity={activity} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Activities List */}
-        <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {nearbyActivities.slice(0, 5).map((activity) => (
-            <Link
-              key={activity.id}
-              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-            >
-              <NearbyActivities activity={activity} />
-            </Link>
-          ))}
-        </div>
+            {/* Activities List */}
+            <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+              {activities?.slice(0, 5).map((activity) => (
+                <Link
+                  key={activity.id}
+                  to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+                >
+                  <NearbyActivities activity={activity} />
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Filter button */}
         <div className="flex overflow-scroll mt-16 gap-4 overflow-y-hidden scrollbar-hide">
@@ -126,7 +153,7 @@ const Home = () => {
       pb-2
     "
         >
-          {communityFlocks.slice(0, 5).map((flock) => (
+          {flocks?.slice(0, 5).map((flock: any, index: number) => (
             <div
               key={flock.id}
               className="
@@ -136,15 +163,15 @@ const Home = () => {
           flex-shrink-0
         "
             >
-              <CommunityFlocksCard card={flock} />
+              <CommunityFlocksCard card={flock} index={index} />
             </div>
           ))}
         </div>
 
         {/* Desktop Grid */}
         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
-          {communityFlocks.slice(0, 5).map((flock) => (
-            <CommunityFlocksCard key={flock.id} card={flock} />
+          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+            <CommunityFlocksCard key={flock.id} card={flock} index={index} />
           ))}
         </div>
       </section>
@@ -162,47 +189,53 @@ const Home = () => {
             <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-        {/* Mobile Carousel */}
-        <div
-          className="
-    flex gap-4 overflow-x-auto
-    snap-x snap-mandatory
-    scrollbar-hide
-    lg:hidden
-    pb-2
-  "
-        >
-          {exploreActivities.slice(0, 5).map((activity) => (
+        {activities?.length === 0 ? (
+          <EmptyState message="No activities found" />
+        ) : (
+          <>
+            {/* Mobile Carousel */}
             <div
-              key={activity.id}
               className="
-        min-w-[85%]
-        sm:min-w-[65%]
-        md:min-w-[45%]
-        snap-center
-        flex-shrink-0
+        flex gap-4 overflow-x-auto
+        snap-x snap-mandatory
+        scrollbar-hide
+        lg:hidden
+        pb-2
       "
             >
-              <Link
-                to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-              >
-                <ExploreActivitiesCard activity={activity} />
-              </Link>
+              {activities?.slice(0, 5).map((activity) => (
+                <div
+                  key={activity.id}
+                  className="
+            min-w-[85%]
+            sm:min-w-[65%]
+            md:min-w-[45%]
+            snap-center
+            flex-shrink-0
+          "
+                >
+                  <Link
+                    to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+                  >
+                    <ExploreActivitiesCard activity={activity} />
+                  </Link>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Desktop Grid */}
-        <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {exploreActivities.slice(0, 5).map((activity) => (
-            <Link
-              key={activity.id}
-              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-            >
-              <ExploreActivitiesCard activity={activity} />
-            </Link>
-          ))}
-        </div>
+            {/* Desktop Grid */}
+            <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+              {activities?.slice(0, 5).map((activity) => (
+                <Link
+                  key={activity.id}
+                  to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+                >
+                  <ExploreActivitiesCard activity={activity} />
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </section>
     </main>
   );

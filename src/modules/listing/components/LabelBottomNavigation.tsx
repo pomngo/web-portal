@@ -2,7 +2,7 @@ import * as React from "react";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import { navItems } from "../../../constants/data";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 export default function LabelBottomNavigation() {
   const [value, setValue] = React.useState("/");

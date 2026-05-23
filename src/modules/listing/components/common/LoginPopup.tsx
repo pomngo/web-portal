@@ -1,9 +1,13 @@
-import React from "react";
 import Modal from "react-modal";
+
+type LoginPopupProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
 
 Modal.setAppElement("#root");
 
-const LoginPopup = ({ isOpen, onClose }) => {
+const LoginPopup = ({ isOpen, onClose }: LoginPopupProps) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -27,7 +31,7 @@ const LoginPopup = ({ isOpen, onClose }) => {
         beforeClose: "opacity-0 scale-95",
       }}
     >
-      <div className="w-[420px] bg-white rounded-3xl shadow-2xl shadow-secondary p-8 text-[14px]">
+      <div className="w-105 bg-white rounded-3xl shadow-2xl shadow-secondary p-8 text-[14px]">
         
         {/* Sign In */}
         <button className="w-full h-14 border border-gray-300 rounded-2xl font-semibold hover:text-secondary/90 transition duration-300">

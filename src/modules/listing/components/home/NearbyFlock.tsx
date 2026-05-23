@@ -2,27 +2,17 @@ import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 
-type NearbyActivitiesProps = {
-  activity: {
+type NearbyFlockProps = {
+  flock: {
     id: number;
-    name?: string;
-    title?: string;
-    campaign_location?: string;
-    cover_image_s3key?: string;
-    image?: string;
-    flock_members_count?: number;
+    flock_name: string;
+    location: string;
+    participants_count: number;
+    cover_image_s3key: string;
   };
 };
 
-const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
-  const imageUrl = activity?.cover_image_s3key
-    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
-    : activity?.image || images.not_found;
-
-  const activityName = activity?.name || activity?.title || "Title not found";
-  const location = activity?.campaign_location || "Location not found";
-  const members = activity?.flock_members_count || 0;
-
+const NearbyFlock = ({ flock }: NearbyFlockProps) => {
   return (
     <div
       className="
@@ -41,17 +31,19 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
       {/* Image */}
       <div className="w-full h-52 overflow-hidden rounded-2xl">
         <img
-          src={imageUrl}
-          alt={activityName}
+          src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.not_found}`}
+          alt={flock.flock_name}
           loading="lazy"
           onError={(e) => {
             (e.target as HTMLImageElement).src = images.not_found;
           }}
           className="
             w-full h-full object-cover
+            bg-primary-dark
             rounded-2xl
             hover:scale-110
             transition-all duration-500
+            
           "
         />
       </div>
@@ -59,17 +51,17 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
       {/* Content */}
       <div className="flex flex-col gap-1 mt-1">
         <h2 className="text-[16px] font-semibold line-clamp-1">
-          {activityName}
+          {flock.flock_name || "Title not found"}
         </h2>
 
         <p className="text-secondary text-[12px] flex items-center gap-1">
           <Icons.map height={14} width={14} />
-          {location}
+          {flock.location || "location not found"}
         </p>
 
         <p className="text-secondary text-[12px] flex items-center gap-1">
           <Icons.users height={14} width={14} />
-          {members} members
+          {flock.participants_count || 0} members
         </p>
       </div>
 
@@ -92,4 +84,4 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
   );
 };
 
-export default NearbyActivities;
+export default NearbyFlock;

@@ -1,11 +1,14 @@
 import { Icons } from "../../../../constants/icons";
+import { images } from "../../../../constants/images";
+import { ENDPOINTS } from "../../../../services/api/endpoints";
 
 export type ExploreActivity = {
   id: number;
-  title: string;
-  location: string;
-  members: number;
-  image: string;
+  name: string;
+  campaign_location: string;
+  flock_members_count: number;
+  cover_image_s3key?: string;
+  image?: string;
 };
 
 type ExploreActivitiesCardProps = {
@@ -13,29 +16,36 @@ type ExploreActivitiesCardProps = {
 };
 
 const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
+  const imageUrl = activity?.cover_image_s3key
+    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
+    : activity?.image || images.not_found;
+
   return (
     <div className="flex flex-col gap-3 active:scale-95 cursor-pointer hover:scale-105 hover:z-99 hover:bg-white transition-all duration-200">
       <div className="w-full h-52 overflow-hidden rounded-2xl">
         <img
-          src={activity.image}
-          alt={activity.title}
+          src={imageUrl}
+          alt={activity?.name || "Activity"}
           loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = images.not_found;
+          }}
           className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-all duration-300"
         />
       </div>
 
       <div className="flex flex-col gap-0.5 mt-2">
-        <h2 className="text-[16px] font-semibold">{activity.title}</h2>
+        <h2 className="text-[16px] font-semibold">{activity?.name || "Title not found"}</h2>
 
         <div className="flex items-center gap-4">
           <p className="text-secondary text-[12px] flex items-center gap-1">
             <Icons.map height={14} width={14} />
-            {activity.location}
+            {activity?.campaign_location || "Location not found"}
           </p>
 
           <p className="text-secondary text-[12px] flex items-center gap-1">
             <Icons.users height={14} width={14} />
-            {activity.members} members
+            {activity?.flock_members_count || 0} members
           </p>
         </div>
       </div>
