@@ -41,7 +41,7 @@ const initialState: ActivityState = {
   selected_activities_loading: false,
   loading: true,
   page: 1,
-  offset: 10,
+  offset: 5,
   hasMore: true,
   error: null,
   errorStatus: null,

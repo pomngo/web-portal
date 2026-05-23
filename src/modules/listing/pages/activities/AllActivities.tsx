@@ -18,11 +18,11 @@ const AllActivities = () => {
 
   // Initial load
   useEffect(() => {
-    dispatch(fetchActivitiesPage({ page: 1, offset: 10 }));
+    dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
   }, [dispatch]);
 
   const handleRetry = () => {
-    dispatch(fetchActivitiesPage({ page: 1, offset: 10 }));
+    dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
   };
 
   // Intersection Observer for infinite scroll
@@ -31,7 +31,7 @@ const AllActivities = () => {
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoadingMore && !loading) {
           setIsLoadingMore(true);
-          dispatch(fetchActivitiesPage({ page: page + 1, offset: 10 })).then(() =>
+          dispatch(fetchActivitiesPage({ page: page + 1, offset: 5 })).then(() =>
             setIsLoadingMore(false)
           ).catch(() => setIsLoadingMore(false));
         }
