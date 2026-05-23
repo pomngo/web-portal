@@ -17,6 +17,9 @@ import {
   Utensils,
   Link,
   Search,
+  Info,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import RightArrow from "../components/icons/RightArrow";
 import LeftArrow from "../components/icons/LeftArrow";
@@ -33,10 +36,14 @@ export const Icons = {
   calendar: CalendarDays,
   search: SearchIcon,
   serarch1: Search,
+  searchLucide: Search,
   map: MapPin,
   rightArrow: RightArrow,
   leftArrow: LeftArrow,
   campass: CompassIcon,
+  info: Info,
+  alertTriangle: AlertTriangle,
+  refresh: RefreshCw,
 
   // Filter icons
   watch: Clock3,

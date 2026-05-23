@@ -6,14 +6,14 @@ import { getActivitiesDetails } from "../../../../store/slices/activitySlice";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { images } from "../../../../constants/images";
 import dayjs from "dayjs";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
   const activityId = Number(id);
-  const { selected_activities, selected_activities_id, selected_activities_loading, error } = useAppSelector((state) => state.activities);
+  const { selected_activities, selected_activities_id, selected_activities_loading, error, errorStatus } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
   const [isCoverFallback, setIsCoverFallback] = useState(false);
@@ -34,6 +34,33 @@ const ActivitiesDetails = () => {
   }
 
   if (error && !selected_activities) {
+    const isNotFound = errorStatus === 404 || error.toLowerCase().includes("not found") || error.toLowerCase().includes("does not exist");
+    
+    if (isNotFound) {
+      return (
+        <>
+          <DetailsTopNav />
+          <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-[#F9F9F9]">
+            <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-slate-100 rounded-3xl shadow-xs max-w-md mx-auto my-12 animate-fade-in">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-400 mb-6">
+                <Icons.serarch1 size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Activity Not Found</h3>
+              <p className="text-slate-500 text-sm mb-8 max-w-xs leading-relaxed">
+                This activity may have been deleted, or the URL link you followed might be incorrect.
+              </p>
+              <Link
+                to="/activities"
+                className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-semibold bg-linear-to-tr from-btn02 to-btn01 transition-all duration-300 hover:scale-105 active:scale-95 shadow-md shadow-orange-500/10 cursor-pointer"
+              >
+                Go to Activities
+              </Link>
+            </div>
+          </div>
+        </>
+      );
+    }
+
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
         <ErrorState

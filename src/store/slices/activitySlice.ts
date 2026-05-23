@@ -30,6 +30,7 @@ interface ActivityState {
   offset: number;
   hasMore: boolean;
   error: string | null;
+  errorStatus: number | null;
 }
 
 const initialState: ActivityState = {
@@ -42,6 +43,7 @@ const initialState: ActivityState = {
   offset: 10,
   hasMore: true,
   error: null,
+  errorStatus: null,
 };
 
 const buildListUrl = (filter?: string) => {
@@ -122,18 +124,21 @@ export const getActivitiesDetails = createAsyncThunk(
         return res.data;
       } else {
         console.error("Failed to fetch activities", res.status, res.statusText);
-        return rejectWithValue("Failed get activities");
+        return rejectWithValue({ message: "Failed get activities", status: res.status });
       }
     } catch (error: unknown) {
       console.error("listActivities error", error);
+      const status = typeof error === "object" && error !== null && "response" in error
+        ? (error as any).response?.status
+        : null;
       const message =
         typeof error === "object" && error !== null && "response" in error
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? (error as any).response?.data?.message
+          ? (error as any).response?.data?.message || (error as any).response?.data?.detail
           : error instanceof Error
             ? error.message
             : "Unknown error";
-      return rejectWithValue(message || "Unknown error");
+      return rejectWithValue({ message: message || "Unknown error", status });
     }
   }
 );
@@ -187,7 +192,10 @@ const activitiesSlice = createSlice({
       })
       .addCase(getActivitiesDetails.pending, (state) => {
         state.selected_activities_loading = true;
+        state.selected_activities = null;
+        state.selected_activities_id = null;
         state.error = null;
+        state.errorStatus = null;
       })
       .addCase(getActivitiesDetails.fulfilled, (state, action) => {
         const activityData = action.payload?.result ?? action.payload?.data ?? action.payload;
@@ -195,11 +203,20 @@ const activitiesSlice = createSlice({
         state.selected_activities_id = activityData?.id ?? null;
         state.selected_activities_loading = false;
         state.error = null;
+        state.errorStatus = null;
       })
       .addCase(getActivitiesDetails.rejected, (state, action) => {
         state.selected_activities_loading = false;
+        state.selected_activities = null;
+        state.selected_activities_id = null;
         const payload = action.payload;
-        state.error = typeof payload === "string" ? payload : "Failed to load details";
+        if (payload && typeof payload === "object" && "message" in payload) {
+          state.error = (payload as any).message;
+          state.errorStatus = (payload as any).status;
+        } else {
+          state.error = typeof payload === "string" ? payload : "Failed to load details";
+          state.errorStatus = null;
+        }
       })
   },
 });

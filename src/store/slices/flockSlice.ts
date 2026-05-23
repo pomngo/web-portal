@@ -20,6 +20,7 @@ interface FlockState {
   offset: number;
   hasMore: boolean;
   error: string | null;
+  errorStatus: number | null;
 }
 
 const initialState: FlockState = {
@@ -32,6 +33,7 @@ const initialState: FlockState = {
   offset: 5,
   hasMore: true,
   error: null,
+  errorStatus: null,
 };
 
 const buildListUrl = (filter?: string) => {
@@ -110,17 +112,20 @@ export const getFlockDetails = createAsyncThunk(
         return res.data;
       } else {
         console.error("Failed to fetch flocks", res.status, res.statusText);
-        return rejectWithValue("Failed get flocks");
+        return rejectWithValue({ message: "Failed get flocks", status: res.status });
       }
     } catch (error: unknown) {
       console.error("listFlocks error", error);
+      const status = typeof error === "object" && error !== null && "response" in error
+        ? (error as any).response?.status
+        : null;
       const message =
         typeof error === "object" && error !== null && "response" in error
-          ? (error as any).response?.data?.message
+          ? (error as any).response?.data?.message || (error as any).response?.data?.detail
           : error instanceof Error
           ? error.message
           : "Unknown error";
-      return rejectWithValue(message || "Unknown error");
+      return rejectWithValue({ message: message || "Unknown error", status });
     }
   }
 );
@@ -173,7 +178,10 @@ const flockSlice = createSlice({
       })
       .addCase(getFlockDetails.pending, (state) => {
         state.selected_flock_loading = true;
+        state.selected_flock = null;
+        state.selected_flock_id = null;
         state.error = null;
+        state.errorStatus = null;
       })
       .addCase(getFlockDetails.fulfilled, (state, action) => {
         const flockData = action.payload?.result ?? action.payload?.data ?? action.payload;
@@ -181,11 +189,20 @@ const flockSlice = createSlice({
         state.selected_flock_id = flockData?.flock_details?.id ?? null;
         state.selected_flock_loading = false;
         state.error = null;
+        state.errorStatus = null;
       })
       .addCase(getFlockDetails.rejected, (state, action) => {
         state.selected_flock_loading = false;
+        state.selected_flock = null;
+        state.selected_flock_id = null;
         const payload = action.payload;
-        state.error = typeof payload === "string" ? payload : "Failed to load details";
+        if (payload && typeof payload === "object" && "message" in payload) {
+          state.error = (payload as any).message;
+          state.errorStatus = (payload as any).status;
+        } else {
+          state.error = typeof payload === "string" ? payload : "Failed to load details";
+          state.errorStatus = null;
+        }
       })
   },
 });
