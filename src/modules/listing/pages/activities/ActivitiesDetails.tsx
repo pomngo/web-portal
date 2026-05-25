@@ -1,23 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getActivitiesDetails } from "../../../../store/slices/activitySlice";
-import { ENDPOINTS } from "../../../../services/api/endpoints";
-import { images } from "../../../../constants/images";
 import dayjs from "dayjs";
 import { useParams, Link } from "react-router-dom";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
+import DetailBanner from "../../components/common/DetailBanner";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
   const activityId = Number(id);
   const { selected_activities, selected_activities_id, selected_activities_loading, error, errorStatus } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
-
-  const [isCoverFallback, setIsCoverFallback] = useState(false);
-  const isFallback = !selected_activities?.cover_image?.[0] || isCoverFallback;
 
   useEffect(() => {
     if (selected_activities_id !== activityId) {
@@ -35,7 +31,7 @@ const ActivitiesDetails = () => {
 
   if (error && !selected_activities) {
     const isNotFound = errorStatus === 404 || error.toLowerCase().includes("not found") || error.toLowerCase().includes("does not exist");
-    
+
     if (isNotFound) {
       return (
         <>
@@ -76,23 +72,10 @@ const ActivitiesDetails = () => {
       <DetailsTopNav />
 
       <div className="min-h-screen bg-[#F9F9F9]">
-        <div
-          className="relative h-96 overflow-hidden bg-cover bg-center flex justify-center items-center bg-linear-to-b from-[10%_15%] via-nav02 to-nav01"
-        >
-          <img
-            src={selected_activities?.cover_image?.[0] ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.cover_image[0]) : images.not_found}
-            alt={selected_activities?.name}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = images.not_found;
-              setIsCoverFallback(true);
-            }}
-            className={`h-full w-full lg:w-[90%] lg:rounded-b-xl ${isFallback ? "object-contain bg-slate-50 p-6" : "object-cover"}`}
-          />
-          {
-            selected_activities?.cover_image?.[0] && <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent lg:w-[90%]  lg:left-[5%] lg:rounded-b-xl" />}
-
-        </div>
-
+        <DetailBanner
+          coverImage={selected_activities?.cover_image?.[0]}
+          altText={selected_activities?.name}
+        />
         <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-3">
@@ -111,7 +94,7 @@ const ActivitiesDetails = () => {
                   <div className="flex items-center gap-1">
                     {" "}
                     <Icons.map size={17} />{" "}
-                    <span className="">Pawana lake, Pune</span>
+                    <span className="">{selected_activities?.campaign_location}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {" "}

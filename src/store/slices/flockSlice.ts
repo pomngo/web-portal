@@ -2,7 +2,16 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../services/api/axios";
 import { ENDPOINTS } from "../../services/api/endpoints";
 
-type FlockItem = Record<string, any>;
+export interface FlockItem {
+  id: number;
+  flock_name: string;
+  location: string;
+  participants_count: number;
+  cover_image_s3key: string;
+  description?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
 
 type FlockPageArgs = {
   page?: number;
@@ -50,7 +59,23 @@ const buildListUrl = (filter?: string) => {
   return `${ENDPOINTS.CAMPAIGN.LIST}${query}`;
 };
 
-export const listFlocks = createAsyncThunk<any, string | void>(
+const normalizeFlockList = (payload: unknown): FlockItem[] => {
+  const raw = typeof payload === "object" && payload !== null && "data" in payload
+    ? (payload as { data: unknown }).data
+    : payload;
+
+  if (Array.isArray(raw)) return raw as FlockItem[];
+  if (raw && typeof raw === "object") {
+    const obj = raw as Record<string, unknown>;
+    if (Array.isArray(obj.result)) return obj.result as FlockItem[];
+    if (Array.isArray(obj.results)) return obj.results as FlockItem[];
+    if (Array.isArray(obj.data)) return obj.data as FlockItem[];
+  }
+
+  return [];
+};
+
+export const listFlocks = createAsyncThunk<unknown, string | void>(
   "flock/listFlocks",
   async (filter: string | void, { rejectWithValue }) => {
     try {
@@ -66,7 +91,7 @@ export const listFlocks = createAsyncThunk<any, string | void>(
       console.error("listFlocks error", error);
       const message =
         typeof error === "object" && error !== null && "response" in error
-          ? (error as any).response?.data?.message
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : error instanceof Error
           ? error.message
           : "Unknown error";
@@ -75,7 +100,7 @@ export const listFlocks = createAsyncThunk<any, string | void>(
   },
 );
 
-export const fetchFlocksPage = createAsyncThunk<any, FlockPageArgs | void>(
+export const fetchFlocksPage = createAsyncThunk<{ data: unknown; page: number; offset: number }, FlockPageArgs | void>(
   "flock/fetchFlocksPage",
   async (params: FlockPageArgs | void, { rejectWithValue }) => {
     try {
@@ -94,7 +119,7 @@ export const fetchFlocksPage = createAsyncThunk<any, FlockPageArgs | void>(
       console.error("fetchFlocksPage error", error);
       const message =
         typeof error === "object" && error !== null && "response" in error
-          ? (error as any).response?.data?.message
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : error instanceof Error
           ? error.message
           : "Unknown error";
@@ -119,11 +144,12 @@ export const getFlockDetails = createAsyncThunk(
     } catch (error: unknown) {
       console.error("listFlocks error", error);
       const status = typeof error === "object" && error !== null && "response" in error
-        ? (error as any).response?.status
+        ? (error as { response?: { status?: number } }).response?.status
         : null;
       const message =
         typeof error === "object" && error !== null && "response" in error
-          ? (error as any).response?.data?.message || (error as any).response?.data?.detail
+          ? (error as { response?: { data?: { message?: string; detail?: string } } }).response?.data?.message ||
+            (error as { response?: { data?: { message?: string; detail?: string } } }).response?.data?.detail
           : error instanceof Error
           ? error.message
           : "Unknown error";
@@ -144,9 +170,8 @@ const flockSlice = createSlice({
         state.error = null;
       })
       .addCase(listFlocks.fulfilled, (state, action) => {
-        // Normalize response: prefer payload.result or payload.results arrays, otherwise payload itself
         const data = action.payload;
-        state.flocks = data?.result ?? data?.results ?? data ?? [];
+        state.flocks = normalizeFlockList(data);
         state.loading = false;
         state.error = null;
         state.isInitialized = true;
@@ -162,15 +187,15 @@ const flockSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchFlocksPage.fulfilled, (state, action) => {
-        const payload = action.payload?.data ?? action.payload;
-        const page = action.payload?.page ?? 1;
-        const offset = action.payload?.offset ?? state.offset;
-        const items = payload?.result ?? payload?.results ?? payload ?? [];
+        const payload = action.payload.data;
+        const page = action.payload.page;
+        const offset = action.payload.offset;
+        const items = normalizeFlockList(payload);
 
         state.flocks = page > 1 ? [...state.flocks, ...items] : items;
         state.page = page;
         state.offset = offset;
-        state.hasMore = Array.isArray(items) ? items.length === offset : false;
+        state.hasMore = items.length === offset;
         state.loading = false;
         state.error = null;
         state.isInitialized = true;
@@ -203,8 +228,8 @@ const flockSlice = createSlice({
         state.selected_flock_id = null;
         const payload = action.payload;
         if (payload && typeof payload === "object" && "message" in payload) {
-          state.error = (payload as any).message;
-          state.errorStatus = (payload as any).status;
+          state.error = (payload as { message: string }).message;
+          state.errorStatus = (payload as { status?: number | null }).status ?? null;
         } else {
           state.error = typeof payload === "string" ? payload : "Failed to load details";
           state.errorStatus = null;

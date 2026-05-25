@@ -21,6 +21,8 @@ const Home = () => {
   const { activities, loading: activityLoading, error: activityError, isInitialized: activityInitialized } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
+  const flockList = flocks;
+
   useEffect(() => {
     if (!flockInitialized) {
       dispatch(listFlocks("?is_discoverable=true"));
@@ -47,7 +49,7 @@ const Home = () => {
     );
   }
 
-  if ((flockError || activityError) && flocks.length === 0 && activities.length === 0) {
+  if ((flockError || activityError) && flockList.length === 0 && activities.length === 0) {
     return (
       <div className="min-h-screen px-16 flex items-center justify-center py-10">
         <ErrorState
@@ -153,7 +155,7 @@ const Home = () => {
       pb-2
     "
         >
-          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+          {flockList.slice(0, 5).map((flock, index) => (
             <div
               key={flock.id}
               className="
@@ -170,7 +172,7 @@ const Home = () => {
 
         {/* Desktop Grid */}
         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
-          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+          {flockList.slice(0, 5).map((flock, index) => (
             <CommunityFlocksCard key={flock.id} card={flock} index={index} />
           ))}
         </div>

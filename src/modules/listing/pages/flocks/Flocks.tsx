@@ -17,6 +17,8 @@ const Flocks = () => {
   const { flocks, loading, error, isInitialized } = useAppSelector((state) => state.flock);
   const dispatch = useAppDispatch();
 
+  const flockList = flocks;
+
   useEffect(() => {
     if (!isInitialized) {
       dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
@@ -31,7 +33,7 @@ const Flocks = () => {
     dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
   };
 
-  if (loading && flocks.length === 0) {
+  if (loading && flockList.length === 0) {
     return (
       <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
         <HomeLoader type="flocks" />
@@ -39,7 +41,7 @@ const Flocks = () => {
     );
   }
 
-  if (error && flocks.length === 0) {
+  if (error && flockList.length === 0) {
     return (
       <div className="min-h-screen px-16 flex items-center justify-center py-10">
         <ErrorState
@@ -76,7 +78,7 @@ const Flocks = () => {
     pb-2
   "
         >
-          {flocks?.slice(0, 5).map((flock: any) => (
+          {flockList.slice(0, 5).map((flock) => (
             <Link
               key={flock.id}
               to={`/flocks/${flock.id}/detail`}
@@ -94,7 +96,7 @@ const Flocks = () => {
 
         {/* Activities List */}
         <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
-          {flocks?.slice(0, 5).map((flock: any) => (
+          {flockList.slice(0, 5).map((flock) => (
             <Link
               key={flock.id}
               to={`/flocks/${flock.id}/detail`}
@@ -140,7 +142,7 @@ const Flocks = () => {
       pb-2
     "
         >
-          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+          {flockList.slice(0, 5).map((flock, index) => (
             <div
               key={flock.id}
               className="
@@ -157,7 +159,7 @@ const Flocks = () => {
 
         {/* Desktop Grid */}
         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
-          {flocks?.slice(0, 5).map((flock: any, index: number) => (
+          {flockList.slice(0, 5).map((flock, index) => (
             <CommunityFlocksCard key={flock.id} card={flock} index={index} />
           ))}
         </div>
