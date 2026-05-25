@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import dayjs from "dayjs";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
@@ -6,11 +6,11 @@ import SidebarCalendar from "../../components/flocks/SidebarCalendar";
 import { Link, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { getFlockDetails } from "../../../../store/slices/flockSlice";
-import { ENDPOINTS } from "../../../../services/api/endpoints";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import { images } from "../../../../constants/images";
 import ErrorState from "../../../../components/common/ErrorState";
 import type { ActivityItem } from "../../../../store/slices/activitySlice";
+import DetailBanner from "../../components/common/DetailBanner";
 
 const FlocksDetails = () => {
   const { id } = useParams();
@@ -18,8 +18,7 @@ const FlocksDetails = () => {
   const { selected_flock, selected_flock_id, selected_flock_loading, error, errorStatus } = useAppSelector((state) => state.flock);
   const dispatch = useAppDispatch();
 
-  const [isCoverFallback, setIsCoverFallback] = useState(false);
-  const isFallback = !selected_flock?.flock_details?.cover_image_s3key || isCoverFallback;
+  // DetailBanner handles cover image fallback state internally.
 
   useEffect(() => {
     if (selected_flock_id !== flockId) {
@@ -79,23 +78,10 @@ const FlocksDetails = () => {
       <DetailsTopNav />
 
       <div className="min-h-screen bg-[#F9F9F9]">
-        <div
-          className={`relative ${isFallback ? "h-64" : "h-96"} overflow-hidden bg-cover bg-center flex justify-center items-center `}
-        >
-          <img
-            src={selected_flock?.flock_details?.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_flock?.flock_details?.cover_image_s3key) : images.not_found}
-            alt={selected_flock?.flock_details?.flock_name}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = images.not_found;
-              setIsCoverFallback(true);
-            }}
-            className={`${isFallback ? "max-h-48 w-auto object-contain rounded-2xl p-4 bg-slate-50/50" : "h-full w-full lg:w-[90%] lg:rounded-b-xl object-cover"}`}
-          />
-          {
-            selected_flock?.flock_details?.cover_image_s3key && <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent lg:w-[90%]  lg:left-[5%] lg:rounded-b-xl" />
-          }
-
-        </div>
+        <DetailBanner
+          coverImage={selected_flock?.flock_details?.cover_image_s3key}
+          altText={selected_flock?.flock_details?.flock_name}
+        />
 
         <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
