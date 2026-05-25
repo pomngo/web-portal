@@ -3,18 +3,18 @@ import type { CardType } from "../../../../types";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { images } from "../../../../constants/images";
 
-type CommunityFlocksCardProps = { 
-  card: { 
-    id: number; 
-    flock_name?: string; 
-    title?: string; 
-    description?: string | ""; 
-    cover_image_s3key?: string | null; 
-    image?: string; 
-    type?: CardType; 
-  }; 
-  index?: number; 
-}; 
+type CommunityFlocksCardProps = {
+  card: {
+    id: number;
+    flock_name?: string;
+    title?: string;
+    description?: string | "";
+    cover_image_s3key?: string | null;
+    image?: string;
+    type?: CardType;
+  };
+  index?: number;
+};
 
 const cardClasses = {
   1: `
@@ -49,7 +49,7 @@ const cardClasses = {
     h-[370px]
   `,
 };
-const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
+const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
   const classKey = ((index % 5) + 1) as 1 | 2 | 3 | 4 | 5;
   const classes = cardClasses[classKey] ?? "";
   const description = card.description?.toString() ?? "";
@@ -63,7 +63,6 @@ const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
         hover:scale-105 hover:z-auto active:scale-95
         transition-all duration-300
         ${classes}
-        ${!card.cover_image_s3key ? "bg-slate-50 border border-slate-100" : ""}
       `}
       style={
         card.cover_image_s3key
@@ -76,7 +75,7 @@ const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
           <img
             src={images.not_found}
             alt="No cover"
-            className="max-h-20 w-auto opacity-30 group-hover:scale-105 transition-transform duration-300"
+            className="max-h-40 w-auto opacity-30 group-hover:scale-105 transition-transform duration-300"
           />
         </div>
       )}
@@ -84,8 +83,7 @@ const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
       <div
         className="
           absolute inset-0
-          bg-linear-to-t from-black/90 via-black/40 to-transparent
-          opacity-60 group-hover:opacity-100
+          bg-linear-to-t from-black/50 via-black/40 to-black/10
           transition-all duration-500
         "
       />
@@ -124,10 +122,10 @@ const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
       {/* Extra Hover Layer */}
       <div>
 
-              <h3 className="text-2xl font-bold mb-2 leading-tight">
-                {card?.flock_name ?? card?.title}
-              </h3>
-          transition duration-200
+        <h3 className="text-2xl font-bold mb-2 leading-tight">
+          {card?.flock_name ?? card?.title}
+        </h3>
+        transition duration-200
         "
       </div>
     </Link>

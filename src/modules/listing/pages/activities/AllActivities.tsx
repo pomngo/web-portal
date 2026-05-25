@@ -1,20 +1,20 @@
 import { Link, useParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import PageHeader from "../../../../components/common/PageHeader";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { fetchActivitiesPage } from "../../../../store/slices/activitySlice";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import ErrorState from "../../../../components/common/ErrorState";
 
 const AllActivities = () => {
   const { search_by } = useParams();
   const dispatch = useAppDispatch();
-  const { activities, loading, page, hasMore, error } = useAppSelector((state) => state.activities);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const observerTarget = useRef<HTMLDivElement>(null);
+  const { activities, loading, hasMore, error } = useAppSelector((state) => state.activities);
+  const [page, setPage] = useState(1);
 
   // Initial load
   useEffect(() => {
@@ -23,33 +23,18 @@ const AllActivities = () => {
 
   const handleRetry = () => {
     dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
+    setPage(1);
   };
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMore && !loading) {
-          setIsLoadingMore(true);
-          dispatch(fetchActivitiesPage({ page: page + 1, offset: 5 })).then(() =>
-            setIsLoadingMore(false)
-          ).catch(() => setIsLoadingMore(false));
-        }
-      },
-      { threshold: 0.1, rootMargin: "50px" }
-    );
-
-    const target = observerTarget.current;
-    if (target) {
-      observer.observe(target);
+  const fetchMore = async () => {
+    const nextPage = page + 1;
+    try {
+      await dispatch(fetchActivitiesPage({ page: nextPage, offset: 5 })).unwrap();
+      setPage(nextPage);
+    } catch {
+      // Managed by the slice
     }
-
-    return () => {
-      if (target) {
-        observer.unobserve(target);
-      }
-    };
-  }, [dispatch, hasMore, isLoadingMore, loading, page]);
+  };
 
   useEffect(() => {
     document.title = "All Activities | Flockn Go";
@@ -84,33 +69,30 @@ const AllActivities = () => {
         <PageHeader slug={search_by} />
 
         {/* Activities List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-x-4 gap-y-16">
-          {activityList.map((activity) => (
-            <Link
-              key={activity.id}
-              to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-            >
-              <NearbyActivities activity={activity} />
-            </Link>
-          ))}
-        </div>
-
-        {/* Intersection Observer Target - placed before loading indicator */}
-        <div ref={observerTarget} className="h-10 mt-8" />
-
-        {/* Loading More Indicator */}
-        {isLoadingMore && (
-          <div className="mt-8">
+        <InfiniteScroll
+          dataLength={activityList.length}
+          next={fetchMore}
+          hasMore={hasMore}
+          loader={<div className=" flex flex-col gap-16 py-10">
             <ScrollLoader />
+          </div>}
+          endMessage={
+            <p className="text-center my-6 font-medium py-4 text-sm text-secondary">
+              No more activities to load.
+            </p>
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-x-4 gap-y-16">
+            {activityList.map((activity) => (
+              <Link
+                key={activity.id}
+                to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
+              >
+                <NearbyActivities activity={activity} />
+              </Link>
+            ))}
           </div>
-        )}
-
-        {/* No More Data Message */}
-        {!hasMore && !loading && activityList.length > 0 && (
-          <div className="text-center mt-8">
-            <p className="text-secondary text-base">No more activities to load</p>
-          </div>
-        )}
+        </InfiniteScroll>
       </section>
     </main>
   );

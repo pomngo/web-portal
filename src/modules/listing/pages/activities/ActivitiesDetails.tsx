@@ -15,8 +15,6 @@ const ActivitiesDetails = () => {
   const { selected_activities, selected_activities_id, selected_activities_loading, error, errorStatus } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
-  // DetailBanner handles cover image fallback state internally.
-
   useEffect(() => {
     if (selected_activities_id !== activityId) {
       dispatch(getActivitiesDetails(activityId));
@@ -96,7 +94,7 @@ const ActivitiesDetails = () => {
                   <div className="flex items-center gap-1">
                     {" "}
                     <Icons.map size={17} />{" "}
-                    <span className="">Pawana lake, Pune</span>
+                    <span className="">{selected_activities?.campaign_location}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {" "}
