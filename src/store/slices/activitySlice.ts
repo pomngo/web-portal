@@ -131,7 +131,7 @@ export const getActivitiesDetails = createAsyncThunk(
     } catch (error: unknown) {
       console.error("listActivities error", error);
       const status = typeof error === "object" && error !== null && "response" in error
-        ? (error as any).response?.status
+        ? (error as { response?: { status?: number } }).response?.status
         : null;
       const message =
         typeof error === "object" && error !== null && "response" in error
@@ -217,8 +217,8 @@ const activitiesSlice = createSlice({
         state.selected_activities_id = null;
         const payload = action.payload;
         if (payload && typeof payload === "object" && "message" in payload) {
-          state.error = (payload as any).message;
-          state.errorStatus = (payload as any).status;
+          state.error = (payload as { message: string }).message;
+          state.errorStatus = (payload as { status?: number | null }).status ?? null;
         } else {
           state.error = typeof payload === "string" ? payload : "Failed to load details";
           state.errorStatus = null;

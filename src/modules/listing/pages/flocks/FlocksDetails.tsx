@@ -10,6 +10,7 @@ import { ENDPOINTS } from "../../../../services/api/endpoints";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import { images } from "../../../../constants/images";
 import ErrorState from "../../../../components/common/ErrorState";
+import type { ActivityItem } from "../../../../store/slices/activitySlice";
 
 const FlocksDetails = () => {
   const { id } = useParams();
@@ -176,7 +177,7 @@ const FlocksDetails = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-                {selected_flock?.public_activities?.map((activity: any, index: number) => {
+                {selected_flock?.public_activities?.map((activity: ActivityItem, index: number) => {
                   return (
                     <Link to={`/flocks/${id}/activities/${activity?.id}/detail`}
                       key={index}
