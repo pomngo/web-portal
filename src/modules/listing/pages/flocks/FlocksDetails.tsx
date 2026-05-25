@@ -37,7 +37,7 @@ const FlocksDetails = () => {
 
   if (error && !selected_flock) {
     const isNotFound = errorStatus === 404 || error.toLowerCase().includes("not found") || error.toLowerCase().includes("does not exist");
-    
+
     if (isNotFound) {
       return (
         <>
@@ -80,7 +80,7 @@ const FlocksDetails = () => {
 
       <div className="min-h-screen bg-[#F9F9F9]">
         <div
-          className="relative h-96 overflow-hidden bg-cover bg-center flex justify-center items-center bg-linear-to-b from-[10%_15%] via-nav02 to-nav01"
+          className={`relative ${isFallback ? "h-64" : "h-96"} overflow-hidden bg-cover bg-center flex justify-center items-center `}
         >
           <img
             src={selected_flock?.flock_details?.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_flock?.flock_details?.cover_image_s3key) : images.not_found}
@@ -89,7 +89,7 @@ const FlocksDetails = () => {
               (e.target as HTMLImageElement).src = images.not_found;
               setIsCoverFallback(true);
             }}
-            className={`h-full w-full lg:w-[90%] lg:rounded-b-xl ${isFallback ? "object-contain bg-slate-50 p-6" : "object-cover"}`}
+            className={`${isFallback ? "max-h-48 w-auto object-contain rounded-2xl p-4 bg-slate-50/50" : "h-full w-full lg:w-[90%] lg:rounded-b-xl object-cover"}`}
           />
           {
             selected_flock?.flock_details?.cover_image_s3key && <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent lg:w-[90%]  lg:left-[5%] lg:rounded-b-xl" />

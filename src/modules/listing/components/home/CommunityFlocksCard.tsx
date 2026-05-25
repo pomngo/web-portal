@@ -58,16 +58,28 @@ const CommunityFlocksCard = ({ card, index=1 }: CommunityFlocksCardProps) => {
       to={`/flocks/${card.id}/detail`}
       className={`
         block w-full
-  relative overflow-hidden rounded-3xl
+        relative overflow-hidden rounded-3xl
         bg-cover bg-center group cursor-pointer
         hover:scale-105 hover:z-auto active:scale-95
         transition-all duration-300
         ${classes}
+        ${!card.cover_image_s3key ? "bg-slate-50 border border-slate-100" : ""}
       `}
-      style={{
-        backgroundImage: `url(${card.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card?.cover_image_s3key) : images.not_found})`,
-      }}
+      style={
+        card.cover_image_s3key
+          ? { backgroundImage: `url(${ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card.cover_image_s3key)})` }
+          : undefined
+      }
     >
+      {!card.cover_image_s3key && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4">
+          <img
+            src={images.not_found}
+            alt="No cover"
+            className="max-h-20 w-auto opacity-30 group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+      )}
       {/* Dark Animated Overlay */}
       <div
         className="
