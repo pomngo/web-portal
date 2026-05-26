@@ -21,57 +21,43 @@ const LoginPopup = ({ isOpen, onClose }: LoginPopupProps) => {
         beforeClose: "opacity-0",
       }}
       className={{
-        base: `
-          absolute top-20 right-10
-          outline-none
-          transition-all duration-300
-          opacity-0 scale-95
-        `,
-        afterOpen: "opacity-100 scale-100",
-        beforeClose: "opacity-0 scale-95",
+        base: `absolute top-20 right-10 scale-95 opacity-0 transition-all duration-300 outline-none`,
+        afterOpen: "scale-100 opacity-100",
+        beforeClose: "scale-95 opacity-0",
       }}
     >
-      <div className="w-105 bg-white rounded-3xl shadow-2xl shadow-secondary p-8 text-[14px]">
-        
+      <div className="shadow-secondary w-105 rounded-3xl bg-white p-8 text-[14px] shadow-2xl">
         {/* Sign In */}
-        <button className="w-full h-14 border border-gray-300 rounded-2xl font-semibold hover:text-secondary/90 transition duration-300">
+        <button className="hover:text-secondary/90 h-14 w-full rounded-2xl border border-gray-300 font-semibold transition duration-300">
           Sign In
         </button>
 
         {/* Create Account */}
-        <button className="w-full h-14 mt-5 rounded-2xl font-medium text-primary bg-linear-to-r from-btn02 to-btn01 to-65% hover:opacity-90 transition duration-300 shadow-md">
+        <button className="text-primary from-btn02 to-btn01 mt-5 h-14 w-full rounded-2xl bg-linear-to-r to-65% font-medium shadow-md transition duration-300 hover:opacity-90">
           Create Account
         </button>
 
         {/* Divider */}
-        <div className="flex items-center my-6">
-          <div className="flex-1 h-px bg-secondary/20"></div>
-          <span className="mx-4 text-secondary/40 text-sm">OR</span>
-          <div className="flex-1 h-px bg-secondary/20"></div>
+        <div className="my-6 flex items-center">
+          <div className="bg-secondary/20 h-px flex-1"></div>
+          <span className="text-secondary/40 mx-4 text-sm">OR</span>
+          <div className="bg-secondary/20 h-px flex-1"></div>
         </div>
 
         {/* Google */}
-        <button className="w-full h-14 border border-secondary/20 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-50 transition duration-300">
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="google"
-            className="w-6 h-6"
-          />
-          <span className="font-medium">
-            Continue With Google
-          </span>
+        <button className="border-secondary/20 flex h-14 w-full items-center justify-center gap-3 rounded-2xl border transition duration-300 hover:bg-gray-50">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="google" className="h-6 w-6" />
+          <span className="font-medium">Continue With Google</span>
         </button>
 
         {/* Apple */}
-        <button className="w-full h-14 mt-4 border border-secondary/20 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-50 transition duration-300">
+        <button className="border-secondary/20 mt-4 flex h-14 w-full items-center justify-center gap-3 rounded-2xl border transition duration-300 hover:bg-gray-50">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
             alt="apple"
-            className="w-5 h-5"
+            className="h-5 w-5"
           />
-          <span className="font-medium" >
-            Continue With Apple
-          </span>
+          <span className="font-medium">Continue With Apple</span>
         </button>
       </div>
     </Modal>

@@ -5,5 +5,5 @@ import image_not_found from "../assets/images/Image-not-found.png";
 export const images = {
   logo: logo,
   flock_banner: flock_banner,
-  not_found: image_not_found
+  not_found: image_not_found,
 };

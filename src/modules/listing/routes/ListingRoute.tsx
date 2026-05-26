@@ -19,10 +19,7 @@ const ListingRoute = () => {
         <Route path="activities/:search_by" element={<AllActivities />} />
       </Route>
       <Route path="/flocks/:id/detail" element={<FlocksDetails />} />
-      <Route
-        path="/flocks/:id/activities/:id/detail"
-        element={<ActivitiesDetails />}
-      />
+      <Route path="/flocks/:id/activities/:id/detail" element={<ActivitiesDetails />} />
     </Routes>
   );
 };

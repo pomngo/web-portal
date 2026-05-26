@@ -37,18 +37,18 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-slate-100 rounded-3xl shadow-xs max-w-md mx-auto my-12 animate-fade-in">
-      <div className={`flex items-center justify-center w-16 h-16 rounded-full mb-6 ${getIconClass()}`}>
+    <div className="animate-fade-in mx-auto my-12 flex max-w-md flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white p-8 text-center shadow-xs">
+      <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-full ${getIconClass()}`}>
         {getIcon()}
       </div>
-      <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
-      <p className="text-slate-500 text-sm mb-8 max-w-xs leading-relaxed">
+      <h3 className="mb-2 text-xl font-bold text-slate-800">{title}</h3>
+      <p className="mb-8 max-w-xs text-sm leading-relaxed text-slate-500">
         {message || "We encountered an issue fetching the data. Please try again."}
       </p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-semibold bg-linear-to-tr from-btn02 to-btn01 transition-all duration-300 hover:scale-105 active:scale-95 shadow-md shadow-orange-500/10 cursor-pointer"
+          className="from-btn02 to-btn01 flex cursor-pointer items-center gap-2 rounded-2xl bg-linear-to-tr px-6 py-3 font-semibold text-white shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-105 active:scale-95"
         >
           <Icons.refresh size={16} />
           Retry

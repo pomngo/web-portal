@@ -56,14 +56,7 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
   return (
     <Link
       to={`/flocks/${card.id}/detail`}
-      className={`
-        block w-full
-        relative overflow-hidden rounded-3xl
-        bg-cover bg-center group cursor-pointer
-        hover:scale-105 hover:z-auto active:scale-95
-        transition-all duration-300
-        ${classes}
-      `}
+      className={`group relative block w-full cursor-pointer overflow-hidden rounded-3xl bg-cover bg-center transition-all duration-300 hover:z-auto hover:scale-105 active:scale-95 ${classes} `}
       style={
         card.cover_image_s3key
           ? { backgroundImage: `url(${ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card.cover_image_s3key)})` }
@@ -71,49 +64,28 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
       }
     >
       {!card.cover_image_s3key && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
           <img
             src={images.not_found}
             alt="No cover"
-            className="max-h-40 w-auto opacity-30 group-hover:scale-105 transition-transform duration-300"
+            className="max-h-40 w-auto opacity-30 transition-transform duration-300 group-hover:scale-105"
           />
         </div>
       )}
       {/* Dark Animated Overlay */}
-      <div
-        className="
-          absolute inset-0
-          bg-linear-to-t from-black/50 via-black/40 to-black/10
-          transition-all duration-500
-        "
-      />
+      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/40 to-black/10 transition-all duration-500" />
 
       {/* Content */}
       <div className="relative z-10 flex h-full items-end p-6 text-white">
-        <div
-          className="
-            transform transition-all duration-500 ease-out
-            translate-y-10 opacity-0
-            group-hover:translate-y-0
-            group-hover:opacity-100
-          "
-        >
-          <h3 className="text-2xl font-bold mb-2 leading-tight">
-            {card?.flock_name}
-          </h3>
+        <div className="translate-y-10 transform opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+          <h3 className="mb-2 text-2xl leading-tight font-bold">{card?.flock_name}</h3>
 
-          <p className="text-sm text-shadow-primary text-primary/80 mb-4 max-w-64">
-            {description.slice(0, 25).trim()}{description.length > 0 && "..."}
+          <p className="text-shadow-primary text-primary/80 mb-4 max-w-64 text-sm">
+            {description.slice(0, 25).trim()}
+            {description.length > 0 && "..."}
           </p>
 
-          <button
-            className="
-              bg-linear-to-tl from-btn02 to-btn01 to-65%
-              transition-all duration-300
-              px-5 py-2 rounded-xl
-              text-sm font-semibold shadow-lg cursor-pointer active:scale-95
-            "
-          >
+          <button className="from-btn02 to-btn01 cursor-pointer rounded-xl bg-linear-to-tl to-65% px-5 py-2 text-sm font-semibold shadow-lg transition-all duration-300 active:scale-95">
             Join Now
           </button>
         </div>
@@ -121,12 +93,8 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
 
       {/* Extra Hover Layer */}
       <div>
-
-        <h3 className="text-2xl font-bold mb-2 leading-tight">
-          {card?.flock_name ?? card?.title}
-        </h3>
-        transition duration-200
-        "
+        <h3 className="mb-2 text-2xl leading-tight font-bold">{card?.flock_name ?? card?.title}</h3>
+        transition duration-200 "
       </div>
     </Link>
   );

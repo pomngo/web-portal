@@ -14,22 +14,9 @@ type NearbyFlockProps = {
 
 const NearbyFlock = ({ flock }: NearbyFlockProps) => {
   return (
-    <div
-      className="
-        w-full
-        rounded-2xl
-        bg-white
-        p-3
-        flex flex-col gap-3
-        cursor-pointer
-        active:scale-95
-        hover:scale-[1.02]
-        transition-all duration-300
-        shadow-sm hover:shadow-lg
-      "
-    >
+    <div className="flex w-full cursor-pointer flex-col gap-3 rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95">
       {/* Image */}
-      <div className="w-full h-52 overflow-hidden rounded-2xl">
+      <div className="h-52 w-full overflow-hidden rounded-2xl">
         <img
           src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.not_found}`}
           alt={flock.flock_name}
@@ -37,47 +24,27 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
           onError={(e) => {
             (e.target as HTMLImageElement).src = images.not_found;
           }}
-          className="
-            w-full h-full object-cover
-            bg-primary-dark
-            rounded-2xl
-            hover:scale-110
-            transition-all duration-500
-            
-          "
+          className="bg-primary-dark h-full w-full rounded-2xl object-cover transition-all duration-500 hover:scale-110"
         />
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-1 mt-1">
-        <h2 className="text-[16px] font-semibold line-clamp-1">
-          {flock.flock_name || "Title not found"}
-        </h2>
+      <div className="mt-1 flex flex-col gap-1">
+        <h2 className="line-clamp-1 text-[16px] font-semibold">{flock.flock_name || "Title not found"}</h2>
 
-        <p className="text-secondary text-[12px] flex items-center gap-1">
+        <p className="text-secondary flex items-center gap-1 text-[12px]">
           <Icons.map height={14} width={14} />
           {flock.location || "location not found"}
         </p>
 
-        <p className="text-secondary text-[12px] flex items-center gap-1">
+        <p className="text-secondary flex items-center gap-1 text-[12px]">
           <Icons.users height={14} width={14} />
           {flock.participants_count || 0} members
         </p>
       </div>
 
       {/* Button */}
-      <button
-        className="
-          w-full rounded-xl
-          bg-linear-to-tr from-btn02 to-btn01 to-75%
-          px-5 py-2 text-primary
-          transition-all duration-300
-          hover:scale-[1.02]
-          active:scale-95
-          cursor-pointer
-          mt-3
-        "
-      >
+      <button className="from-btn02 to-btn01 text-primary mt-3 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-5 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95">
         Join Now
       </button>
     </div>

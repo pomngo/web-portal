@@ -5,15 +5,10 @@ type HomeLoaderProps = {
 };
 
 const CardSkeleton = () => (
-  <div className="w-full rounded-2xl bg-white p-3 flex flex-col gap-3 border border-slate-100 shadow-xs">
-    <Skeleton
-      variant="rounded"
-      width="100%"
-      height={208}
-      sx={{ borderRadius: "16px" }}
-    />
-    
-    <div className="flex flex-col gap-2 mt-1">
+  <div className="flex w-full flex-col gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-xs">
+    <Skeleton variant="rounded" width="100%" height={208} sx={{ borderRadius: "16px" }} />
+
+    <div className="mt-1 flex flex-col gap-2">
       <Skeleton variant="text" width="80%" height={24} />
       <div className="flex items-center gap-1.5">
         <Skeleton variant="circular" width={14} height={14} />
@@ -25,12 +20,7 @@ const CardSkeleton = () => (
       </div>
     </div>
 
-    <Skeleton
-      variant="rounded"
-      width="100%"
-      height={40}
-      sx={{ borderRadius: "12px" }}
-    />
+    <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: "12px" }} />
   </div>
 );
 
@@ -47,18 +37,13 @@ const BentoFlockCardSkeleton = ({ index }: { index: number }) => {
 
   return (
     <div className={`relative overflow-hidden rounded-3xl ${classes}`}>
-      <Skeleton
-        variant="rectangular"
-        width="100%"
-        height="100%"
-        sx={{ borderRadius: "24px" }}
-      />
+      <Skeleton variant="rectangular" width="100%" height="100%" sx={{ borderRadius: "24px" }} />
     </div>
   );
 };
 
 const CategoryFiltersSkeleton = () => (
-  <div className="flex gap-4 overflow-x-auto py-2 scrollbar-hide">
+  <div className="scrollbar-hide flex gap-4 overflow-x-auto py-2">
     {Array.from({ length: 7 }).map((_, index) => (
       <Skeleton
         key={index}
@@ -72,39 +57,27 @@ const CategoryFiltersSkeleton = () => (
   </div>
 );
 
-const SectionHeaderSkeleton = ({
-  hasSubtitle = true,
-}: {
-  hasSubtitle?: boolean;
-}) => (
-  <div className="flex justify-between items-center mb-4">
-    <div className="flex flex-col gap-1.5 w-2/3">
+const SectionHeaderSkeleton = ({ hasSubtitle = true }: { hasSubtitle?: boolean }) => (
+  <div className="mb-4 flex items-center justify-between">
+    <div className="flex w-2/3 flex-col gap-1.5">
       <Skeleton variant="text" width="40%" height={32} />
       {hasSubtitle && <Skeleton variant="text" width="65%" height={20} />}
     </div>
-    <Skeleton
-      variant="rounded"
-      width={120}
-      height={36}
-      sx={{ borderRadius: "12px" }}
-    />
+    <Skeleton variant="rounded" width={120} height={36} sx={{ borderRadius: "12px" }} />
   </div>
 );
 
 const ResponsiveCardListSkeleton = () => (
   <>
-    <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide lg:hidden pb-2">
+    <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
       {Array.from({ length: 5 }).map((_, index) => (
-        <div
-          key={index}
-          className="min-w-[85%] sm:min-w-[65%] md:min-w-[45%] snap-center flex-shrink-0"
-        >
+        <div key={index} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
           <CardSkeleton />
         </div>
       ))}
     </div>
 
-    <div className="hidden lg:grid lg:grid-cols-5 gap-4">
+    <div className="hidden gap-4 lg:grid lg:grid-cols-5">
       {Array.from({ length: 5 }).map((_, index) => (
         <CardSkeleton key={index} />
       ))}
@@ -114,18 +87,15 @@ const ResponsiveCardListSkeleton = () => (
 
 const ResponsiveBentoFlockListSkeleton = () => (
   <>
-    <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide lg:hidden pb-2">
+    <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
       {Array.from({ length: 5 }).map((_, index) => (
-        <div
-          key={index}
-          className="min-w-[90%] sm:min-w-[70%] snap-center flex-shrink-0 h-[370px]"
-        >
+        <div key={index} className="h-[370px] min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
           <BentoFlockCardSkeleton index={index} />
         </div>
       ))}
     </div>
 
-    <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
+    <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
       {Array.from({ length: 5 }).map((_, index) => (
         <BentoFlockCardSkeleton key={index} index={index} />
       ))}
@@ -137,17 +107,12 @@ const HomeLoader = ({ type = "home" }: HomeLoaderProps) => {
   if (type === "all-activities" || type === "all-flocks") {
     return (
       <section className="w-full">
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Skeleton variant="text" width={220} height={40} />
-          <Skeleton
-            variant="rounded"
-            width={100}
-            height={36}
-            sx={{ borderRadius: "12px" }}
-          />
+          <Skeleton variant="rounded" width={100} height={36} sx={{ borderRadius: "12px" }} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {Array.from({ length: 10 }).map((_, index) => (
             <CardSkeleton key={index} />
           ))}
@@ -158,7 +123,7 @@ const HomeLoader = ({ type = "home" }: HomeLoaderProps) => {
 
   if (type === "flocks") {
     return (
-      <div className="flex flex-col gap-16 w-full">
+      <div className="flex w-full flex-col gap-16">
         <section>
           <SectionHeaderSkeleton />
           <ResponsiveCardListSkeleton />
@@ -177,7 +142,7 @@ const HomeLoader = ({ type = "home" }: HomeLoaderProps) => {
 
   if (type === "activities") {
     return (
-      <div className="flex flex-col gap-16 w-full">
+      <div className="flex w-full flex-col gap-16">
         <section>
           <SectionHeaderSkeleton />
           <ResponsiveCardListSkeleton />
@@ -195,7 +160,7 @@ const HomeLoader = ({ type = "home" }: HomeLoaderProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-16 w-full">
+    <div className="flex w-full flex-col gap-16">
       <section>
         <SectionHeaderSkeleton />
         <ResponsiveCardListSkeleton />

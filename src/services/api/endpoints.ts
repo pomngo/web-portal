@@ -3,7 +3,7 @@
 export const ENDPOINTS = {
   BASE_URL: {
     BASE_API_URL: import.meta.env.VITE_API_BASE_URL,
-    BASE_IMAGE_URL: (url: string)=>`${import.meta.env.VITE_IMAGE_URL}/${url}`,
+    BASE_IMAGE_URL: (url: string) => `${import.meta.env.VITE_IMAGE_URL}/${url}`,
   },
   CAMPAIGN: {
     LIST: "/public/flocks/?is_discoverable=true",

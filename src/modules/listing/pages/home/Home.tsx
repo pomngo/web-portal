@@ -17,8 +17,18 @@ import EmptyState from "../../../../components/common/EmptyState";
 
 const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { flocks, loading: flockLoading, error: flockError, isInitialized: flockInitialized } = useAppSelector((state) => state.flock);
-  const { activities, loading: activityLoading, error: activityError, isInitialized: activityInitialized } = useAppSelector((state) => state.activities);
+  const {
+    flocks,
+    loading: flockLoading,
+    error: flockError,
+    isInitialized: flockInitialized,
+  } = useAppSelector((state) => state.flock);
+  const {
+    activities,
+    loading: activityLoading,
+    error: activityError,
+    isInitialized: activityInitialized,
+  } = useAppSelector((state) => state.activities);
   const dispatch = useAppDispatch();
 
   const flockList = flocks;
@@ -43,7 +53,7 @@ const Home = () => {
 
   if (flockLoading || activityLoading) {
     return (
-      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <HomeLoader type="home" />
       </div>
     );
@@ -51,7 +61,7 @@ const Home = () => {
 
   if ((flockError || activityError) && flockList.length === 0 && activities.length === 0) {
     return (
-      <div className="min-h-screen px-16 flex items-center justify-center py-10">
+      <div className="flex min-h-screen items-center justify-center px-16 py-10">
         <ErrorState
           title="Unable to load Home Feed"
           message={flockError || activityError || "An error occurred while fetching the feed."}
@@ -62,16 +72,14 @@ const Home = () => {
   }
 
   return (
-    <main className="min-h-screen px-4  sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+    <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* Nearby Activities */}
       <section className="">
         {/* Heading */}
-        <div className="flex justify-between mb-4">
+        <div className="mb-4 flex justify-between">
           <div className="">
             <TitleText title="Nearby Activities" />
-            <p className="text-secondary text-base">
-              Enable your location to get personalized results.
-            </p>
+            <p className="text-secondary text-base">Enable your location to get personalized results.</p>
           </div>
           <div className="">
             <GradientLinkButton to="/activities/nearby-activities" />
@@ -82,36 +90,18 @@ const Home = () => {
           <EmptyState message="No nearby activities found" />
         ) : (
           <>
-            <div
-              className="
-        flex gap-4 overflow-x-auto
-        snap-x snap-mandatory
-        scrollbar-hide
-        lg:hidden
-        pb-2
-      "
-            >
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
               {activities?.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="
-            min-w-[85%] sm:min-w-[65%] md:min-w-[45%]
-            snap-center
-            flex-shrink-0
-          "
-                >
+                <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
                   <NearbyActivities activity={activity} />
                 </div>
               ))}
             </div>
 
             {/* Activities List */}
-            <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+            <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {activities?.slice(0, 5).map((activity) => (
-                <Link
-                  key={activity.id}
-                  to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-                >
+                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
@@ -120,7 +110,7 @@ const Home = () => {
         )}
 
         {/* Filter button */}
-        <div className="flex overflow-scroll mt-16 gap-4 overflow-y-hidden scrollbar-hide">
+        <div className="scrollbar-hide mt-16 flex gap-4 overflow-scroll overflow-y-hidden">
           {filterOptions.map((item, index) => (
             <FilterButton
               key={index}
@@ -135,7 +125,7 @@ const Home = () => {
 
       {/* Community Flocks */}
       <section>
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div>
             <TitleText title="Community Flocks" />
           </div>
@@ -146,32 +136,16 @@ const Home = () => {
         </div>
 
         {/* Mobile Carousel */}
-        <div
-          className="
-      flex gap-4 overflow-x-auto
-      snap-x snap-mandatory
-      scrollbar-hide
-      lg:hidden
-      pb-2
-    "
-        >
+        <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
           {flockList.slice(0, 5).map((flock, index) => (
-            <div
-              key={flock.id}
-              className="
-          min-w-[90%]
-          sm:min-w-[70%]
-          snap-center
-          flex-shrink-0
-        "
-            >
+            <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
               <CommunityFlocksCard card={flock} index={index} />
             </div>
           ))}
         </div>
 
         {/* Desktop Grid */}
-        <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 auto-rows-auto">
+        <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
           {flockList.slice(0, 5).map((flock, index) => (
             <CommunityFlocksCard key={flock.id} card={flock} index={index} />
           ))}
@@ -180,7 +154,7 @@ const Home = () => {
 
       {/* Explore Activities */}
       <section className="mb-20 lg:mb-0">
-        <div className="flex justify-between mb-4">
+        <div className="mb-4 flex justify-between">
           <div className="">
             <TitleText title="Explore Activities" />
             <p className="text-secondary text-xs sm:text-sm md:text-base">
@@ -196,29 +170,10 @@ const Home = () => {
         ) : (
           <>
             {/* Mobile Carousel */}
-            <div
-              className="
-        flex gap-4 overflow-x-auto
-        snap-x snap-mandatory
-        scrollbar-hide
-        lg:hidden
-        pb-2
-      "
-            >
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
               {activities?.slice(0, 5).map((activity) => (
-                <div
-                  key={activity.id}
-                  className="
-            min-w-[85%]
-            sm:min-w-[65%]
-            md:min-w-[45%]
-            snap-center
-            flex-shrink-0
-          "
-                >
-                  <Link
-                    to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-                  >
+                <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
+                  <Link to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>
@@ -226,12 +181,9 @@ const Home = () => {
             </div>
 
             {/* Desktop Grid */}
-            <div className="hidden lg:grid lg:grid-cols-5 gap-8 md:gap-4">
+            <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {activities?.slice(0, 5).map((activity) => (
-                <Link
-                  key={activity.id}
-                  to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-                >
+                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                   <ExploreActivitiesCard activity={activity} />
                 </Link>
               ))}

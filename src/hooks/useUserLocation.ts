@@ -1,13 +1,8 @@
-
 import { useEffect, useState } from "react";
-import {
-  locationService,
-  type UserLocation,
-} from "../services/location.service";
+import { locationService, type UserLocation } from "../services/location.service";
 
 export const useUserLocation = () => {
-  const [location, setLocation] =
-    useState<UserLocation | null>(null);
+  const [location, setLocation] = useState<UserLocation | null>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -16,8 +11,7 @@ export const useUserLocation = () => {
   const initializeLocation = async () => {
     try {
       // 1. CHECK CACHE FIRST
-      const cachedLocation =
-        locationService.getCachedLocation();
+      const cachedLocation = locationService.getCachedLocation();
 
       if (cachedLocation) {
         setLocation(cachedLocation);
@@ -26,8 +20,7 @@ export const useUserLocation = () => {
       }
 
       // 2. FETCH LOCATION
-      const currentLocation =
-        await locationService.getCurrentLocation();
+      const currentLocation = await locationService.getCurrentLocation();
 
       setLocation(currentLocation);
     } catch {

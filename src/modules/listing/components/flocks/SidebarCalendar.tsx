@@ -5,11 +5,7 @@ import { DayPicker } from "react-day-picker";
 
 import "react-day-picker/dist/style.css";
 
-const holidayDates = [
-  new Date(2025, 9, 9),
-  new Date(2025, 9, 10),
-  new Date(2025, 9, 11),
-];
+const holidayDates = [new Date(2025, 9, 9), new Date(2025, 9, 10), new Date(2025, 9, 11)];
 
 const activityDates = [new Date(2025, 9, 9), new Date(2025, 9, 17)];
 
@@ -50,14 +46,14 @@ const SidebarCalendar = () => {
       activity: activityDates,
       draft: draftDates,
     }),
-    [],
+    []
   );
 
   return (
-    <div className="w-full max-w-md rounded-xl bg-primary p-8">
+    <div className="bg-primary w-full max-w-md rounded-xl p-8">
       {/* HEADER */}
       <div className="mb-10 flex items-center justify-between">
-        <h2 className="text-base font-medium bg-linear-to-br from-btn01 to-btn-light to-65% bg-clip-text text-transparent">
+        <h2 className="from-btn01 to-btn-light bg-linear-to-br to-65% bg-clip-text text-base font-medium text-transparent">
           {month.toLocaleString("default", {
             month: "long",
             year: "numeric",
@@ -66,21 +62,17 @@ const SidebarCalendar = () => {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() =>
-              setMonth(new Date(month.getFullYear(), month.getMonth() - 1))
-            }
-            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-black/5 cursor-pointer active:scale-95 transition-all duration-200"
+            onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1))}
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-black/5 active:scale-95"
           >
-            <ChevronLeft className="h-8 w-8 stroke-[1.5] text-secondary" />
+            <ChevronLeft className="text-secondary h-8 w-8 stroke-[1.5]" />
           </button>
 
           <button
-            onClick={() =>
-              setMonth(new Date(month.getFullYear(), month.getMonth() + 1))
-            }
-            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-black/5 cursor-pointer active:scale-95 transition-all duration-200"
+            onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1))}
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-black/5 active:scale-95"
           >
-            <ChevronRight className="h-8 w-8 stroke-[1.5] text-secondary" />
+            <ChevronRight className="text-secondary h-8 w-8 stroke-[1.5]" />
           </button>
         </div>
       </div>
@@ -103,8 +95,7 @@ const SidebarCalendar = () => {
 
           week: "grid grid-cols-7 mb-0",
 
-          weekday:
-            "flex items-center justify-center text-[15px] font-semibold text-black/60",
+          weekday: "flex items-center justify-center text-[15px] font-semibold text-black/60",
 
           day: "relative flex h-[40px] w-[40px] items-center justify-center rounded-full text-[16px] font-medium text-[#333] transition-all m-1 mx-2",
 
@@ -152,15 +143,13 @@ const SidebarCalendar = () => {
 
       {/* EVENTS */}
       <div className="mt-12">
-        <h3 className="text-[16px] font-semibold text-secondary">
-          Events List
-        </h3>
+        <h3 className="text-secondary text-[16px] font-semibold">Events List</h3>
 
         {/* HOLIDAY */}
         <div className="mt-7">
           <h4 className="text-[14px] font-semibold text-[#0066FF]">Holiday</h4>
 
-          <div className="mt-5 rounded-xl bg-secondary/5 px-5 py-1">
+          <div className="bg-secondary/5 mt-5 rounded-xl px-5 py-1">
             {events.Holiday.map((item) => (
               <div
                 key={item.title}
@@ -186,20 +175,15 @@ const SidebarCalendar = () => {
         <div className="mt-9">
           <h4 className="text-[14px] font-semibold text-[#0066FF]">Activity</h4>
 
-          <div className="mt-5 rounded-xl bg-secondary/5 px-5 py-1">
+          <div className="bg-secondary/5 mt-5 rounded-xl px-5 py-1">
             {events.Activity.map((item) => (
-              <div
-                key={item.title}
-                className="flex items-center justify-between py-3"
-              >
+              <div key={item.title} className="flex items-center justify-between py-3">
                 <div className="flex gap-4">
                   <span className="h-4 w-4 rounded-full bg-[#C9C2FF]" />
 
-                  <p className="text-[14px] flex flex-col font-medium">
+                  <p className="flex flex-col text-[14px] font-medium">
                     <span className="text-primary-dark/80">{item.title}</span>
-                    <span className="text-[12px] text-secondary/80">
-                      {item.date}
-                    </span>
+                    <span className="text-secondary/80 text-[12px]">{item.date}</span>
                   </p>
                 </div>
 

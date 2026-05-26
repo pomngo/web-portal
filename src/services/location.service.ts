@@ -10,19 +10,13 @@ class LocationService {
     try {
       const gpsLocation = await this.getGPSLocation();
 
-      localStorage.setItem(
-        "user_location",
-        JSON.stringify(gpsLocation)
-      );
+      localStorage.setItem("user_location", JSON.stringify(gpsLocation));
 
       return gpsLocation;
     } catch {
       const ipLocation = await this.getIPLocation();
 
-      localStorage.setItem(
-        "user_location",
-        JSON.stringify(ipLocation)
-      );
+      localStorage.setItem("user_location", JSON.stringify(ipLocation));
 
       return ipLocation;
     }

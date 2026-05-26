@@ -12,12 +12,14 @@ const DetailBanner = ({ coverImage, altText = "Banner" }: DetailBannerProps) => 
   const isFallback = !coverImage || isCoverFallback;
 
   const srcUrl = coverImage
-    ? (coverImage.startsWith("http") ? coverImage : ENDPOINTS.BASE_URL.BASE_IMAGE_URL(coverImage))
+    ? coverImage.startsWith("http")
+      ? coverImage
+      : ENDPOINTS.BASE_URL.BASE_IMAGE_URL(coverImage)
     : images.not_found;
 
   return (
     <div
-      className={`relative ${isFallback ? "h-64" : "h-96"} overflow-hidden bg-cover bg-center flex justify-center items-center`}
+      className={`relative ${isFallback ? "h-64" : "h-96"} flex items-center justify-center overflow-hidden bg-cover bg-center`}
     >
       <img
         src={srcUrl}
@@ -26,10 +28,10 @@ const DetailBanner = ({ coverImage, altText = "Banner" }: DetailBannerProps) => 
           (e.target as HTMLImageElement).src = images.not_found;
           setIsCoverFallback(true);
         }}
-        className={`${isFallback ? "max-h-48 w-auto object-contain rounded-2xl p-4 bg-slate-50/50" : "h-full w-full lg:w-[90%] lg:rounded-b-xl object-cover"}`}
+        className={`${isFallback ? "max-h-48 w-auto rounded-2xl bg-slate-50/50 object-contain p-4" : "h-full w-full object-cover lg:w-[90%] lg:rounded-b-xl"}`}
       />
       {coverImage && !isCoverFallback && (
-        <div className="absolute inset-0 bg-linear-to-r from-primary-dark/90 via-primary-dark/60 to-transparent lg:w-[90%] lg:left-[5%] lg:rounded-b-xl" />
+        <div className="from-primary-dark/90 via-primary-dark/60 absolute inset-0 bg-linear-to-r to-transparent lg:left-[5%] lg:w-[90%] lg:rounded-b-xl" />
       )}
     </div>
   );

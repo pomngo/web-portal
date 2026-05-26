@@ -30,20 +30,20 @@ const SearchBar = () => {
   const open = Boolean(anchorEl);
 
   return (
-    <div className="mt-6 w-full flex justify-center itecms-center">
-      <div className="hidden rounded-full sm:flex justify-center items-center bg-linear-to-r from-btn01/10 to-btn02/10  p-0.5 w-fit ">
-        <div className="rounded-full bg-primary p-5 sm:min-w-xl lg:min-w-4xl flex justify-between items-center gap-10 ">
+    <div className="itecms-center mt-6 flex w-full justify-center">
+      <div className="from-btn01/10 to-btn02/10 hidden w-fit items-center justify-center rounded-full bg-linear-to-r p-0.5 sm:flex">
+        <div className="bg-primary flex items-center justify-between gap-10 rounded-full p-5 sm:min-w-xl lg:min-w-4xl">
           {/* Search Option */}
-          <div className="px-5 py-2 transition-all duration-300 hover:scale-105 flex gap-2 cursor-pointer ">
+          <div className="flex cursor-pointer gap-2 px-5 py-2 transition-all duration-300 hover:scale-105">
             {/* {Icons && <Icons.map className="text-btn01" />} */}
             <LocationIcon />
             <div className={`flex flex-col`}>
-              <p className="text-sm font-medium text-primary-dark">Location</p>
-              <div className="text-xs font-medium text-secondary/40">
+              <p className="text-primary-dark text-sm font-medium">Location</p>
+              <div className="text-secondary/40 text-xs font-medium">
                 <input
                   type="search"
                   defaultValue={location?.city?.split(" ")[0] || ""}
-                  className="p-0.5 outline-none text-xs font-medium text-secondary bg-white rounded-md"
+                  className="text-secondary rounded-md bg-white p-0.5 text-xs font-medium outline-none"
                   placeholder="Search Location"
                   list="interest-suggestions"
                 />
@@ -64,17 +64,17 @@ const SearchBar = () => {
               </div>
             </div>
           </div>
-          <div className=" px-5 py-2 transition-all duration-300 hover:scale-105 flex gap-2 cursor-pointer border-l ">
+          <div className="flex cursor-pointer gap-2 border-l px-5 py-2 transition-all duration-300 hover:scale-105">
             {/* {Icons && <Icons.heart className="text-btn01" />} */}
 
             <HeartIcon />
 
             <div className={`flex flex-col`}>
-              <p className="text-sm font-medium text-primary-dark">Interest</p>
-              <div className="text-xs font-medium text-secondary/40">
+              <p className="text-primary-dark text-sm font-medium">Interest</p>
+              <div className="text-secondary/40 text-xs font-medium">
                 <input
                   type="search"
-                  className="p-0.5 px-0 outline-none text-xs font-medium text-secondary/70 bg-transparent text-nowrap"
+                  className="text-secondary/70 bg-transparent p-0.5 px-0 text-xs font-medium text-nowrap outline-none"
                   placeholder="Search Interest"
                   list="interest-suggestions"
                 />
@@ -95,14 +95,14 @@ const SearchBar = () => {
           </div>
           <div
             onClick={handleOpen}
-            className="px-5 py-2 transition-all duration-300 hover:scale-105 flex gap-2 cursor-pointer border-l"
+            className="flex cursor-pointer gap-2 border-l px-5 py-2 transition-all duration-300 hover:scale-105"
           >
             {/* {Icons && <Icons.calendar className="text-btn01" />} */}
             <CalendarIcon />
             <div className={`flex flex-col`}>
-              <p className="text-sm font-medium text-primary-dark">Date</p>
+              <p className="text-primary-dark text-sm font-medium">Date</p>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-medium text-secondary/40 text-nowrap">
+                <span className="text-secondary/40 text-xs font-medium text-nowrap">
                   {!value ? "Select Date" : value.format("DD MMM YYYY")}
                 </span>
                 {value && (
@@ -112,10 +112,10 @@ const SearchBar = () => {
                       setValue(null);
                       dispatch(listActivities());
                     }}
-                    className="p-0.5 rounded-full hover:bg-slate-100 text-secondary/60 hover:text-secondary cursor-pointer transition-colors"
+                    className="text-secondary/60 hover:text-secondary cursor-pointer rounded-full p-0.5 transition-colors hover:bg-slate-100"
                     title="Clear Date"
                   >
-                    <Icons.close size={14} className="w-3.5 h-3.5 text-btn01" />
+                    <Icons.close size={14} className="text-btn01 h-3.5 w-3.5" />
                   </button>
                 )}
               </div>
@@ -137,11 +137,7 @@ const SearchBar = () => {
               },
             }}
           >
-            <DateCalendarValue
-              value={value}
-              setValue={setValue}
-              onClose={handleClose}
-            />
+            <DateCalendarValue value={value} setValue={setValue} onClose={handleClose} />
           </Popover>
 
           <button
@@ -152,7 +148,7 @@ const SearchBar = () => {
                 dispatch(listActivities());
               }
             }}
-            className="h-12 w-12 p-2 bg-btn-light/20 text-primary rounded-full flex justify-center items-center cursor-pointer active:scale-95 transition-all duration-200 animate-pulse"
+            className="bg-btn-light/20 text-primary flex h-12 w-12 animate-pulse cursor-pointer items-center justify-center rounded-full p-2 transition-all duration-200 active:scale-95"
           >
             {/* <Icons.search className="text-btn01" /> */}
             <SearchIcon />
@@ -160,9 +156,12 @@ const SearchBar = () => {
         </div>
       </div>
 
-      <div className="rounded-full flex sm:hidden justify-center items-center bg-linear-to-r from-btn01/10 to-btn02/10  p-0.5 w-full shadow-md">
-        <div className="rounded-full bg-primary p-2 w-full flex gap-2 items-center">
-          <Link to={"/"} className="h-12 w-12 bg-btn-light/20 text-secondary rounded-full flex justify-center items-center cursor-pointer active:scale-95 transition-all duration-200 animate-pulse">
+      <div className="from-btn01/10 to-btn02/10 flex w-full items-center justify-center rounded-full bg-linear-to-r p-0.5 shadow-md sm:hidden">
+        <div className="bg-primary flex w-full items-center gap-2 rounded-full p-2">
+          <Link
+            to={"/"}
+            className="bg-btn-light/20 text-secondary flex h-12 w-12 animate-pulse cursor-pointer items-center justify-center rounded-full transition-all duration-200 active:scale-95"
+          >
             <Icons.serarch1 />
           </Link>
           <h3 className="">Start Your Search</h3>

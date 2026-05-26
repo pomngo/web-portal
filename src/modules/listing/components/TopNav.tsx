@@ -37,7 +37,7 @@ const TopNav = () => {
   }, [location.pathname]);
 
   return (
-    <div className="bg-linear-to-b from-nav01 via-nav02 to-[10%_15%] px-4  sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4">
+    <div className="from-nav01 via-nav02 bg-linear-to-b to-[10%_15%] px-4 py-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* top */}
       <div className="flex items-center justify-between">
         {/* Logo */}
@@ -49,7 +49,7 @@ const TopNav = () => {
         <div className="relative">
           {/* Dynamic Sliding Background */}
           <div
-            className="absolute top-2 h-10 rounded-full bg-btn-light/20 transition-all duration-300 ease-in-out"
+            className="bg-btn-light/20 absolute top-2 h-10 rounded-full transition-all duration-300 ease-in-out"
             style={{
               width: sliderStyle.width,
               transform: `translateX(${sliderStyle.left}px)`,
@@ -57,7 +57,7 @@ const TopNav = () => {
           />
 
           {/* Nav Items */}
-          <div className="hidden relative sm:flex items-center gap-2">
+          <div className="relative hidden items-center gap-2 sm:flex">
             {navItems.map((item, index) => {
               const Icon = item.icon;
 
@@ -79,18 +79,16 @@ const TopNav = () => {
                       {Icon && (
                         <Icon
                           className={`mr-2 h-5 w-5 transition-all duration-300 ${
-                            isActive
-                              ? "text-btn01"
-                              : "text-secondary/70 group-hover:text-black"
+                            isActive ? "text-btn01" : "text-secondary/70 group-hover:text-black"
                           }`}
                         />
                       )}
 
                       <span
-                        className={`transition-all text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] duration-300 ${
+                        className={`text-[12px] transition-all duration-300 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] ${
                           isActive
-                            ? "bg-linear-to-tr from-btn01 to-btn02 bg-clip-text text-transparent font-semibold"
-                            : "text-secondary/70 group-hover:text-black text-[15px] font-medium"
+                            ? "from-btn01 to-btn02 bg-linear-to-tr bg-clip-text font-semibold text-transparent"
+                            : "text-secondary/70 text-[15px] font-medium group-hover:text-black"
                         }`}
                       >
                         {item.name}
@@ -107,7 +105,7 @@ const TopNav = () => {
         <div className="relative">
           <button
             onClick={() => setOpen(true)}
-            className="text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] text-nowrap  rounded-full bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+            className="from-btn02 to-btn01 text-primary cursor-pointer rounded-full bg-linear-to-tr to-75% px-5 py-2 text-[12px] text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px]"
           >
             Become Organizer
           </button>

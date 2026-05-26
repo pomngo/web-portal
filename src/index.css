@@ -1,5 +1,4 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 html {
   scroll-behavior: auto;
@@ -18,22 +17,19 @@ html {
 }
 @import "tailwindcss";
 
-
-
 @theme {
-  --color-nav01: #FFEDDE;
-  --color-nav02: #FFF4EB;
-  --color-primary: #FFFFFF;
+  --color-nav01: #ffedde;
+  --color-nav02: #fff4eb;
+  --color-primary: #ffffff;
   --color-primary-dark: #000000;
   --color-secondary: #343434;
-  --color-btn01: #EF7F23;
-  --color-btn02: #E74728;
-  --color-btn-light: #E74728;
-  --color-btn-biget01: #88F2C5;
-  --color-btn-biget02: #ABACFF;
-  --color-btn-biget03: #FFDABC;
+  --color-btn01: #ef7f23;
+  --color-btn02: #e74728;
+  --color-btn-light: #e74728;
+  --color-btn-biget01: #88f2c5;
+  --color-btn-biget02: #abacff;
+  --color-btn-biget03: #ffdabc;
 }
-
 
 .animated-text {
   display: inline-block;

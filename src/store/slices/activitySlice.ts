@@ -52,9 +52,7 @@ const buildListUrl = (filter?: string) => {
   const cleanFilter = (filter || "").trim();
   if (!cleanFilter) return ENDPOINTS.ACTIVITY.LIST;
   const separator = ENDPOINTS.ACTIVITY.LIST.includes("?") ? "&" : "?";
-  const query = cleanFilter.startsWith("?") || cleanFilter.startsWith("&")
-    ? cleanFilter.slice(1)
-    : cleanFilter;
+  const query = cleanFilter.startsWith("?") || cleanFilter.startsWith("&") ? cleanFilter.slice(1) : cleanFilter;
   return `${ENDPOINTS.ACTIVITY.LIST}${separator}${query}`;
 };
 
@@ -75,14 +73,14 @@ export const listActivities = createAsyncThunk<any, string | void>(
       console.error("listActivities error", error);
       const message =
         typeof error === "object" && error !== null && "response" in error
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? (error as any).response?.data?.message
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (error as any).response?.data?.message
           : error instanceof Error
             ? error.message
             : "Unknown error";
       return rejectWithValue(message || "Unknown error");
     }
-  },
+  }
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,7 +90,9 @@ export const fetchActivitiesPage = createAsyncThunk<any, ActivityPageArgs | void
     try {
       const page = params?.page ?? 1;
       const offset = params?.offset ?? 5;
-      const filter = params?.filter ? `${params.filter}&page=${page}&offset=${offset}` : `page=${page}&offset=${offset}`;
+      const filter = params?.filter
+        ? `${params.filter}&page=${page}&offset=${offset}`
+        : `page=${page}&offset=${offset}`;
       const url = buildListUrl(filter);
       const res = await api.get(url);
       if (res.status === 200) {
@@ -105,23 +105,21 @@ export const fetchActivitiesPage = createAsyncThunk<any, ActivityPageArgs | void
       console.error("fetchActivitiesPage error", error);
       const message =
         typeof error === "object" && error !== null && "response" in error
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? (error as any).response?.data?.message
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (error as any).response?.data?.message
           : error instanceof Error
             ? error.message
             : "Unknown error";
       return rejectWithValue(message || "Unknown error");
     }
-  },
+  }
 );
 
 export const getActivitiesDetails = createAsyncThunk(
   "activities/getActivitiesDetails",
   async (activitiesId: number, { rejectWithValue }) => {
     try {
-      const res = await api.get(
-        `${ENDPOINTS.ACTIVITY.DETAILS(activitiesId)}`
-      );
+      const res = await api.get(`${ENDPOINTS.ACTIVITY.DETAILS(activitiesId)}`);
       if (res.status === 200) {
         return res.data;
       } else {
@@ -130,13 +128,14 @@ export const getActivitiesDetails = createAsyncThunk(
       }
     } catch (error: unknown) {
       console.error("listActivities error", error);
-      const status = typeof error === "object" && error !== null && "response" in error
-        ? (error as { response?: { status?: number } }).response?.status
-        : null;
+      const status =
+        typeof error === "object" && error !== null && "response" in error
+          ? (error as { response?: { status?: number } }).response?.status
+          : null;
       const message =
         typeof error === "object" && error !== null && "response" in error
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? (error as any).response?.data?.message || (error as any).response?.data?.detail
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (error as any).response?.data?.message || (error as any).response?.data?.detail
           : error instanceof Error
             ? error.message
             : "Unknown error";
@@ -223,7 +222,7 @@ const activitiesSlice = createSlice({
           state.error = typeof payload === "string" ? payload : "Failed to load details";
           state.errorStatus = null;
         }
-      })
+      });
   },
 });
 

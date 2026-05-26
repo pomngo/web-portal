@@ -15,7 +15,9 @@ import DetailBanner from "../../components/common/DetailBanner";
 const FlocksDetails = () => {
   const { id } = useParams();
   const flockId = Number(id);
-  const { selected_flock, selected_flock_id, selected_flock_loading, error, errorStatus } = useAppSelector((state) => state.flock);
+  const { selected_flock, selected_flock_id, selected_flock_loading, error, errorStatus } = useAppSelector(
+    (state) => state.flock
+  );
   const dispatch = useAppDispatch();
 
   // DetailBanner handles cover image fallback state internally.
@@ -35,24 +37,27 @@ const FlocksDetails = () => {
   }
 
   if (error && !selected_flock) {
-    const isNotFound = errorStatus === 404 || error.toLowerCase().includes("not found") || error.toLowerCase().includes("does not exist");
+    const isNotFound =
+      errorStatus === 404 ||
+      error.toLowerCase().includes("not found") ||
+      error.toLowerCase().includes("does not exist");
 
     if (isNotFound) {
       return (
         <>
           <DetailsTopNav />
-          <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-[#F9F9F9]">
-            <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-slate-100 rounded-3xl shadow-xs max-w-md mx-auto my-12 animate-fade-in">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-400 mb-6">
+          <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#F9F9F9] p-6">
+            <div className="animate-fade-in mx-auto my-12 flex max-w-md flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white p-8 text-center shadow-xs">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-400">
                 <Icons.serarch1 size={32} />
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Flock Not Found</h3>
-              <p className="text-slate-500 text-sm mb-8 max-w-xs leading-relaxed">
+              <h3 className="mb-2 text-xl font-bold text-slate-800">Flock Not Found</h3>
+              <p className="mb-8 max-w-xs text-sm leading-relaxed text-slate-500">
                 This flock may have been deleted, or the URL link you followed might be incorrect.
               </p>
               <Link
                 to="/flocks"
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-semibold bg-linear-to-tr from-btn02 to-btn01 transition-all duration-300 hover:scale-105 active:scale-95 shadow-md shadow-orange-500/10 cursor-pointer"
+                className="from-btn02 to-btn01 flex cursor-pointer items-center gap-2 rounded-2xl bg-linear-to-tr px-6 py-3 font-semibold text-white shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-105 active:scale-95"
               >
                 Go to Flocks
               </Link>
@@ -63,7 +68,7 @@ const FlocksDetails = () => {
     }
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <ErrorState
           title="Flock Details Unavailable"
           message={error}
@@ -87,21 +92,15 @@ const FlocksDetails = () => {
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-3">
               <div>
-                <h2 className="text-[28px] font-semibold">
-                  {selected_flock?.flock_details?.flock_name}
-                </h2>
+                <h2 className="text-[28px] font-semibold">{selected_flock?.flock_details?.flock_name}</h2>
 
-                <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-primary-dark/70">
+                <p className="text-primary-dark/70 mt-1 max-w-2xl text-[15px] leading-relaxed">
                   {selected_flock?.flock_details?.description}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-[15px] text-primary-dark/80">
-                <Icons.users
-                  width={22}
-                  height={22}
-                  className="text-secondary"
-                />
+              <div className="text-primary-dark/80 flex items-center gap-2 text-[15px]">
+                <Icons.users width={22} height={22} className="text-secondary" />
 
                 <span className="underline underline-offset-4">
                   {selected_flock?.flock_details?.participants_count || 0} Members
@@ -128,24 +127,19 @@ const FlocksDetails = () => {
                   label: "Files",
                 },
               ].map((item) => (
-                <div
-                  key={item.label}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <button className="flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:bg-secondary/10 active:scale-95">
+                <div key={item.label} className="flex flex-col items-center gap-2">
+                  <button className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95">
                     {item.icon}
                   </button>
 
-                  <span className="text-xs text-primary-dark/70">
-                    {item.label}
-                  </span>
+                  <span className="text-primary-dark/70 text-xs">{item.label}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-6">
+        <div className="mt-6 px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex gap-6">
             <aside className="hidden w-sm shrink-0 lg:block">
               <div className="sticky top-4 space-y-4">
@@ -153,11 +147,13 @@ const FlocksDetails = () => {
               </div>
             </aside>
 
-            <main className="flex-1 rounded-xl bg-primary p-8">
+            <main className="bg-primary flex-1 rounded-xl p-8">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-base font-medium bg-linear-to-bl from-btn-light to-btn01 to-65% bg-clip-text text-transparent">MAY 2026</h2>
+                <h2 className="from-btn-light to-btn01 bg-linear-to-bl to-65% bg-clip-text text-base font-medium text-transparent">
+                  MAY 2026
+                </h2>
 
-                <p className="text-sm text-primary-dark/60">
+                <p className="text-primary-dark/60 text-sm">
                   {selected_flock?.public_activities?.length} Activities Found
                 </p>
               </div>
@@ -165,18 +161,15 @@ const FlocksDetails = () => {
               <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
                 {selected_flock?.public_activities?.map((activity: ActivityItem, index: number) => {
                   return (
-                    <Link to={`/flocks/${id}/activities/${activity?.id}/detail`}
+                    <Link
+                      to={`/flocks/${id}/activities/${activity?.id}/detail`}
                       key={index}
-                      className="flex flex-col gap-4 rounded-3xl hover:scale-105 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:p-2"
+                      className="flex cursor-pointer flex-col gap-4 rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:p-2 hover:shadow-md"
                     >
-
                       <div className="">
-                        <p className="font-semibold text-base">
-                          {dayjs(activity?.created_at).format("ddd, MMM D")}
-                        </p>
+                        <p className="text-base font-semibold">{dayjs(activity?.created_at).format("ddd, MMM D")}</p>
                       </div>
                       <div className="flex items-center gap-4">
-
                         <img
                           src={activity?.cover_image[0] || images.not_found}
                           alt={activity?.name}
@@ -187,11 +180,14 @@ const FlocksDetails = () => {
                         />
                         <div className="">
                           <div className="flex flex-col items-start justify-between gap-2">
-                            <h3 className="text-lg text-nowrap font-semibold">
-                              {activity?.name.slice(0, 12).trim()}{activity?.name.toString().length > 12 && "..."}
+                            <h3 className="text-lg font-semibold text-nowrap">
+                              {activity?.name.slice(0, 12).trim()}
+                              {activity?.name.toString().length > 12 && "..."}
                             </h3>
 
-                            <span className={`rounded-full ${activity?.current_tab === "draft" ? "bg-btn-biget03/50 border-2 border-btn-biget03" : activity?.current_tab === "ONGOING" ? "bg-btn-biget01/50 border-2 border-btn-biget01" : "bg-btn-biget02/50 border-2 border-btn-biget02"} px-3 py-1 text-xs font-medium text-secondary`}>
+                            <span
+                              className={`rounded-full ${activity?.current_tab === "draft" ? "bg-btn-biget03/50 border-btn-biget03 border-2" : activity?.current_tab === "ONGOING" ? "bg-btn-biget01/50 border-btn-biget01 border-2" : "bg-btn-biget02/50 border-btn-biget02 border-2"} text-secondary px-3 py-1 text-xs font-medium`}
+                            >
                               {activity?.current_tab}
                             </span>
                           </div>
@@ -202,10 +198,8 @@ const FlocksDetails = () => {
                 })}
 
                 {selected_flock?.public_activities?.length === 0 && (
-                  <div className="rounded-3xl border bg-primary p-10 text-center shadow-sm">
-                    <p className="text-primary-dark/60">
-                      No activities found for selected date.
-                    </p>
+                  <div className="bg-primary rounded-3xl border p-10 text-center shadow-sm">
+                    <p className="text-primary-dark/60">No activities found for selected date.</p>
                   </div>
                 )}
               </div>

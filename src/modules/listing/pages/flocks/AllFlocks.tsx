@@ -42,7 +42,7 @@ const AllFlocks = () => {
 
   if (loading && flockList.length === 0) {
     return (
-      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <HomeLoader type="all-flocks" />
       </div>
     );
@@ -50,18 +50,14 @@ const AllFlocks = () => {
 
   if (error && flockList.length === 0) {
     return (
-      <div className="min-h-screen px-16 flex items-center justify-center py-10">
-        <ErrorState
-          title="Unable to load Flocks"
-          message={error}
-          onRetry={handleRetry}
-        />
+      <div className="flex min-h-screen items-center justify-center px-16 py-10">
+        <ErrorState title="Unable to load Flocks" message={error} onRetry={handleRetry} />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen px-4  sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+    <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />
@@ -71,16 +67,16 @@ const AllFlocks = () => {
           dataLength={flockList.length}
           next={fetchMore}
           hasMore={hasMore}
-          loader={<div className=" flex flex-col gap-16 py-10">
-            <ScrollLoader />
-          </div>}
+          loader={
+            <div className="flex flex-col gap-16 py-10">
+              <ScrollLoader />
+            </div>
+          }
           endMessage={
-            <p className="text-center my-6 font-medium py-4 text-sm text-secondary">
-              No more flocks are there.
-            </p>
+            <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more flocks are there.</p>
           }
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 gap-x-4 gap-y-16">
+          <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {flockList.map((flock) => (
               <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
                 <NearbyFlock flock={flock} />

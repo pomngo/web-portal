@@ -53,16 +53,17 @@ const buildListUrl = (filter?: string) => {
     ? cleanFilter.startsWith("?")
       ? `&${cleanFilter.slice(1)}`
       : cleanFilter.startsWith("&")
-      ? cleanFilter
-      : `&${cleanFilter}`
+        ? cleanFilter
+        : `&${cleanFilter}`
     : "";
   return `${ENDPOINTS.CAMPAIGN.LIST}${query}`;
 };
 
 const normalizeFlockList = (payload: unknown): FlockItem[] => {
-  const raw = typeof payload === "object" && payload !== null && "data" in payload
-    ? (payload as { data: unknown }).data
-    : payload;
+  const raw =
+    typeof payload === "object" && payload !== null && "data" in payload
+      ? (payload as { data: unknown }).data
+      : payload;
 
   if (Array.isArray(raw)) return raw as FlockItem[];
   if (raw && typeof raw === "object") {
@@ -93,11 +94,11 @@ export const listFlocks = createAsyncThunk<unknown, string | void>(
         typeof error === "object" && error !== null && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : error instanceof Error
-          ? error.message
-          : "Unknown error";
+            ? error.message
+            : "Unknown error";
       return rejectWithValue(message || "Unknown error");
     }
-  },
+  }
 );
 
 export const fetchFlocksPage = createAsyncThunk<{ data: unknown; page: number; offset: number }, FlockPageArgs | void>(
@@ -106,7 +107,9 @@ export const fetchFlocksPage = createAsyncThunk<{ data: unknown; page: number; o
     try {
       const page = params?.page ?? 1;
       const offset = params?.offset ?? 5;
-      const filter = params?.filter ? `${params.filter}&page=${page}&offset=${offset}` : `page=${page}&offset=${offset}`;
+      const filter = params?.filter
+        ? `${params.filter}&page=${page}&offset=${offset}`
+        : `page=${page}&offset=${offset}`;
       const url = buildListUrl(filter);
       const res = await api.get(url);
       if (res.status === 200) {
@@ -121,20 +124,18 @@ export const fetchFlocksPage = createAsyncThunk<{ data: unknown; page: number; o
         typeof error === "object" && error !== null && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : error instanceof Error
-          ? error.message
-          : "Unknown error";
+            ? error.message
+            : "Unknown error";
       return rejectWithValue(message || "Unknown error");
     }
-  },
+  }
 );
 
 export const getFlockDetails = createAsyncThunk(
   "flock/getFlockDetails",
   async (flockId: number, { rejectWithValue }) => {
     try {
-      const res = await api.get(
-        `${ENDPOINTS.CAMPAIGN.DETAILS(flockId)}`
-      );
+      const res = await api.get(`${ENDPOINTS.CAMPAIGN.DETAILS(flockId)}`);
       if (res.status === 200) {
         return res.data;
       } else {
@@ -143,16 +144,17 @@ export const getFlockDetails = createAsyncThunk(
       }
     } catch (error: unknown) {
       console.error("listFlocks error", error);
-      const status = typeof error === "object" && error !== null && "response" in error
-        ? (error as { response?: { status?: number } }).response?.status
-        : null;
+      const status =
+        typeof error === "object" && error !== null && "response" in error
+          ? (error as { response?: { status?: number } }).response?.status
+          : null;
       const message =
         typeof error === "object" && error !== null && "response" in error
           ? (error as { response?: { data?: { message?: string; detail?: string } } }).response?.data?.message ||
             (error as { response?: { data?: { message?: string; detail?: string } } }).response?.data?.detail
           : error instanceof Error
-          ? error.message
-          : "Unknown error";
+            ? error.message
+            : "Unknown error";
       return rejectWithValue({ message: message || "Unknown error", status });
     }
   }
@@ -161,8 +163,7 @@ export const getFlockDetails = createAsyncThunk(
 const flockSlice = createSlice({
   name: "contact",
   initialState,
-  reducers: {}
-  ,
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(listFlocks.pending, (state) => {
@@ -234,7 +235,7 @@ const flockSlice = createSlice({
           state.error = typeof payload === "string" ? payload : "Failed to load details";
           state.errorStatus = null;
         }
-      })
+      });
   },
 });
 
