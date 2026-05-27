@@ -1,24 +1,37 @@
-import { useState, lazy, Suspense } from "react";
-
-const DateCalendarValue = lazy(() => import("../../../../components/ui/DateCalendarValue"));
-import { useUserLocation } from "../../../../hooks/useUserLocation";
+import { useState, lazy, Suspense, useEffect } from "react";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import Popover from "@mui/material/Popover";
+
+import { useUserLocation } from "../../../../hooks/useUserLocation";
 import SearchIcon from "../../../../components/icons/SearchIcon";
 import CalendarIcon from "../../../../components/icons/CalendarIcon";
 import LocationIcon from "../../../../components/icons/LocationIcon";
 import HeartIcon from "../../../../components/icons/HeartIcon";
 import { Icons } from "../../../../constants/icons";
-import { Link } from "react-router-dom";
-import { useAppDispatch } from "../../../../store/hooks";
-import { listActivities } from "../../../../store/slices/activitySlice";
+
+const DateCalendarValue = lazy(() => import("../../../../components/ui/DateCalendarValue"));
 
 const SearchBar = () => {
-  const dispatch = useAppDispatch();
   const { location } = useUserLocation();
-  const [value, setValue] = useState<Dayjs | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const [locInput, setLocInput] = useState(searchParams.get("location") || "");
+  const [interestInput, setInterestInput] = useState(searchParams.get("interest") || "");
+  
+  // Set date from URL if present
+  const urlDate = searchParams.get("created_date");
+  const [value, setValue] = useState<Dayjs | null>(urlDate ? dayjs(urlDate) : null);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    if (!searchParams.get("location") && location?.city) {
+      setLocInput(location.city.split(" ")[0]);
+    }
+  }, [location, searchParams]);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -29,6 +42,24 @@ const SearchBar = () => {
   };
 
   const open = Boolean(anchorEl);
+
+  const handleSearch = () => {
+    const newParams = new URLSearchParams(searchParams);
+    if (locInput) newParams.set("location", locInput);
+    else newParams.delete("location");
+
+    if (interestInput) newParams.set("interest", interestInput);
+    else newParams.delete("interest");
+
+    if (value) newParams.set("created_date", value.format("YYYY-MM-DD"));
+    else newParams.delete("created_date");
+
+    setSearchParams(newParams);
+
+    if (window.location.pathname.includes("/detail")) {
+      navigate(`/activities?${newParams.toString()}`);
+    }
+  };
 
   return (
     <div className="itecms-center mt-6 flex w-full justify-center">
@@ -43,7 +74,8 @@ const SearchBar = () => {
               <div className="text-secondary/40 text-xs font-medium">
                 <input
                   type="search"
-                  defaultValue={location?.city?.split(" ")[0] || ""}
+                  value={locInput}
+                  onChange={(e) => setLocInput(e.target.value)}
                   className="text-secondary rounded-md bg-white p-0.5 text-xs font-medium outline-none"
                   placeholder="Search Location"
                   list="interest-suggestions"
@@ -75,6 +107,8 @@ const SearchBar = () => {
               <div className="text-secondary/40 text-xs font-medium">
                 <input
                   type="search"
+                  value={interestInput}
+                  onChange={(e) => setInterestInput(e.target.value)}
                   className="text-secondary/70 bg-transparent p-0.5 px-0 text-xs font-medium text-nowrap outline-none"
                   placeholder="Search Interest"
                   list="interest-suggestions"
@@ -111,7 +145,9 @@ const SearchBar = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       setValue(null);
-                      dispatch(listActivities());
+                      const newParams = new URLSearchParams(searchParams);
+                      newParams.delete("created_date");
+                      setSearchParams(newParams);
                     }}
                     className="text-secondary/60 hover:text-secondary cursor-pointer rounded-full p-0.5 transition-colors hover:bg-slate-100"
                     title="Clear Date"
@@ -152,13 +188,7 @@ const SearchBar = () => {
           </Popover>
 
           <button
-            onClick={() => {
-              if (value) {
-                dispatch(listActivities(`?created_date=${value.format("YYYY-MM-DD")}`));
-              } else {
-                dispatch(listActivities());
-              }
-            }}
+            onClick={handleSearch}
             className="bg-btn-light/20 text-primary flex h-12 w-12 animate-pulse cursor-pointer items-center justify-center rounded-full p-2 transition-all duration-200 active:scale-95"
           >
             {/* <Icons.search className="text-btn01" /> */}

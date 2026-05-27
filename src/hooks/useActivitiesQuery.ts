@@ -1,7 +1,7 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import api from "../services/api/axios";
 import { ENDPOINTS } from "../services/api/endpoints";
-import type { ActivityItem } from "../store/slices/activitySlice";
+import type { ActivityItem } from "../types";
 
 const buildListUrl = (filter?: string) => {
   const cleanFilter = (filter || "").trim();

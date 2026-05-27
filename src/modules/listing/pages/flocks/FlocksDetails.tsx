@@ -6,7 +6,7 @@ import { Link, useParams } from "react-router-dom";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import { images } from "../../../../constants/images";
 import ErrorState from "../../../../components/common/ErrorState";
-import type { ActivityItem } from "../../../../store/slices/activitySlice";
+import type { ActivityItem } from "../../../../types";
 import DetailBanner from "../../components/common/DetailBanner";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useFlockDetails } from "../../../../hooks/useFlocksQuery";

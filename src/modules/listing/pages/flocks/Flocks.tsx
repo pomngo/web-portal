@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
 import { useState } from "react";
@@ -14,12 +14,26 @@ import { useFlocks } from "../../../../hooks/useFlocksQuery";
 
 const Flocks = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
+  const [searchParams] = useSearchParams();
+
+  // Combine URL search params, selected category filter, and discoverable details for Flocks
+  const flockQueryString = (() => {
+    const params = new URLSearchParams(searchParams);
+    params.set("is_discoverable", "true");
+    params.set("page", "1");
+    params.set("offset", "5");
+    if (selectedFilter) {
+      params.set("interest", selectedFilter);
+    }
+    return `?${params.toString()}`;
+  })();
+
   const {
     data: flockList = [],
     isLoading: loading,
     error,
     refetch,
-  } = useFlocks("?is_discoverable=true&page=1&offset=5");
+  } = useFlocks(flockQueryString);
 
   useSEO({
     title: "Flocks | FlocknGo - Find & Connect with Community Groups",

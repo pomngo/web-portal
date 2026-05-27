@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { filterOptions } from "../../../../constants/data";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import FilterButton from "../../components/common/FilterButton";
@@ -14,12 +14,23 @@ import { useActivities } from "../../../../hooks/useActivitiesQuery";
 
 const Activities = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
+  const [searchParams] = useSearchParams();
+
+  // Combine URL search params and selected category filter for Activities
+  const activityQueryString = (() => {
+    const params = new URLSearchParams(searchParams);
+    if (selectedFilter) {
+      params.set("interest", selectedFilter);
+    }
+    return `?${params.toString()}`;
+  })();
+
   const {
     data: activities = [],
     isLoading: loading,
     error,
     refetch,
-  } = useActivities();
+  } = useActivities(activityQueryString);
 
   useSEO({
     title: "Activities | FlocknGo - Explore Events & Experiences",

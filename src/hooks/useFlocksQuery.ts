@@ -1,7 +1,7 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import api from "../services/api/axios";
 import { ENDPOINTS } from "../services/api/endpoints";
-import type { FlockItem } from "../store/slices/flockSlice";
+import type { FlockItem } from "../types";
 
 const buildListUrl = (filter?: string) => {
   const cleanFilter = (filter || "").trim();

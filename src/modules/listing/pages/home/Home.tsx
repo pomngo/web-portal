@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
@@ -16,20 +16,37 @@ import { useActivities } from "../../../../hooks/useActivitiesQuery";
 
 const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
+  const [searchParams] = useSearchParams();
+
+  // Combine URL search params and baseline discoverable state for Flocks
+  const flockQueryString = (() => {
+    const params = new URLSearchParams(searchParams);
+    params.set("is_discoverable", "true");
+    return `?${params.toString()}`;
+  })();
+
+  // Combine URL search params and selected category filter for Activities
+  const activityQueryString = (() => {
+    const params = new URLSearchParams(searchParams);
+    if (selectedFilter) {
+      params.set("interest", selectedFilter);
+    }
+    return `?${params.toString()}`;
+  })();
   
   const {
     data: flockList = [],
     isLoading: flockLoading,
     error: flockError,
     refetch: refetchFlocks,
-  } = useFlocks("?is_discoverable=true");
+  } = useFlocks(flockQueryString);
 
   const {
     data: activities = [],
     isLoading: activityLoading,
     error: activityError,
     refetch: refetchActivities,
-  } = useActivities();
+  } = useActivities(activityQueryString);
 
   useSEO({
     title: "Home | FlocknGo - Discover Nearby Activities & Groups",
