@@ -11,6 +11,7 @@ import { images } from "../../../../constants/images";
 import ErrorState from "../../../../components/common/ErrorState";
 import type { ActivityItem } from "../../../../store/slices/activitySlice";
 import DetailBanner from "../../components/common/DetailBanner";
+import { useSEO } from "../../../../hooks/useSEO";
 
 const FlocksDetails = () => {
   const { id } = useParams();
@@ -28,9 +29,18 @@ const FlocksDetails = () => {
     }
   }, [dispatch, flockId, selected_flock_id]);
 
-  useEffect(() => {
-    document.title = "Flock Details | Flockn Go";
-  }, []);
+  useSEO({
+    title: selected_flock?.flock_details?.flock_name
+      ? `${selected_flock.flock_details.flock_name} | FlocknGo`
+      : "Flock Details | FlocknGo",
+    description: selected_flock?.flock_details?.description
+      ? selected_flock.flock_details.description.slice(0, 160)
+      : "Discover local community groups and activities with FlocknGo.",
+    keywords: selected_flock?.flock_details?.flock_name
+      ? `${selected_flock.flock_details.flock_name}, social group, community meetup`
+      : "social group, community meetup",
+    ogImage: selected_flock?.flock_details?.cover_image_s3key || undefined,
+  });
 
   if (selected_flock_loading) {
     return <FlockDetailsLoader />;
@@ -92,7 +102,7 @@ const FlocksDetails = () => {
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-3">
               <div>
-                <h2 className="text-[28px] font-semibold">{selected_flock?.flock_details?.flock_name}</h2>
+                <h1 className="text-[28px] font-semibold">{selected_flock?.flock_details?.flock_name}</h1>
 
                 <p className="text-primary-dark/70 mt-1 max-w-2xl text-[15px] leading-relaxed">
                   {selected_flock?.flock_details?.description}

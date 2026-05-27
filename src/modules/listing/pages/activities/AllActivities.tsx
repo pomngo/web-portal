@@ -9,6 +9,7 @@ import { fetchActivitiesPage } from "../../../../store/slices/activitySlice";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import ErrorState from "../../../../components/common/ErrorState";
+import { useSEO } from "../../../../hooks/useSEO";
 
 const AllActivities = () => {
   const { search_by } = useParams();
@@ -36,9 +37,11 @@ const AllActivities = () => {
     }
   };
 
-  useEffect(() => {
-    document.title = "All Activities | Flockn Go";
-  }, []);
+  useSEO({
+    title: `All Activities - ${search_by || "Nearby"} | FlocknGo`,
+    description: `Discover all our local activities, experiences, and events matching ${search_by || "your interest"}. Join now on FlocknGo!`,
+    keywords: "discover activities, find local events, local experiences, social meetup activities",
+  });
 
   const activityList = activities;
 
@@ -60,6 +63,7 @@ const AllActivities = () => {
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <h1 className="sr-only">Explore All Activities - {search_by || "Nearby"}</h1>
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />

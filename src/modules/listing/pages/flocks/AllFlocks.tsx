@@ -9,6 +9,7 @@ import ScrollLoader from "../../../../components/common/ScrollLoader";
 
 import ErrorState from "../../../../components/common/ErrorState";
 import HomeLoader from "../../../../components/common/HomeLoader";
+import { useSEO } from "../../../../hooks/useSEO";
 
 const AllFlocks = () => {
   const { search_by } = useParams();
@@ -31,9 +32,11 @@ const AllFlocks = () => {
     dispatch(fetchFlocksPage({ page: 1, offset: 5 }));
   }, [dispatch]);
 
-  useEffect(() => {
-    document.title = "All Flocks | Flockn Go";
-  }, []);
+  useSEO({
+    title: `All Flocks - ${search_by || "Nearby"} | FlocknGo`,
+    description: `Discover and browse through all our local community flocks and groups matching ${search_by || "your interest"}. Join now on FlocknGo!`,
+    keywords: "discover flocks, find community, local social groups, join social group",
+  });
 
   const handleRetry = () => {
     dispatch(fetchFlocksPage({ page: 1, offset: 5 }));
@@ -58,6 +61,7 @@ const AllFlocks = () => {
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <h1 className="sr-only">Explore All Community Flocks - {search_by || "Nearby"}</h1>
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />

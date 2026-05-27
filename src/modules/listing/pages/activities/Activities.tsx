@@ -12,6 +12,7 @@ import { listActivities } from "../../../../store/slices/activitySlice";
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
 import HomeLoader from "../../../../components/common/HomeLoader";
+import { useSEO } from "../../../../hooks/useSEO";
 
 const Activities = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
@@ -24,9 +25,11 @@ const Activities = () => {
     }
   }, [dispatch, isInitialized]);
 
-  useEffect(() => {
-    document.title = "Activities | Flockn Go";
-  }, []);
+  useSEO({
+    title: "Activities | FlocknGo - Explore Events & Experiences",
+    description: "Discover nearby local activities, outdoor adventures, workshops, and fun experiences. Join exciting local events with FlocknGo.",
+    keywords: "local activities, events near me, local experiences, fun activities, community events",
+  });
 
   const handleRetry = () => {
     dispatch(listActivities());
@@ -49,6 +52,7 @@ const Activities = () => {
   }
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <h1 className="sr-only">Discover Local Activities and Upcoming Events - FlocknGo</h1>
       <section className="">
         {/* Heading */}
         <div className="mb-4 flex justify-between">

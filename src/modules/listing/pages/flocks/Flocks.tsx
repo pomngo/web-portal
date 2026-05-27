@@ -11,6 +11,7 @@ import { listFlocks } from "../../../../store/slices/flockSlice";
 import NearbyFlock from "../../components/home/NearbyFlock";
 
 import ErrorState from "../../../../components/common/ErrorState";
+import { useSEO } from "../../../../hooks/useSEO";
 
 const Flocks = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
@@ -25,9 +26,11 @@ const Flocks = () => {
     }
   }, [dispatch, isInitialized]);
 
-  useEffect(() => {
-    document.title = "Flocks | Flockn Go";
-  }, []);
+  useSEO({
+    title: "Flocks | FlocknGo - Find & Connect with Community Groups",
+    description: "Browse and discover local social groups, clubs, and interest-based flocks. Connect with like-minded people near you with FlocknGo.",
+    keywords: "local social groups, interest groups, find community, meetup groups, social club",
+  });
 
   const handleRetry = () => {
     dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
@@ -50,6 +53,7 @@ const Flocks = () => {
   }
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <h1 className="sr-only">Browse Local Flocks and Social Groups - FlocknGo</h1>
       {/* Nearby Flocks */}
       <section className="">
         {/* Heading */}

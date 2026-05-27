@@ -8,6 +8,7 @@ import { useParams, Link } from "react-router-dom";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
 import DetailBanner from "../../components/common/DetailBanner";
+import { useSEO } from "../../../../hooks/useSEO";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
@@ -22,9 +23,18 @@ const ActivitiesDetails = () => {
     }
   }, [dispatch, activityId, selected_activities_id]);
 
-  useEffect(() => {
-    document.title = "Activities Details | Flockn Go";
-  }, []);
+  useSEO({
+    title: selected_activities?.name
+      ? `${selected_activities.name} | FlocknGo`
+      : "Activity Details | FlocknGo",
+    description: selected_activities?.description
+      ? selected_activities.description.slice(0, 160)
+      : "Discover local community activities and events with FlocknGo.",
+    keywords: selected_activities?.name
+      ? `${selected_activities.name}, local activity, community events`
+      : "local activity, community events",
+    ogImage: selected_activities?.cover_image?.[0] || undefined,
+  });
 
   if (selected_activities_loading) {
     return <ActivityDetailsLoader />;
@@ -81,7 +91,7 @@ const ActivitiesDetails = () => {
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-3">
               <div>
-                <h2 className="text-primary-dark/80 text-[24px] font-bold">{selected_activities?.name}</h2>
+                <h1 className="text-primary-dark/80 text-[24px] font-bold">{selected_activities?.name}</h1>
 
                 <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-black/70">
                   {selected_activities?.description}
