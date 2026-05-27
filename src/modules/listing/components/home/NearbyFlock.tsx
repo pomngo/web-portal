@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -51,4 +52,4 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
   );
 };
 
-export default NearbyFlock;
+export default memo(NearbyFlock);

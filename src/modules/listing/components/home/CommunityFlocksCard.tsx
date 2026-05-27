@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import type { CardType } from "../../../../types";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -103,4 +104,4 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
   );
 };
 
-export default CommunityFlocksCard;
+export default memo(CommunityFlocksCard);

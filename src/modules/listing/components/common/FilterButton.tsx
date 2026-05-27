@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 type FilterButtonProps = {
   Icon: React.ElementType;
   label: string;
@@ -21,4 +23,4 @@ const FilterButton = ({ Icon, label, selectedFilter, setSelectedFilter }: Filter
   );
 };
 
-export default FilterButton;
+export default memo(FilterButton);

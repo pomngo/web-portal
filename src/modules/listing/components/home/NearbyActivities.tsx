@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -61,4 +62,4 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
   );
 };
 
-export default NearbyActivities;
+export default memo(NearbyActivities);

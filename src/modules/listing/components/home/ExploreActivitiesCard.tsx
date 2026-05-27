@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -53,4 +54,4 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
   );
 };
 
-export default ExploreActivitiesCard;
+export default memo(ExploreActivitiesCard);
