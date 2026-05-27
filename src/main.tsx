@@ -5,13 +5,26 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30000, // 30 seconds
+      retry: 3, // retry 3 times on failure
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 createRoot(document.getElementById("root")!).render(
   // <StrictMode>
   <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
   </Provider>
   // </StrictMode>,
 );

@@ -1,41 +1,26 @@
 import { Link, useParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import PageHeader from "../../../../components/common/PageHeader";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { fetchActivitiesPage } from "../../../../store/slices/activitySlice";
 import InfiniteScroll from "react-infinite-scroll-component";
-
 import ErrorState from "../../../../components/common/ErrorState";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useInfiniteActivities } from "../../../../hooks/useActivitiesQuery";
 
 const AllActivities = () => {
   const { search_by } = useParams();
-  const dispatch = useAppDispatch();
-  const { activities, loading, hasMore, error } = useAppSelector((state) => state.activities);
-  const [page, setPage] = useState(1);
 
-  // Initial load
-  useEffect(() => {
-    dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
-  }, [dispatch]);
+  const {
+    data,
+    isLoading: loading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+  } = useInfiniteActivities("", 5);
 
-  const handleRetry = () => {
-    dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
-    setPage(1);
-  };
-
-  const fetchMore = async () => {
-    const nextPage = page + 1;
-    try {
-      await dispatch(fetchActivitiesPage({ page: nextPage, offset: 5 })).unwrap();
-      setPage(nextPage);
-    } catch {
-      // Managed by the slice
-    }
-  };
+  const activityList = data?.pages.flatMap((page) => page.items) || [];
 
   useSEO({
     title: `All Activities - ${search_by || "Nearby"} | FlocknGo`,
@@ -43,7 +28,9 @@ const AllActivities = () => {
     keywords: "discover activities, find local events, local experiences, social meetup activities",
   });
 
-  const activityList = activities;
+  const handleRetry = () => {
+    refetch();
+  };
 
   if (loading && activityList.length === 0) {
     return (
@@ -56,7 +43,7 @@ const AllActivities = () => {
   if (error && activityList.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center px-16 py-10">
-        <ErrorState title="Unable to load Activities" message={error} onRetry={handleRetry} />
+        <ErrorState title="Unable to load Activities" message={error.message} onRetry={handleRetry} />
       </div>
     );
   }
@@ -71,8 +58,8 @@ const AllActivities = () => {
         {/* Activities List */}
         <InfiniteScroll
           dataLength={activityList.length}
-          next={fetchMore}
-          hasMore={hasMore}
+          next={fetchNextPage}
+          hasMore={!!hasNextPage}
           loader={
             <div className="flex flex-col gap-16 py-10">
               <ScrollLoader />

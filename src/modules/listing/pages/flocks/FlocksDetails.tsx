@@ -1,33 +1,26 @@
-import { useEffect } from "react";
 import dayjs from "dayjs";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
 import SidebarCalendar from "../../components/flocks/SidebarCalendar";
 import { Link, useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { getFlockDetails } from "../../../../store/slices/flockSlice";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import { images } from "../../../../constants/images";
 import ErrorState from "../../../../components/common/ErrorState";
 import type { ActivityItem } from "../../../../store/slices/activitySlice";
 import DetailBanner from "../../components/common/DetailBanner";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useFlockDetails } from "../../../../hooks/useFlocksQuery";
 
 const FlocksDetails = () => {
   const { id } = useParams();
   const flockId = Number(id);
-  const { selected_flock, selected_flock_id, selected_flock_loading, error, errorStatus } = useAppSelector(
-    (state) => state.flock
-  );
-  const dispatch = useAppDispatch();
 
-  // DetailBanner handles cover image fallback state internally.
-
-  useEffect(() => {
-    if (selected_flock_id !== flockId) {
-      dispatch(getFlockDetails(flockId));
-    }
-  }, [dispatch, flockId, selected_flock_id]);
+  const {
+    data: selected_flock,
+    isLoading: selected_flock_loading,
+    error,
+    refetch,
+  } = useFlockDetails(flockId);
 
   useSEO({
     title: selected_flock?.flock_details?.flock_name
@@ -47,10 +40,14 @@ const FlocksDetails = () => {
   }
 
   if (error && !selected_flock) {
+    const axiosError = error as any;
+    const errorStatus = axiosError?.response?.status;
+    const errorMsg = axiosError?.response?.data?.message || axiosError?.message || "";
+
     const isNotFound =
       errorStatus === 404 ||
-      error.toLowerCase().includes("not found") ||
-      error.toLowerCase().includes("does not exist");
+      errorMsg.toLowerCase().includes("not found") ||
+      errorMsg.toLowerCase().includes("does not exist");
 
     if (isNotFound) {
       return (
@@ -81,8 +78,8 @@ const FlocksDetails = () => {
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <ErrorState
           title="Flock Details Unavailable"
-          message={error}
-          onRetry={() => dispatch(getFlockDetails(flockId))}
+          message={errorMsg}
+          onRetry={refetch}
         />
       </div>
     );

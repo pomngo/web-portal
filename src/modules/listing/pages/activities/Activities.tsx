@@ -2,28 +2,24 @@ import { Link } from "react-router-dom";
 import { filterOptions } from "../../../../constants/data";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import FilterButton from "../../components/common/FilterButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { listActivities } from "../../../../store/slices/activitySlice";
-
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useActivities } from "../../../../hooks/useActivitiesQuery";
 
 const Activities = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { activities, loading, error, isInitialized } = useAppSelector((state) => state.activities);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (!isInitialized) {
-      dispatch(listActivities());
-    }
-  }, [dispatch, isInitialized]);
+  const {
+    data: activities = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = useActivities();
 
   useSEO({
     title: "Activities | FlocknGo - Explore Events & Experiences",
@@ -32,7 +28,7 @@ const Activities = () => {
   });
 
   const handleRetry = () => {
-    dispatch(listActivities());
+    refetch();
   };
 
   if (loading && activities.length === 0) {
@@ -46,7 +42,7 @@ const Activities = () => {
   if (error && activities.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center px-16 py-10">
-        <ErrorState title="Unable to load Activities" message={error} onRetry={handleRetry} />
+        <ErrorState title="Unable to load Activities" message={error.message} onRetry={handleRetry} />
       </div>
     );
   }

@@ -4,44 +4,32 @@ import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
-import { listFlocks } from "../../../../store/slices/flockSlice";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { listActivities } from "../../../../store/slices/activitySlice";
-
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useFlocks } from "../../../../hooks/useFlocksQuery";
+import { useActivities } from "../../../../hooks/useActivitiesQuery";
 
 const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
+  
   const {
-    flocks,
-    loading: flockLoading,
+    data: flockList = [],
+    isLoading: flockLoading,
     error: flockError,
-    isInitialized: flockInitialized,
-  } = useAppSelector((state) => state.flock);
+    refetch: refetchFlocks,
+  } = useFlocks("?is_discoverable=true");
+
   const {
-    activities,
-    loading: activityLoading,
+    data: activities = [],
+    isLoading: activityLoading,
     error: activityError,
-    isInitialized: activityInitialized,
-  } = useAppSelector((state) => state.activities);
-  const dispatch = useAppDispatch();
-
-  const flockList = flocks;
-
-  useEffect(() => {
-    if (!flockInitialized) {
-      dispatch(listFlocks("?is_discoverable=true"));
-    }
-    if (!activityInitialized) {
-      dispatch(listActivities());
-    }
-  }, [dispatch, flockInitialized, activityInitialized]);
+    refetch: refetchActivities,
+  } = useActivities();
 
   useSEO({
     title: "Home | FlocknGo - Discover Nearby Activities & Groups",
@@ -51,8 +39,8 @@ const Home = () => {
   });
 
   const handleRetry = () => {
-    dispatch(listFlocks("?is_discoverable=true"));
-    dispatch(listActivities());
+    refetchFlocks();
+    refetchActivities();
   };
 
   if (flockLoading || activityLoading) {
@@ -68,7 +56,7 @@ const Home = () => {
       <div className="flex min-h-screen items-center justify-center px-16 py-10">
         <ErrorState
           title="Unable to load Home Feed"
-          message={flockError || activityError || "An error occurred while fetching the feed."}
+          message={flockError?.message || activityError?.message || "An error occurred while fetching the feed."}
           onRetry={handleRetry}
         />
       </div>

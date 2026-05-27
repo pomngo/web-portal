@@ -1,27 +1,23 @@
-import { useEffect } from "react";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { getActivitiesDetails } from "../../../../store/slices/activitySlice";
 import dayjs from "dayjs";
 import { useParams, Link } from "react-router-dom";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
 import DetailBanner from "../../components/common/DetailBanner";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useActivityDetails } from "../../../../hooks/useActivitiesQuery";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
   const activityId = Number(id);
-  const { selected_activities, selected_activities_id, selected_activities_loading, error, errorStatus } =
-    useAppSelector((state) => state.activities);
-  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (selected_activities_id !== activityId) {
-      dispatch(getActivitiesDetails(activityId));
-    }
-  }, [dispatch, activityId, selected_activities_id]);
+  const {
+    data: selected_activities,
+    isLoading: selected_activities_loading,
+    error,
+    refetch,
+  } = useActivityDetails(activityId);
 
   useSEO({
     title: selected_activities?.name
@@ -41,10 +37,14 @@ const ActivitiesDetails = () => {
   }
 
   if (error && !selected_activities) {
+    const axiosError = error as any;
+    const errorStatus = axiosError?.response?.status;
+    const errorMsg = axiosError?.response?.data?.message || axiosError?.message || "";
+
     const isNotFound =
       errorStatus === 404 ||
-      error.toLowerCase().includes("not found") ||
-      error.toLowerCase().includes("does not exist");
+      errorMsg.toLowerCase().includes("not found") ||
+      errorMsg.toLowerCase().includes("does not exist");
 
     if (isNotFound) {
       return (
@@ -75,12 +75,13 @@ const ActivitiesDetails = () => {
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <ErrorState
           title="Activity Details Unavailable"
-          message={error}
-          onRetry={() => dispatch(getActivitiesDetails(activityId))}
+          message={errorMsg}
+          onRetry={refetch}
         />
       </div>
     );
   }
+
   return (
     <>
       <DetailsTopNav />

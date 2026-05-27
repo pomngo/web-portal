@@ -1,36 +1,26 @@
 import { Link, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
 import PageHeader from "../../../../components/common/PageHeader";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { fetchFlocksPage } from "../../../../store/slices/flockSlice";
 import NearbyFlock from "../../components/home/NearbyFlock";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
-
 import ErrorState from "../../../../components/common/ErrorState";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useInfiniteFlocks } from "../../../../hooks/useFlocksQuery";
 
 const AllFlocks = () => {
   const { search_by } = useParams();
-  const { flocks, hasMore, loading, error } = useAppSelector((state) => state.flock);
-  const flockList = flocks;
-  const [page, setPage] = useState(1);
-  const dispatch = useAppDispatch();
 
-  const fetchMore = async () => {
-    const nextPage = page + 1;
-    try {
-      await dispatch(fetchFlocksPage({ page: nextPage, offset: 5 })).unwrap();
-      setPage(nextPage);
-    } catch {
-      // The hasMore flag is managed by the slice on failure.
-    }
-  };
+  const {
+    data,
+    isLoading: loading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+  } = useInfiniteFlocks("", 5);
 
-  useEffect(() => {
-    dispatch(fetchFlocksPage({ page: 1, offset: 5 }));
-  }, [dispatch]);
+  const flockList = data?.pages.flatMap((page) => page.items) || [];
 
   useSEO({
     title: `All Flocks - ${search_by || "Nearby"} | FlocknGo`,
@@ -39,8 +29,7 @@ const AllFlocks = () => {
   });
 
   const handleRetry = () => {
-    dispatch(fetchFlocksPage({ page: 1, offset: 5 }));
-    setPage(1);
+    refetch();
   };
 
   if (loading && flockList.length === 0) {
@@ -54,7 +43,7 @@ const AllFlocks = () => {
   if (error && flockList.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center px-16 py-10">
-        <ErrorState title="Unable to load Flocks" message={error} onRetry={handleRetry} />
+        <ErrorState title="Unable to load Flocks" message={error.message} onRetry={handleRetry} />
       </div>
     );
   }
@@ -69,8 +58,8 @@ const AllFlocks = () => {
         {/* Activities List */}
         <InfiniteScroll
           dataLength={flockList.length}
-          next={fetchMore}
-          hasMore={hasMore}
+          next={fetchNextPage}
+          hasMore={!!hasNextPage}
           loader={
             <div className="flex flex-col gap-16 py-10">
               <ScrollLoader />

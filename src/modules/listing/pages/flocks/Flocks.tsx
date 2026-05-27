@@ -1,30 +1,25 @@
 import { Link } from "react-router-dom";
 import { filterOptions } from "../../../../constants/data";
 import FilterButton from "../../components/common/FilterButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { listFlocks } from "../../../../store/slices/flockSlice";
 import NearbyFlock from "../../components/home/NearbyFlock";
 
 import ErrorState from "../../../../components/common/ErrorState";
 import { useSEO } from "../../../../hooks/useSEO";
+import { useFlocks } from "../../../../hooks/useFlocksQuery";
 
 const Flocks = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const { flocks, loading, error, isInitialized } = useAppSelector((state) => state.flock);
-  const dispatch = useAppDispatch();
-
-  const flockList = flocks;
-
-  useEffect(() => {
-    if (!isInitialized) {
-      dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
-    }
-  }, [dispatch, isInitialized]);
+  const {
+    data: flockList = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = useFlocks("?is_discoverable=true&page=1&offset=5");
 
   useSEO({
     title: "Flocks | FlocknGo - Find & Connect with Community Groups",
@@ -33,7 +28,7 @@ const Flocks = () => {
   });
 
   const handleRetry = () => {
-    dispatch(listFlocks("?is_discoverable=true&page=1&offset=5"));
+    refetch();
   };
 
   if (loading && flockList.length === 0) {
@@ -47,7 +42,7 @@ const Flocks = () => {
   if (error && flockList.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center px-16 py-10">
-        <ErrorState title="Unable to load Flocks" message={error} onRetry={handleRetry} />
+        <ErrorState title="Unable to load Flocks" message={error.message} onRetry={handleRetry} />
       </div>
     );
   }
