@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { images } from "../../../constants/images";
 import { navItems } from "../../../constants/data";
 import SearchBar from "./common/SearchBar";
-import LoginPopup from "./common/LoginPopup";
+
+const LoginPopup = lazy(() => import("./common/LoginPopup"));
 
 const TopNav = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
@@ -104,12 +106,19 @@ const TopNav = () => {
         {/* Button */}
         <div className="relative">
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true);
+              setHasBeenOpened(true);
+            }}
             className="from-btn02 to-btn01 text-primary cursor-pointer rounded-full bg-linear-to-tr to-75% px-5 py-2 text-[12px] text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px]"
           >
             Become Organizer
           </button>
-          <LoginPopup isOpen={open} onClose={() => setOpen(false)} />
+          {hasBeenOpened && (
+            <Suspense fallback={null}>
+              <LoginPopup isOpen={open} onClose={() => setOpen(false)} />
+            </Suspense>
+          )}
         </div>
       </div>
 

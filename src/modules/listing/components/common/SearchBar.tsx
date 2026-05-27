@@ -1,5 +1,6 @@
-import { useState } from "react";
-import DateCalendarValue from "../../../../components/ui/DateCalendarValue";
+import { useState, lazy, Suspense } from "react";
+
+const DateCalendarValue = lazy(() => import("../../../../components/ui/DateCalendarValue"));
 import { useUserLocation } from "../../../../hooks/useUserLocation";
 import type { Dayjs } from "dayjs";
 import Popover from "@mui/material/Popover";
@@ -137,7 +138,17 @@ const SearchBar = () => {
               },
             }}
           >
-            <DateCalendarValue value={value} setValue={setValue} onClose={handleClose} />
+            {open && (
+              <Suspense
+                fallback={
+                  <div className="flex h-[340px] w-[320px] items-center justify-center p-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EF7F23] border-t-transparent"></div>
+                  </div>
+                }
+              >
+                <DateCalendarValue value={value} setValue={setValue} onClose={handleClose} />
+              </Suspense>
+            )}
           </Popover>
 
           <button

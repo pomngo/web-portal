@@ -56,18 +56,21 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
   return (
     <Link
       to={`/flocks/${card.id}/detail`}
-      className={`group relative block w-full cursor-pointer overflow-hidden rounded-3xl bg-cover bg-center transition-all duration-300 hover:z-auto hover:scale-105 active:scale-95 ${classes} `}
-      style={
-        card.cover_image_s3key
-          ? { backgroundImage: `url(${ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card.cover_image_s3key)})` }
-          : undefined
-      }
+      className={`group relative block w-full cursor-pointer overflow-hidden rounded-3xl transition-all duration-300 hover:z-auto hover:scale-105 active:scale-95 ${classes} `}
     >
-      {!card.cover_image_s3key && (
+      {card.cover_image_s3key ? (
+        <img
+          src={ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card.cover_image_s3key)}
+          alt={card.flock_name || "Cover Image"}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+      ) : (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
           <img
             src={images.not_found}
             alt="No cover"
+            loading="lazy"
             className="max-h-40 w-auto opacity-30 transition-transform duration-300 group-hover:scale-105"
           />
         </div>

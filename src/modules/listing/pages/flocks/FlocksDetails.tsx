@@ -173,6 +173,7 @@ const FlocksDetails = () => {
                         <img
                           src={activity?.cover_image[0] || images.not_found}
                           alt={activity?.name}
+                          loading="lazy"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = images.not_found;
                           }}
