@@ -126,20 +126,16 @@ const ActivitiesDetails = () => {
             <div className="flex items-center gap-5">
               {[
                 {
-                  icon: <Icons.flag />,
+                  icon: <Icons.update />,
                   label: "Updates",
                 },
                 {
-                  icon: <Icons.film />,
+                  icon: <Icons.polls />,
                   label: "Polls",
                 },
                 {
-                  icon: <Icons.camera />,
-                  label: "Gallery",
-                },
-                {
-                  icon: <Icons.heartHandshake />,
-                  label: "Files",
+                  icon: <Icons.chat />,
+                  label: "Chat",
                 },
               ].map((item) => (
                 <div key={item.label} className="flex flex-col items-center gap-2">

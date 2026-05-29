@@ -93,6 +93,7 @@ const FlocksDetails = () => {
         <DetailBanner
           coverImage={selected_flock?.flock_details?.cover_image_s3key}
           altText={selected_flock?.flock_details?.flock_name}
+          defaultImage={images.default_flock_banner}
         />
 
         <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -118,19 +119,19 @@ const FlocksDetails = () => {
             <div className="flex items-center gap-5">
               {[
                 {
-                  icon: <Icons.flag />,
+                  icon: <Icons.update />,
                   label: "Updates",
                 },
                 {
-                  icon: <Icons.film />,
+                  icon: <Icons.polls />,
                   label: "Polls",
                 },
                 {
-                  icon: <Icons.camera />,
+                  icon: <Icons.gallery />,
                   label: "Gallery",
                 },
                 {
-                  icon: <Icons.heartHandshake />,
+                  icon: <Icons.file />,
                   label: "Files",
                 },
               ].map((item) => (
