@@ -6,10 +6,10 @@ import { ENDPOINTS } from "../../../../services/api/endpoints";
 type NearbyFlockProps = {
   flock: {
     id: number;
-    flock_name: string;
+    name?: string;
     location: string;
-    participants_count: number;
-    cover_image_s3key: string;
+    member_count?: number;
+    cover_image_s3key?: string | null;
   };
 };
 
@@ -20,7 +20,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
       <div className="h-52 w-full overflow-hidden rounded-2xl">
         <img
           src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.not_found}`}
-          alt={flock.flock_name}
+          alt={flock.name}
           loading="lazy"
           onError={(e) => {
             (e.target as HTMLImageElement).src = images.not_found;
@@ -31,7 +31,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
 
       {/* Content */}
       <div className="mt-1 flex flex-col gap-1">
-        <h2 className="line-clamp-1 text-[16px] font-semibold">{flock.flock_name || "Title not found"}</h2>
+        <h2 className="line-clamp-1 text-[16px] font-semibold">{flock.name || "Title not found"}</h2>
 
         <p className="text-secondary flex items-center gap-1 text-[12px]">
           <Icons.map height={14} width={14} />
@@ -40,7 +40,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
 
         <p className="text-secondary flex items-center gap-1 text-[12px]">
           <Icons.users height={14} width={14} />
-          {flock.participants_count || 0} members
+          {flock.member_count || 0} members
         </p>
       </div>
 

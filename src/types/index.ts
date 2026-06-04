@@ -2,10 +2,12 @@ export type CardType = "large" | "small" | "wide" | "tall";
 
 export interface FlockItem {
   id: number;
-  flock_name: string;
+  name?: string;
+  flock_name?: string;
   location: string;
-  participants_count: number;
-  cover_image_s3key: string;
+  member_count?: number;
+  participants_count?: number;
+  cover_image_s3key?: string | null;
   description?: string;
   [key: string]: any;
 }

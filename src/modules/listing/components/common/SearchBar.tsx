@@ -27,8 +27,16 @@ const SearchBar = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  // Sync inputs with URL search parameters
   useEffect(() => {
-    if (!searchParams.get("location") && location?.city) {
+    setLocInput(searchParams.get("location") || "");
+    setInterestInput(searchParams.get("interest") || "");
+    const dateParam = searchParams.get("created_date");
+    setValue(dateParam ? dayjs(dateParam) : null);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!searchParams.get("location") && location?.city && !locInput) {
       setLocInput(location.city.split(" ")[0]);
     }
   }, [location, searchParams]);
@@ -76,6 +84,9 @@ const SearchBar = () => {
                   type="search"
                   value={locInput}
                   onChange={(e) => setLocInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
                   className="text-secondary rounded-md bg-white p-0.5 text-xs font-medium outline-none"
                   placeholder="Search Location"
                   list="interest-suggestions"
@@ -109,6 +120,9 @@ const SearchBar = () => {
                   type="search"
                   value={interestInput}
                   onChange={(e) => setInterestInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
                   className="text-secondary/70 bg-transparent p-0.5 px-0 text-xs font-medium text-nowrap outline-none"
                   placeholder="Search Interest"
                   list="interest-suggestions"

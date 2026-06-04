@@ -7,7 +7,7 @@ import { images } from "../../../../constants/images";
 type CommunityFlocksCardProps = {
   card: {
     id: number;
-    flock_name?: string;
+    name?: string;
     title?: string;
     description?: string | "";
     cover_image_s3key?: string | null;
@@ -62,7 +62,7 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
       {card.cover_image_s3key ? (
         <img
           src={ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card.cover_image_s3key)}
-          alt={card.flock_name || "Cover Image"}
+          alt={card.name || "Cover Image"}
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -82,7 +82,7 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
       {/* Content */}
       <div className="relative z-10 flex h-full items-end p-6 text-white">
         <div className="translate-y-10 transform opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-          <h3 className="mb-2 text-2xl leading-tight font-bold">{card?.flock_name}</h3>
+          <h3 className="mb-2 text-2xl leading-tight font-bold">{card?.name || card?.title}</h3>
 
           <p className="text-shadow-primary text-primary/80 mb-4 max-w-64 text-sm">
             {description.slice(0, 25).trim()}
@@ -97,7 +97,7 @@ const CommunityFlocksCard = ({ card, index = 1 }: CommunityFlocksCardProps) => {
 
       {/* Extra Hover Layer */}
       <div>
-        <h3 className="mb-2 text-2xl leading-tight font-bold">{card?.flock_name ?? card?.title}</h3>
+        <h3 className="mb-2 text-2xl leading-tight font-bold">{card?.name || card?.title}</h3>
         transition duration-200 "
       </div>
     </Link>

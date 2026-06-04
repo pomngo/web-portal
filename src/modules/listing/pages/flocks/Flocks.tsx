@@ -7,34 +7,73 @@ import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import NearbyFlock from "../../components/home/NearbyFlock";
-
 import ErrorState from "../../../../components/common/ErrorState";
+import EmptyState from "../../../../components/common/EmptyState";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useFlocks } from "../../../../hooks/useFlocksQuery";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
 
 const Flocks = () => {
-  const [selectedFilter, setSelectedFilter] = useState("");
+  useSyncFilters();
+  const queryClient = useQueryClient();
+  const [selectedFilter, setSelectedFilter] = useState(() => sessionStorage.getItem("flocks_page_filter") || "");
   const [searchParams] = useSearchParams();
 
-  // Combine URL search params, selected category filter, and discoverable details for Flocks
+  const handleSetSelectedFilter = (value: React.SetStateAction<string>) => {
+    setSelectedFilter((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      if (next) {
+        sessionStorage.setItem("flocks_page_filter", next);
+      } else {
+        sessionStorage.removeItem("flocks_page_filter");
+        if (prev) {
+          evictFilterFromCache(queryClient, "interest", prev);
+        }
+      }
+      return next;
+    });
+  };
+
+  // Combine query parameters for React Query key-based caching
   const flockQueryString = (() => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", "1");
-    params.set("offset", "5");
-    if (selectedFilter) {
-      params.set("interest", selectedFilter);
-    }
-    return `?${params.toString()}`;
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = selectedFilter || searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
+    return params.toString() ? `?${params.toString()}` : "";
   })();
 
+  const communityFlockQueryString = (() => {
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
+    return params.toString() ? `?${params.toString()}` : "";
+  })();
+
+  // Fetch flocks (Query Keys include the query strings for caching)
   const {
-    data: flockList = [],
-    isLoading: loading,
-    error,
-    refetch,
+    data: nearbyFlockList = [],
+    isLoading: nearbyLoading,
+    error: nearbyError,
+    refetch: refetchNearby,
   } = useFlocks(flockQueryString);
 
-  const isFlockFiltered = !!selectedFilter || searchParams.toString().length > 0;
+  const {
+    data: communityFlockList = [],
+    isLoading: communityLoading,
+    error: communityError,
+    refetch: refetchCommunity,
+  } = useFlocks(communityFlockQueryString);
+
+  const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
   useSEO({
     title: "Flocks | FlocknGo - Find & Connect with Community Groups",
@@ -43,8 +82,13 @@ const Flocks = () => {
   });
 
   const handleRetry = () => {
-    refetch();
+    refetchNearby();
+    refetchCommunity();
   };
+
+  const loading = nearbyLoading || communityLoading;
+  const error = nearbyError || communityError;
+  const flockList = nearbyFlockList; // placeholder for initial length check
 
   if (loading && flockList.length === 0) {
     return (
@@ -61,6 +105,11 @@ const Flocks = () => {
       </div>
     );
   }
+
+  // Client-side filtering logic (now bypassed as API returns pre-filtered data)
+  const filteredNearbyFlocks = nearbyFlockList;
+  const filteredCommunityFlocks = communityFlockList;
+
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <h1 className="sr-only">Browse Local Flocks and Social Groups - FlocknGo</h1>
@@ -77,26 +126,32 @@ const Flocks = () => {
           </div>
         </div>
 
-        <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-          {flockList.slice(0, 5).map((flock) => (
-            <Link
-              key={flock.id}
-              to={`/flocks/${flock.id}/detail`}
-              className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]"
-            >
-              <NearbyFlock flock={flock} />
-            </Link>
-          ))}
-        </div>
+        {filteredNearbyFlocks.length === 0 ? (
+          <EmptyState message="No nearby flocks found" />
+        ) : (
+          <>
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
+              {filteredNearbyFlocks.slice(0, 5).map((flock) => (
+                <Link
+                  key={flock.id}
+                  to={`/flocks/${flock.id}/detail`}
+                  className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]"
+                >
+                  <NearbyFlock flock={flock} />
+                </Link>
+              ))}
+            </div>
 
-        {/* Activities List */}
-        <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
-          {flockList.slice(0, 5).map((flock) => (
-            <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
-              <NearbyFlock flock={flock} />
-            </Link>
-          ))}
-        </div>
+            {/* Activities List */}
+            <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
+              {filteredNearbyFlocks.slice(0, 5).map((flock) => (
+                <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
+                  <NearbyFlock flock={flock} />
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Filter button */}
         <div className="scrollbar-hide mt-16 flex gap-4 overflow-scroll overflow-y-hidden">
@@ -106,7 +161,7 @@ const Flocks = () => {
               Icon={item.icon}
               label={item.label}
               selectedFilter={selectedFilter}
-              setSelectedFilter={setSelectedFilter}
+              setSelectedFilter={handleSetSelectedFilter}
             />
           ))}
         </div>
@@ -124,21 +179,27 @@ const Flocks = () => {
           </div>
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-          {flockList.slice(0, 5).map((flock, index) => (
-            <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
-              <CommunityFlocksCard card={flock} index={index} />
+        {filteredCommunityFlocks.length === 0 ? (
+          <EmptyState message="No flocks found" />
+        ) : (
+          <>
+            {/* Mobile Carousel */}
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
+              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
+                <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
+                  <CommunityFlocksCard card={flock} index={index} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Desktop Grid */}
-        <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
-          {flockList.slice(0, 5).map((flock, index) => (
-            <CommunityFlocksCard key={flock.id} card={flock} index={index} />
-          ))}
-        </div>
+            {/* Desktop Grid */}
+            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
+              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
+                <CommunityFlocksCard key={flock.id} card={flock} index={index} />
+              ))}
+            </div>
+          </>
+        )}
       </section>
     </main>
   );

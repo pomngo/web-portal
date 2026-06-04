@@ -13,26 +13,53 @@ import EmptyState from "../../../../components/common/EmptyState";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useFlocks } from "../../../../hooks/useFlocksQuery";
 import { useActivities } from "../../../../hooks/useActivitiesQuery";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
 
 const Home = () => {
-  const [selectedFilter, setSelectedFilter] = useState("");
+  useSyncFilters();
+  const queryClient = useQueryClient();
+  const [selectedFilter, setSelectedFilter] = useState(() => sessionStorage.getItem("home_activity_filter") || "");
   const [searchParams] = useSearchParams();
 
-  // Combine URL search params for Flocks
+  const handleSetSelectedFilter = (value: React.SetStateAction<string>) => {
+    setSelectedFilter((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      if (next) {
+        sessionStorage.setItem("home_activity_filter", next);
+      } else {
+        sessionStorage.removeItem("home_activity_filter");
+        if (prev) {
+          evictFilterFromCache(queryClient, "interest", prev);
+        }
+      }
+      return next;
+    });
+  };
+
+  // Combine query parameters for React Query key-based caching
   const flockQueryString = (() => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
     return params.toString() ? `?${params.toString()}` : "";
   })();
 
-  // Combine URL search params and selected category filter for Activities
   const activityQueryString = (() => {
-    const params = new URLSearchParams(searchParams);
-    if (selectedFilter) {
-      params.set("interest", selectedFilter);
-    }
-    return `?${params.toString()}`;
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (date) params.set("created_date", date);
+    if (selectedFilter) params.set("interest", selectedFilter);
+    return params.toString() ? `?${params.toString()}` : "";
   })();
-  
+
+  // Fetch flocks and activities (Query Key includes flockQueryString/activityQueryString for caching)
   const {
     data: flockList = [],
     isLoading: flockLoading,
@@ -41,14 +68,18 @@ const Home = () => {
   } = useFlocks(flockQueryString);
 
   const {
-    data: activities = [],
-    isLoading: activityLoading,
-    error: activityError,
-    refetch: refetchActivities,
+    data: nearbyActivities = [],
+    isLoading: nearbyActivityLoading,
+    error: nearbyActivityError,
+    refetch: refetchNearbyActivities,
   } = useActivities(activityQueryString);
 
-  const isActivityFiltered = !!selectedFilter || searchParams.toString().length > 0;
-  const isFlockFiltered = searchParams.toString().length > 0;
+  const {
+    data: exploreActivities = [],
+    isLoading: exploreActivityLoading,
+    error: exploreActivityError,
+    refetch: refetchExploreActivities,
+  } = useActivities("");
 
   useSEO({
     title: "Home | FlocknGo - Discover Nearby Activities & Groups",
@@ -59,8 +90,12 @@ const Home = () => {
 
   const handleRetry = () => {
     refetchFlocks();
-    refetchActivities();
+    refetchNearbyActivities();
+    refetchExploreActivities();
   };
+
+  const activityLoading = nearbyActivityLoading || exploreActivityLoading;
+  const activityError = nearbyActivityError || exploreActivityError;
 
   if (flockLoading || activityLoading) {
     return (
@@ -70,7 +105,7 @@ const Home = () => {
     );
   }
 
-  if ((flockError || activityError) && flockList.length === 0 && activities.length === 0) {
+  if ((flockError || activityError) && flockList.length === 0 && nearbyActivities.length === 0 && exploreActivities.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center px-16 py-10">
         <ErrorState
@@ -81,6 +116,15 @@ const Home = () => {
       </div>
     );
   }
+
+  // Determine filtering status for headers based on context-specific filters
+  const isActivityFiltered = !!selectedFilter || !!searchParams.get("location") || !!searchParams.get("created_date");
+  const isFlockFiltered = !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
+
+  // Client-side filtering logic based on context rules (now bypassed as API returns pre-filtered data)
+  const filteredNearbyActivities = nearbyActivities;
+  const filteredExploreActivities = exploreActivities;
+  const filteredCommunityFlocks = flockList;
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -98,12 +142,12 @@ const Home = () => {
           </div>
         </div>
 
-        {activities?.length === 0 ? (
+        {filteredNearbyActivities.length === 0 ? (
           <EmptyState message="No nearby activities found" />
         ) : (
           <>
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-              {activities?.map((activity) => (
+              {filteredNearbyActivities.map((activity) => (
                 <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
                   <NearbyActivities activity={activity} />
                 </div>
@@ -112,7 +156,7 @@ const Home = () => {
 
             {/* Activities List */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
-              {activities?.slice(0, 5).map((activity) => (
+              {filteredNearbyActivities.slice(0, 5).map((activity) => (
                 <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
@@ -129,7 +173,7 @@ const Home = () => {
               Icon={item.icon}
               label={item.label}
               selectedFilter={selectedFilter}
-              setSelectedFilter={setSelectedFilter}
+              setSelectedFilter={handleSetSelectedFilter}
             />
           ))}
         </div>
@@ -139,7 +183,7 @@ const Home = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title="Community Flocks" />
+            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
           </div>
 
           <div>
@@ -147,21 +191,27 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-          {flockList.slice(0, 5).map((flock, index) => (
-            <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
-              <CommunityFlocksCard card={flock} index={index} />
+        {filteredCommunityFlocks.length === 0 ? (
+          <EmptyState message="No flocks found" />
+        ) : (
+          <>
+            {/* Mobile Carousel */}
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
+              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
+                <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
+                  <CommunityFlocksCard card={flock} index={index} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Desktop Grid */}
-        <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
-          {flockList.slice(0, 5).map((flock, index) => (
-            <CommunityFlocksCard key={flock.id} card={flock} index={index} />
-          ))}
-        </div>
+            {/* Desktop Grid */}
+            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
+              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
+                <CommunityFlocksCard key={flock.id} card={flock} index={index} />
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {/* Explore Activities */}
@@ -177,13 +227,13 @@ const Home = () => {
             <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-        {activities?.length === 0 ? (
+        {filteredExploreActivities.length === 0 ? (
           <EmptyState message="No activities found" />
         ) : (
           <>
             {/* Mobile Carousel */}
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-              {activities?.slice(0, 5).map((activity) => (
+              {filteredExploreActivities.slice(0, 5).map((activity) => (
                 <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
                   <Link to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                     <ExploreActivitiesCard activity={activity} />
@@ -194,7 +244,7 @@ const Home = () => {
 
             {/* Desktop Grid */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
-              {activities?.slice(0, 5).map((activity) => (
+              {filteredExploreActivities.slice(0, 5).map((activity) => (
                 <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                   <ExploreActivitiesCard activity={activity} />
                 </Link>

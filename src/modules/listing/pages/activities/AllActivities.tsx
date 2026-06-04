@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import PageHeader from "../../../../components/common/PageHeader";
@@ -7,9 +7,22 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import ErrorState from "../../../../components/common/ErrorState";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useInfiniteActivities } from "../../../../hooks/useActivitiesQuery";
+import { useSyncFilters } from "../../../../utils/filter";
 
 const AllActivities = () => {
+  useSyncFilters();
   const { search_by } = useParams();
+  const [searchParams] = useSearchParams();
+  const activityQueryString = (() => {
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
+    return params.toString() ? `?${params.toString()}` : "";
+  })();
 
   const {
     data,
@@ -18,9 +31,11 @@ const AllActivities = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useInfiniteActivities("", 5);
+  } = useInfiniteActivities(activityQueryString, 5);
 
   const activityList = data?.pages.flatMap((page) => page.items) || [];
+
+  const filteredActivityList = activityList;
 
   useSEO({
     title: `All Activities - ${search_by || "Nearby"} | FlocknGo`,
@@ -57,7 +72,7 @@ const AllActivities = () => {
 
         {/* Activities List */}
         <InfiniteScroll
-          dataLength={activityList.length}
+          dataLength={filteredActivityList.length}
           next={fetchNextPage}
           hasMore={!!hasNextPage}
           loader={
@@ -70,7 +85,7 @@ const AllActivities = () => {
           }
         >
           <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            {activityList.map((activity) => (
+            {filteredActivityList.map((activity) => (
               <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
                 <NearbyActivities activity={activity} />
               </Link>

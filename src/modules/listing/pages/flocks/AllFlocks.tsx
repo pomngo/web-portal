@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import PageHeader from "../../../../components/common/PageHeader";
 import NearbyFlock from "../../components/home/NearbyFlock";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -7,9 +7,22 @@ import ErrorState from "../../../../components/common/ErrorState";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useInfiniteFlocks } from "../../../../hooks/useFlocksQuery";
+import { useSyncFilters } from "../../../../utils/filter";
 
 const AllFlocks = () => {
+  useSyncFilters();
   const { search_by } = useParams();
+  const [searchParams] = useSearchParams();
+  const flockQueryString = (() => {
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
+    return params.toString() ? `?${params.toString()}` : "";
+  })();
 
   const {
     data,
@@ -18,9 +31,11 @@ const AllFlocks = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useInfiniteFlocks("", 5);
+  } = useInfiniteFlocks(flockQueryString, 5);
 
   const flockList = data?.pages.flatMap((page) => page.items) || [];
+
+  const filteredFlockList = flockList;
 
   useSEO({
     title: `All Flocks - ${search_by || "Nearby"} | FlocknGo`,
@@ -57,7 +72,7 @@ const AllFlocks = () => {
 
         {/* Activities List */}
         <InfiniteScroll
-          dataLength={flockList.length}
+          dataLength={filteredFlockList.length}
           next={fetchNextPage}
           hasMore={!!hasNextPage}
           loader={
@@ -70,7 +85,7 @@ const AllFlocks = () => {
           }
         >
           <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {flockList.map((flock) => (
+            {filteredFlockList.map((flock) => (
               <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
                 <NearbyFlock flock={flock} />
               </Link>
