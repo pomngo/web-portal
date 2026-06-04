@@ -47,6 +47,9 @@ const Home = () => {
     refetch: refetchActivities,
   } = useActivities(activityQueryString);
 
+  const isActivityFiltered = !!selectedFilter || searchParams.toString().length > 0;
+  const isFlockFiltered = searchParams.toString().length > 0;
+
   useSEO({
     title: "Home | FlocknGo - Discover Nearby Activities & Groups",
     description:
@@ -87,7 +90,7 @@ const Home = () => {
         {/* Heading */}
         <div className="mb-4 flex justify-between">
           <div className="">
-            <TitleText title="Nearby Activities" />
+            <TitleText title={isActivityFiltered ? "Filtered Activities" : "Nearby Activities"} />
             <p className="text-secondary text-base">Enable your location to get personalized results.</p>
           </div>
           <div className="">
@@ -136,7 +139,7 @@ const Home = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title="Community Flocks" />
+            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
           </div>
 
           <div>
@@ -165,7 +168,7 @@ const Home = () => {
       <section className="mb-20 lg:mb-0">
         <div className="mb-4 flex justify-between">
           <div className="">
-            <TitleText title="Explore Activities" />
+            <TitleText title={isActivityFiltered ? "Filtered Activities" : "Explore Activities"} />
             <p className="text-secondary text-xs sm:text-sm md:text-base">
               Explore these amazing flocks and fetch your interest
             </p>

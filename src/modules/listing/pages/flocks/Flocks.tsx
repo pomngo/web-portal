@@ -34,6 +34,8 @@ const Flocks = () => {
     refetch,
   } = useFlocks(flockQueryString);
 
+  const isFlockFiltered = !!selectedFilter || searchParams.toString().length > 0;
+
   useSEO({
     title: "Flocks | FlocknGo - Find & Connect with Community Groups",
     description: "Browse and discover local social groups, clubs, and interest-based flocks. Connect with like-minded people near you with FlocknGo.",
@@ -67,7 +69,7 @@ const Flocks = () => {
         {/* Heading */}
         <div className="mb-4 flex justify-between">
           <div className="">
-            <TitleText title="Nearby Flocks" />
+            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Nearby Flocks"} />
             <p className="text-secondary text-base">Enable your location to get personalized results.</p>
           </div>
           <div className="">
@@ -114,7 +116,7 @@ const Flocks = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title="Community Flocks" />
+            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
           </div>
 
           <div>
