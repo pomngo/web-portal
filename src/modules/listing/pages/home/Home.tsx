@@ -139,7 +139,7 @@ const Home = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
+            <TitleText title="Community Flocks" />
           </div>
 
           <div>
@@ -168,7 +168,7 @@ const Home = () => {
       <section className="mb-20 lg:mb-0">
         <div className="mb-4 flex justify-between">
           <div className="">
-            <TitleText title={isActivityFiltered ? "Filtered Activities" : "Explore Activities"} />
+            <TitleText title="Explore Activities" />
             <p className="text-secondary text-xs sm:text-sm md:text-base">
               Explore these amazing flocks and fetch your interest
             </p>
