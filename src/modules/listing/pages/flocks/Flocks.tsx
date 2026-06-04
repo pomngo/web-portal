@@ -19,7 +19,6 @@ const Flocks = () => {
   // Combine URL search params, selected category filter, and discoverable details for Flocks
   const flockQueryString = (() => {
     const params = new URLSearchParams(searchParams);
-    params.set("is_discoverable", "true");
     params.set("page", "1");
     params.set("offset", "5");
     if (selectedFilter) {

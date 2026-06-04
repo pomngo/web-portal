@@ -7,8 +7,10 @@ export type ExploreActivity = {
   id: number;
   name: string;
   campaign_location: string;
-  flock_members_count: number;
+  flock_members_count?: number;
+  joined_member_count?: number;
   cover_image_s3key?: string;
+  last_cover_image?: string | null;
   image?: string;
 };
 
@@ -17,9 +19,11 @@ type ExploreActivitiesCardProps = {
 };
 
 const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
-  const imageUrl = activity?.cover_image_s3key
-    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
-    : activity?.image || images.not_found;
+  const imageUrl = activity?.last_cover_image
+    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+    : activity?.cover_image_s3key
+      ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
+      : activity?.image || images.not_found;
 
   return (
     <div className="flex cursor-pointer flex-col gap-3 transition-all duration-200 hover:z-99 hover:scale-105 hover:bg-white active:scale-95">
@@ -46,7 +50,7 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
 
           <p className="text-secondary flex items-center gap-1 text-[12px]">
             <Icons.users height={14} width={14} />
-            {activity?.flock_members_count || 0} members
+            {activity?.joined_member_count ?? activity?.flock_members_count ?? 0} members
           </p>
         </div>
       </div>

@@ -14,9 +14,12 @@ export interface ActivityItem {
   id: number;
   name: string;
   campaign_location: string;
-  flock_members_count: number;
+  flock_members_count?: number;
+  joined_member_count?: number;
   title?: string;
   cover_image_s3key?: string;
+  last_cover_image?: string | null;
   image?: string;
   [key: string]: any;
 }
+

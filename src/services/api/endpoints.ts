@@ -6,7 +6,7 @@ export const ENDPOINTS = {
     BASE_IMAGE_URL: (url: string) => `${import.meta.env.VITE_IMAGE_URL}/${url}`,
   },
   CAMPAIGN: {
-    LIST: "/public/flocks/?is_discoverable=true",
+    LIST: "/public/flocks/",
     DETAILS: (id: string | number) => `/public/flocks/?flock_id=${id}`,
   },
   ACTIVITY: {

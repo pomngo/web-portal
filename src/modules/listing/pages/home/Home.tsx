@@ -18,11 +18,10 @@ const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [searchParams] = useSearchParams();
 
-  // Combine URL search params and baseline discoverable state for Flocks
+  // Combine URL search params for Flocks
   const flockQueryString = (() => {
     const params = new URLSearchParams(searchParams);
-    params.set("is_discoverable", "true");
-    return `?${params.toString()}`;
+    return params.toString() ? `?${params.toString()}` : "";
   })();
 
   // Combine URL search params and selected category filter for Activities

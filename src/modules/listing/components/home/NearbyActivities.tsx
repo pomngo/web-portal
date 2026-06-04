@@ -10,19 +10,23 @@ type NearbyActivitiesProps = {
     title?: string;
     campaign_location?: string;
     cover_image_s3key?: string;
+    last_cover_image?: string | null;
     image?: string;
     flock_members_count?: number;
+    joined_member_count?: number;
   };
 };
 
 const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
-  const imageUrl = activity?.cover_image_s3key
-    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
-    : activity?.image || images.not_found;
+  const imageUrl = activity?.last_cover_image
+    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+    : activity?.cover_image_s3key
+      ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
+      : activity?.image || images.not_found;
 
   const activityName = activity?.name || activity?.title || "Title not found";
   const location = activity?.campaign_location || "Location not found";
-  const members = activity?.flock_members_count || 0;
+  const members = activity?.joined_member_count ?? activity?.flock_members_count ?? 0;
 
   return (
     <div className="flex w-full cursor-pointer flex-col gap-3 rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95">

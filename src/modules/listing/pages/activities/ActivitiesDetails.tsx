@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
 import dayjs from "dayjs";
@@ -7,10 +8,20 @@ import ErrorState from "../../../../components/common/ErrorState";
 import DetailBanner from "../../components/common/DetailBanner";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useActivityDetails } from "../../../../hooks/useActivitiesQuery";
+import JoinPromptPopup from "../../components/common/JoinPromptPopup";
+import { ENDPOINTS } from "../../../../services/api/endpoints";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
   const activityId = Number(id);
+
+  const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
+  const [joinPopupMessage, setJoinPopupMessage] = useState("");
+
+  const handleActionClick = (label: string) => {
+    setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
+    setIsJoinPopupOpen(true);
+  };
 
   const {
     data: selected_activities,
@@ -29,7 +40,11 @@ const ActivitiesDetails = () => {
     keywords: selected_activities?.name
       ? `${selected_activities.name}, local activity, community events`
       : "local activity, community events",
-    ogImage: selected_activities?.cover_image?.[0] || undefined,
+    ogImage:
+      selected_activities?.cover_image?.[0] ||
+      (selected_activities?.last_cover_image
+        ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.last_cover_image)
+        : undefined),
   });
 
   if (selected_activities_loading) {
@@ -87,7 +102,15 @@ const ActivitiesDetails = () => {
       <DetailsTopNav />
 
       <div className="min-h-screen bg-[#F9F9F9]">
-        <DetailBanner coverImage={selected_activities?.cover_image?.[0]} altText={selected_activities?.name} />
+        <DetailBanner
+          coverImage={
+            selected_activities?.cover_image?.[0] ||
+            (selected_activities?.last_cover_image
+              ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.last_cover_image)
+              : undefined)
+          }
+          altText={selected_activities?.name}
+        />
         <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-3">
@@ -118,7 +141,7 @@ const ActivitiesDetails = () => {
                 <Icons.users width={22} height={22} className="text-secondary" />
 
                 <span className="underline underline-offset-4">
-                  {selected_activities?.flock_members_count || 0} Members
+                  {selected_activities?.joined_member_count ?? selected_activities?.flock_members_count ?? 0} Members
                 </span>
               </div>
             </div>
@@ -138,12 +161,23 @@ const ActivitiesDetails = () => {
                   label: "Chat",
                 },
               ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-2">
-                  <button className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95">
+                <div key={item.label} className="relative group flex flex-col items-center gap-2">
+                  <button
+                    onClick={() => handleActionClick(item.label)}
+                    className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                  >
                     {item.icon}
                   </button>
 
                   <span className="text-xs text-black/70">{item.label}</span>
+
+                  {/* Tooltip */}
+                  <div className="pointer-events-none absolute bottom-full mb-2.5 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 z-50 w-48 text-center">
+                    <div className="bg-slate-900/95 text-white text-[11px] rounded-lg py-2 px-3 shadow-lg font-medium leading-normal border border-slate-700/30 backdrop-blur-xs">
+                      Join us first then you can see {item.label.toLowerCase()} and all things
+                    </div>
+                    <div className="w-1.5 h-1.5 bg-slate-900 rotate-45 -mt-0.75 border-r border-b border-slate-700/30"></div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -193,6 +227,11 @@ const ActivitiesDetails = () => {
           </div>
         </div>
       </div>
+      <JoinPromptPopup
+        isOpen={isJoinPopupOpen}
+        onClose={() => setIsJoinPopupOpen(false)}
+        message={joinPopupMessage}
+      />
     </>
   );
 };
