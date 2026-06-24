@@ -15,14 +15,9 @@ export const useUserLocation = () => {
 
       if (cachedLocation) {
         setLocation(cachedLocation);
-        setLoading(false);
-        return;
+      } else {
+        setLocation(null);
       }
-
-      // 2. FETCH LOCATION
-      const currentLocation = await locationService.getCurrentLocation();
-
-      setLocation(currentLocation);
     } catch {
       setError("Unable to get location");
     } finally {
