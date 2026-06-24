@@ -19,11 +19,12 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
       {/* Image */}
       <div className="h-52 w-full overflow-hidden rounded-2xl">
         <img
-          src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.not_found}`}
+          src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.default_flock_banner}`}
           alt={flock.name}
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = images.not_found;
+            e.currentTarget.onerror = null;
+            (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
           className="bg-primary-dark h-full w-full rounded-2xl object-cover transition-all duration-500 hover:scale-110"
         />

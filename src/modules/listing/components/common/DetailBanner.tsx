@@ -11,7 +11,7 @@ type DetailBannerProps = {
 const DetailBanner = ({
   coverImage,
   altText = "Banner",
-  defaultImage = images.not_found,
+  defaultImage = images.default_flock_banner,
 }: DetailBannerProps) => {
   const [isCoverFallback, setIsCoverFallback] = useState(false);
 
@@ -21,30 +21,28 @@ const DetailBanner = ({
       : ENDPOINTS.BASE_URL.BASE_IMAGE_URL(coverImage)
     : defaultImage;
 
-  const isFallback = srcUrl === images.not_found || isCoverFallback;
-  const isDefaultFlockBanner = srcUrl === images.default_flock_banner;
+  const isDefaultFlockBanner = srcUrl === images.default_flock_banner || isCoverFallback;
 
   return (
     <div
-      className={`relative ${isFallback ? "h-64" : "h-96"} flex items-center justify-center overflow-hidden bg-cover bg-center`}
+      className={`relative ${isDefaultFlockBanner ? "h-64 lg:h-96" : "h-96"} flex items-center justify-center overflow-hidden bg-cover bg-center`}
       style={isDefaultFlockBanner ? { backgroundColor: "#7e4af4" } : undefined}
     >
       <img
         src={srcUrl}
         alt={altText}
         onError={(e) => {
-          (e.target as HTMLImageElement).src = images.not_found;
+          e.currentTarget.onerror = null;
+          (e.target as HTMLImageElement).src = images.default_flock_banner;
           setIsCoverFallback(true);
         }}
-        className={`${
-          isFallback
-            ? "max-h-48 w-auto rounded-2xl bg-slate-50/50 object-contain p-4"
-            : isDefaultFlockBanner
-              ? "h-full w-full object-contain"
-              : "h-full w-full object-cover lg:w-[90%] lg:rounded-b-xl"
-        }`}
+        className={
+          isDefaultFlockBanner
+            ? "h-full w-full object-contain"
+            : "h-full w-full object-cover lg:w-[90%] lg:rounded-b-xl"
+        }
       />
-      {srcUrl !== images.not_found && !isCoverFallback && !isDefaultFlockBanner && (
+      {!isDefaultFlockBanner && (
         <div className="from-primary-dark/90 via-primary-dark/60 absolute inset-0 bg-linear-to-r to-transparent lg:left-[5%] lg:w-[90%] lg:rounded-b-xl" />
       )}
     </div>

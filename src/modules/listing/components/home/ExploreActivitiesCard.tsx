@@ -23,7 +23,7 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
     ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
     : activity?.cover_image_s3key
       ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
-      : activity?.image || images.not_found;
+      : activity?.image || images.default_flock_banner;
 
   return (
     <div className="flex cursor-pointer flex-col gap-3 transition-all duration-200 hover:z-99 hover:scale-105 hover:bg-white active:scale-95">
@@ -33,7 +33,8 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
           alt={activity?.name || "Activity"}
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = images.not_found;
+            e.currentTarget.onerror = null;
+            (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
           className="h-full w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105"
         />

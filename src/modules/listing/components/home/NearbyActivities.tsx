@@ -22,7 +22,7 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
     ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
     : activity?.cover_image_s3key
       ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
-      : activity?.image || images.not_found;
+      : activity?.image || images.default_flock_banner;
 
   const activityName = activity?.name || activity?.title || "Title not found";
   const location = activity?.campaign_location || "Location not found";
@@ -37,7 +37,8 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
           alt={activityName}
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = images.not_found;
+            e.currentTarget.onerror = null;
+            (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
           className="h-full w-full rounded-2xl object-cover transition-all duration-500 hover:scale-110"
         />

@@ -10,6 +10,7 @@ import { useSEO } from "../../../../hooks/useSEO";
 import { useActivityDetails } from "../../../../hooks/useActivitiesQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
@@ -146,41 +147,48 @@ const ActivitiesDetails = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-5">
-              {[
-                {
-                  icon: <Icons.update />,
-                  label: "Updates",
-                },
-                {
-                  icon: <Icons.polls />,
-                  label: "Polls",
-                },
-                {
-                  icon: <Icons.chat />,
-                  label: "Chat",
-                },
-              ].map((item) => (
-                <div key={item.label} className="relative group flex flex-col items-center gap-2">
-                  <button
-                    onClick={() => handleActionClick(item.label)}
-                    className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
-                  >
-                    {item.icon}
-                  </button>
-
-                  <span className="text-xs text-black/70">{item.label}</span>
-
-                  {/* Tooltip */}
-                  <div className="pointer-events-none absolute bottom-full mb-2.5 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 z-50 w-48 text-center">
-                    <div className="bg-slate-900/95 text-white text-[11px] rounded-lg py-2 px-3 shadow-lg font-medium leading-normal border border-slate-700/30 backdrop-blur-xs">
-                      Join us first then you can see {item.label.toLowerCase()} and all things
-                    </div>
-                    <div className="w-1.5 h-1.5 bg-slate-900 rotate-45 -mt-0.75 border-r border-b border-slate-700/30"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <Tooltip.Provider delayDuration={150}>
+              <div className="flex items-center gap-5">
+                {[
+                  {
+                    icon: <Icons.update />,
+                    label: "Updates",
+                  },
+                  {
+                    icon: <Icons.polls />,
+                    label: "Polls",
+                  },
+                  {
+                    icon: <Icons.chat />,
+                    label: "Chat",
+                  },
+                ].map((item) => (
+                  <Tooltip.Root key={item.label}>
+                    <Tooltip.Trigger asChild>
+                      <div className="flex flex-col items-center gap-2">
+                        <button
+                          onClick={() => handleActionClick(item.label)}
+                          className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                        >
+                          {item.icon}
+                        </button>
+                        <span className="text-xs text-black/70">{item.label}</span>
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        side="top"
+                        sideOffset={5}
+                        className="rt-TooltipContent z-50 max-w-48 text-center bg-slate-900/95 text-white text-[11px] rounded-lg py-2 px-3 shadow-lg font-medium leading-normal border border-slate-700/30 backdrop-blur-xs select-none"
+                      >
+                        Join us first then you can see {item.label.toLowerCase()} and all things
+                        <Tooltip.Arrow className="fill-slate-900" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                ))}
+              </div>
+            </Tooltip.Provider>
           </div>
         </div>
 
@@ -225,6 +233,8 @@ const ActivitiesDetails = () => {
               </div>
             </main>
           </div>
+
+
         </div>
       </div>
       <JoinPromptPopup
