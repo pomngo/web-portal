@@ -52,3 +52,204 @@ html {
     background-position: 0% 50%;
   }
 }
+
+/* Radix Tooltip Animations */
+.rt-TooltipContent {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+.rt-TooltipContent[data-state="delayed-open"] {
+  animation-name: rt-slideUpAndFade;
+}
+
+@keyframes rt-slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Radix Accordion Animations */
+.accordion-item {
+  overflow: hidden;
+}
+
+.accordion-trigger[data-state="open"] svg {
+  transform: rotate(180deg);
+}
+
+.accordion-trigger svg {
+  transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.accordion-content {
+  overflow: hidden;
+}
+.accordion-content[data-state="open"] {
+  animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+.accordion-content[data-state="closed"] {
+  animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* Radix Dialog/Drawer Animations */
+.dialog-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dialog-content {
+  background-color: white;
+  border-radius: 24px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.12);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 450px;
+  max-height: 85vh;
+  padding: 24px;
+  z-index: 51;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-content {
+  background-color: white;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+  box-shadow: 0px -10px 30px rgba(0, 0, 0, 0.08);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 80vh;
+  padding: 24px;
+  z-index: 51;
+  animation: drawerShow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes drawerShow {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Custom DayPicker Button Sizing & Highlights */
+.rdp-day {
+  padding: 0 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.rdp-day_button {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 100% !important;
+  margin: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #333 !important;
+  background-color: transparent !important;
+  border: 2px solid transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+@media (min-width: 640px) {
+  .rdp-day_button {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
+}
+
+.rdp-day_button:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Modifiers applied to the cell, targeting the button inside */
+.rdp-holiday-day .rdp-day_button {
+  background-color: #F8D5E5 !important;
+  color: black !important;
+}
+.rdp-holiday-day .rdp-day_button:hover {
+  background-color: #F8D5E5 !important;
+}
+
+.rdp-activity-day .rdp-day_button {
+  background-color: #C9C2FF !important;
+  color: black !important;
+}
+.rdp-activity-day .rdp-day_button:hover {
+  background-color: #C9C2FF !important;
+}
+
+.rdp-draft-day .rdp-day_button {
+  background-color: #F8E6D5 !important;
+  color: black !important;
+}
+.rdp-draft-day .rdp-day_button:hover {
+  background-color: #F8E6D5 !important;
+}
+
+.rdp-selected-day .rdp-day_button {
+  background-color: #C9C2FF !important;
+  color: black !important;
+}
+
+.rdp-today-day .rdp-day_button {
+  border: 1px solid #FF5B2E !important;
+}

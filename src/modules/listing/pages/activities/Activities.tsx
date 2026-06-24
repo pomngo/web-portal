@@ -1,7 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { filterOptions } from "../../../../constants/data";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import FilterButton from "../../components/common/FilterButton";
+import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import TitleText from "../../../../components/common/TitleText";
@@ -47,17 +46,6 @@ const Activities = () => {
     return params.toString() ? `?${params.toString()}` : "";
   })();
 
-  const exploreActivityQueryString = (() => {
-    const params = new URLSearchParams();
-    const loc = searchParams.get("location");
-    const interest = searchParams.get("interest");
-    const date = searchParams.get("created_date");
-    if (loc) params.set("location", loc);
-    if (interest) params.set("interest", interest);
-    if (date) params.set("created_date", date);
-    return params.toString() ? `?${params.toString()}` : "";
-  })();
-
   // Fetch activities (Query Keys include the query strings for caching)
   const {
     data: nearbyActivitiesList = [],
@@ -71,7 +59,7 @@ const Activities = () => {
     isLoading: exploreLoading,
     error: exploreError,
     refetch: refetchExplore,
-  } = useActivities(exploreActivityQueryString);
+  } = useActivities("");
 
   const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
@@ -105,8 +93,10 @@ const Activities = () => {
     );
   }
 
-  // Client-side filtering logic (now bypassed as API returns pre-filtered data)
-  const filteredNearbyActivities = nearbyActivitiesList;
+  // Fallback Logic: matching/nearby first, fallback to all activities if no matches found
+  const isNearbyActivitiesFallback = nearbyActivitiesList.length === 0 && isActivityFiltered;
+  const filteredNearbyActivities = nearbyActivitiesList.length > 0 ? nearbyActivitiesList : exploreActivitiesList;
+
   const filteredExploreActivities = exploreActivitiesList;
 
   return (
@@ -123,6 +113,12 @@ const Activities = () => {
             <GradientLinkButton to="/activities/nearby-activities" />
           </div>
         </div>
+
+        {isNearbyActivitiesFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No activities match your current search/location. Showing fallback recommendations:
+          </p>
+        )}
 
         {filteredNearbyActivities.length === 0 ? (
           <EmptyState message="No nearby activities found" />
@@ -147,18 +143,11 @@ const Activities = () => {
           </>
         )}
 
-        {/* Filter button */}
-        <div className="scrollbar-hide mt-16 flex gap-4 overflow-scroll overflow-y-hidden">
-          {filterOptions.map((item, index) => (
-            <FilterButton
-              key={index}
-              Icon={item.icon}
-              label={item.label}
-              selectedFilter={selectedFilter}
-              setSelectedFilter={handleSetSelectedFilter}
-            />
-          ))}
-        </div>
+        {/* Filter Chips */}
+        <InterestChips
+          selectedFilter={selectedFilter}
+          setSelectedFilter={handleSetSelectedFilter}
+        />
       </section>
 
       {/* Explore Activities */}

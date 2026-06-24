@@ -4,27 +4,27 @@ import { useEffect, useRef } from "react";
 import { useQueryClient, QueryClient } from "@tanstack/react-query";
 
 // Keyword mapping to make client-side interest filtering feel real and intelligent
+export const keywordMap: Record<string, string[]> = {
+  adventure: ["obstacle", "race", "trip", "ride", "trek", "adventure", "camp", "outdoor", "climb", "hike", "nature", "riders", "motorcycle", "wheels", "trail"],
+  social: ["campfire", "meetup", "night", "party", "social", "gathering", "hangout", "club", "meet", "connect", "campfire night", "talk"],
+  creative: ["art", "craft", "design", "paint", "drawing", "rangoli", "creative"],
+  tech: ["tech", "hackathon", "coding", "web", "app", "developer", "engineers"],
+  wellness: ["yoga", "wellness", "meditation", "healthy", "morning"],
+  culinary: ["feast", "food", "street food", "culinary", "cooking", "eat", "dining", "restaurant", "cafe", "hops"],
+  history: ["history", "fort", "museum", "historical", "heritage"],
+  music: ["music", "concert", "singer", "mic", "band", "acoustic", "jam"],
+  photography: ["photography", "photo", "camera", "shoot", "walk"],
+  travel: ["travel", "tour", "explore", "trip", "coastal", "beach", "road", "highway"],
+  fitness: ["fitness", "gym", "run", "jog", "cycling", "workout", "sports", "wheels"],
+  gaming: ["gaming", "game", "board game", "play"],
+  movies: ["movies", "film", "cinema", "show", "theater"],
+  nature: ["nature", "trees", "lake", "sunset", "river", "park", "garden", "outdoor"]
+};
+
 export const matchFilter = (item: any, filter: string): boolean => {
   if (!filter) return true;
   const normalizedFilter = filter.toLowerCase().trim();
   if (!normalizedFilter) return true;
-
-  const keywordMap: Record<string, string[]> = {
-    adventure: ["obstacle", "race", "trip", "ride", "trek", "adventure", "camp", "outdoor", "climb", "hike", "nature", "riders", "motorcycle", "wheels", "trail"],
-    social: ["campfire", "meetup", "night", "party", "social", "gathering", "hangout", "club", "meet", "connect", "campfire night", "talk"],
-    creative: ["art", "craft", "design", "paint", "drawing", "rangoli", "creative"],
-    tech: ["tech", "hackathon", "coding", "web", "app", "developer", "engineers"],
-    wellness: ["yoga", "wellness", "meditation", "healthy", "morning"],
-    culinary: ["feast", "food", "street food", "culinary", "cooking", "eat", "dining", "restaurant", "cafe", "hops"],
-    history: ["history", "fort", "museum", "historical", "heritage"],
-    music: ["music", "concert", "singer", "mic", "band", "acoustic", "jam"],
-    photography: ["photography", "photo", "camera", "shoot", "walk"],
-    travel: ["travel", "tour", "explore", "trip", "coastal", "beach", "road", "highway"],
-    fitness: ["fitness", "gym", "run", "jog", "cycling", "workout", "sports", "wheels"],
-    gaming: ["gaming", "game", "board game", "play"],
-    movies: ["movies", "film", "cinema", "show", "theater"],
-    nature: ["nature", "trees", "lake", "sunset", "river", "park", "garden", "outdoor"]
-  };
 
   const keywords = keywordMap[normalizedFilter] || [normalizedFilter];
 

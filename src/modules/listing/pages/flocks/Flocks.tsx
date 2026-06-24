@@ -1,6 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { filterOptions } from "../../../../constants/data";
-import FilterButton from "../../components/common/FilterButton";
+import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
@@ -47,17 +46,6 @@ const Flocks = () => {
     return params.toString() ? `?${params.toString()}` : "";
   })();
 
-  const communityFlockQueryString = (() => {
-    const params = new URLSearchParams();
-    const loc = searchParams.get("location");
-    const interest = searchParams.get("interest");
-    const date = searchParams.get("created_date");
-    if (loc) params.set("location", loc);
-    if (interest) params.set("interest", interest);
-    if (date) params.set("created_date", date);
-    return params.toString() ? `?${params.toString()}` : "";
-  })();
-
   // Fetch flocks (Query Keys include the query strings for caching)
   const {
     data: nearbyFlockList = [],
@@ -66,12 +54,21 @@ const Flocks = () => {
     refetch: refetchNearby,
   } = useFlocks(flockQueryString);
 
+  const communityFlockQueryString = flockQueryString;
+
   const {
     data: communityFlockList = [],
     isLoading: communityLoading,
     error: communityError,
     refetch: refetchCommunity,
   } = useFlocks(communityFlockQueryString);
+
+  const {
+    data: unfilteredFlockList = [],
+    isLoading: unfilteredLoading,
+    error: unfilteredError,
+    refetch: refetchUnfiltered,
+  } = useFlocks("");
 
   const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
@@ -84,10 +81,11 @@ const Flocks = () => {
   const handleRetry = () => {
     refetchNearby();
     refetchCommunity();
+    refetchUnfiltered();
   };
 
-  const loading = nearbyLoading || communityLoading;
-  const error = nearbyError || communityError;
+  const loading = nearbyLoading || communityLoading || unfilteredLoading;
+  const error = nearbyError || communityError || unfilteredError;
   const flockList = nearbyFlockList; // placeholder for initial length check
 
   if (loading && flockList.length === 0) {
@@ -106,9 +104,12 @@ const Flocks = () => {
     );
   }
 
-  // Client-side filtering logic (now bypassed as API returns pre-filtered data)
-  const filteredNearbyFlocks = nearbyFlockList;
-  const filteredCommunityFlocks = communityFlockList;
+  // Fallback Logic: matching/nearby first, fallback to all flocks if no matches found
+  const isNearbyFlocksFallback = nearbyFlockList.length === 0 && isFlockFiltered;
+  const filteredNearbyFlocks = nearbyFlockList.length > 0 ? nearbyFlockList : unfilteredFlockList;
+
+  const isCommunityFlocksFallback = communityFlockList.length === 0 && isFlockFiltered;
+  const filteredCommunityFlocks = communityFlockList.length > 0 ? communityFlockList : unfilteredFlockList;
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -125,6 +126,12 @@ const Flocks = () => {
             <GradientLinkButton to="/flocks/nearby-flocks" />
           </div>
         </div>
+
+        {isNearbyFlocksFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No flocks match your current search/location. Showing fallback recommendations:
+          </p>
+        )}
 
         {filteredNearbyFlocks.length === 0 ? (
           <EmptyState message="No nearby flocks found" />
@@ -153,25 +160,18 @@ const Flocks = () => {
           </>
         )}
 
-        {/* Filter button */}
-        <div className="scrollbar-hide mt-16 flex gap-4 overflow-scroll overflow-y-hidden">
-          {filterOptions.map((item, index) => (
-            <FilterButton
-              key={index}
-              Icon={item.icon}
-              label={item.label}
-              selectedFilter={selectedFilter}
-              setSelectedFilter={handleSetSelectedFilter}
-            />
-          ))}
-        </div>
+        {/* Filter Chips */}
+        <InterestChips
+          selectedFilter={selectedFilter}
+          setSelectedFilter={handleSetSelectedFilter}
+        />
       </section>
 
       {/* Community Flocks */}
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title="Community Flocks" />
+            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
           </div>
 
           <div>
@@ -179,23 +179,29 @@ const Flocks = () => {
           </div>
         </div>
 
+        {isCommunityFlocksFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No flocks match your current search/location. Showing fallback recommendations:
+          </p>
+        )}
+
         {filteredCommunityFlocks.length === 0 ? (
           <EmptyState message="No flocks found" />
         ) : (
           <>
             {/* Mobile Carousel */}
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:hidden">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
                 <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
-                  <CommunityFlocksCard card={flock} index={index} />
+                  <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
                 </div>
               ))}
             </div>
 
             {/* Desktop Grid */}
-            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
+            <div className="hidden auto-rows-auto grid-cols-1 gap-4 md:grid md:grid-cols-12">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <CommunityFlocksCard key={flock.id} card={flock} index={index} />
+                <CommunityFlocksCard key={flock.id} card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
               ))}
             </div>
           </>

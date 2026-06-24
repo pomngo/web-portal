@@ -1,7 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import { filterOptions } from "../../../../constants/data";
-import FilterButton from "../../components/common/FilterButton";
+import InterestChips from "../../components/common/InterestChips";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import { useState } from "react";
@@ -37,11 +36,12 @@ const Home = () => {
     });
   };
 
-  // Combine query parameters for React Query key-based caching
+
+
   const flockQueryString = (() => {
     const params = new URLSearchParams();
     const loc = searchParams.get("location");
-    const interest = searchParams.get("interest");
+    const interest = selectedFilter || searchParams.get("interest");
     const date = searchParams.get("created_date");
     if (loc) params.set("location", loc);
     if (interest) params.set("interest", interest);
@@ -52,10 +52,11 @@ const Home = () => {
   const activityQueryString = (() => {
     const params = new URLSearchParams();
     const loc = searchParams.get("location");
+    const interest = selectedFilter || searchParams.get("interest");
     const date = searchParams.get("created_date");
     if (loc) params.set("location", loc);
     if (date) params.set("created_date", date);
-    if (selectedFilter) params.set("interest", selectedFilter);
+    if (interest) params.set("interest", interest);
     return params.toString() ? `?${params.toString()}` : "";
   })();
 
@@ -66,6 +67,13 @@ const Home = () => {
     error: flockError,
     refetch: refetchFlocks,
   } = useFlocks(flockQueryString);
+
+  const {
+    data: unfilteredFlockList = [],
+    isLoading: unfilteredFlockLoading,
+    error: unfilteredFlockError,
+    refetch: refetchUnfilteredFlocks,
+  } = useFlocks("");
 
   const {
     data: nearbyActivities = [],
@@ -90,14 +98,15 @@ const Home = () => {
 
   const handleRetry = () => {
     refetchFlocks();
+    refetchUnfilteredFlocks();
     refetchNearbyActivities();
     refetchExploreActivities();
   };
 
   const activityLoading = nearbyActivityLoading || exploreActivityLoading;
-  const activityError = nearbyActivityError || exploreActivityError;
+  const activityError = nearbyActivityError || exploreActivityError || unfilteredFlockError;
 
-  if (flockLoading || activityLoading) {
+  if (flockLoading || activityLoading || unfilteredFlockLoading) {
     return (
       <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <HomeLoader type="home" />
@@ -118,13 +127,17 @@ const Home = () => {
   }
 
   // Determine filtering status for headers based on context-specific filters
-  const isActivityFiltered = !!selectedFilter || !!searchParams.get("location") || !!searchParams.get("created_date");
-  const isFlockFiltered = !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
+  const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
+  const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
-  // Client-side filtering logic based on context rules (now bypassed as API returns pre-filtered data)
-  const filteredNearbyActivities = nearbyActivities;
+  // Fallback Logic: matching/nearby first, fallback to all activities/flocks if no matches found
+  const isNearbyActivitiesFallback = nearbyActivities.length === 0 && isActivityFiltered;
+  const filteredNearbyActivities = nearbyActivities.length > 0 ? nearbyActivities : exploreActivities;
+  
+  const isCommunityFlocksFallback = flockList.length === 0 && isFlockFiltered;
+  const filteredCommunityFlocks = flockList.length > 0 ? flockList : unfilteredFlockList;
+
   const filteredExploreActivities = exploreActivities;
-  const filteredCommunityFlocks = flockList;
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -141,6 +154,12 @@ const Home = () => {
             <GradientLinkButton to="/activities/nearby-activities" />
           </div>
         </div>
+
+        {isNearbyActivitiesFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No activities match your current search/location. Showing fallback recommendations:
+          </p>
+        )}
 
         {filteredNearbyActivities.length === 0 ? (
           <EmptyState message="No nearby activities found" />
@@ -165,18 +184,11 @@ const Home = () => {
           </>
         )}
 
-        {/* Filter button */}
-        <div className="scrollbar-hide mt-16 flex gap-4 overflow-scroll overflow-y-hidden">
-          {filterOptions.map((item, index) => (
-            <FilterButton
-              key={index}
-              Icon={item.icon}
-              label={item.label}
-              selectedFilter={selectedFilter}
-              setSelectedFilter={handleSetSelectedFilter}
-            />
-          ))}
-        </div>
+        {/* Filter Chips */}
+        <InterestChips
+          selectedFilter={selectedFilter}
+          setSelectedFilter={handleSetSelectedFilter}
+        />
       </section>
 
       {/* Community Flocks */}
@@ -191,23 +203,29 @@ const Home = () => {
           </div>
         </div>
 
+        {isCommunityFlocksFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No flocks match your current search/location. Showing fallback recommendations:
+          </p>
+        )}
+
         {filteredCommunityFlocks.length === 0 ? (
           <EmptyState message="No flocks found" />
         ) : (
           <>
             {/* Mobile Carousel */}
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:hidden">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
                 <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
-                  <CommunityFlocksCard card={flock} index={index} />
+                  <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
                 </div>
               ))}
             </div>
 
             {/* Desktop Grid */}
-            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
+            <div className="hidden auto-rows-auto grid-cols-1 gap-4 md:grid md:grid-cols-12">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <CommunityFlocksCard key={flock.id} card={flock} index={index} />
+                <CommunityFlocksCard key={flock.id} card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
               ))}
             </div>
           </>
