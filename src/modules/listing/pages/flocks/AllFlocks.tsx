@@ -47,13 +47,7 @@ const AllFlocks = () => {
     refetch();
   };
 
-  if (loading && flockList.length === 0) {
-    return (
-      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <HomeLoader type="all-flocks" />
-      </div>
-    );
-  }
+
 
   if (error && flockList.length === 0) {
     return (
@@ -70,28 +64,31 @@ const AllFlocks = () => {
       <section className="">
         <PageHeader slug={search_by} />
 
-        {/* Activities List */}
-        <InfiniteScroll
-          dataLength={filteredFlockList.length}
-          next={fetchNextPage}
-          hasMore={!!hasNextPage}
-          loader={
-            <div className="flex flex-col gap-16 py-10">
-              <ScrollLoader />
+        {loading && flockList.length === 0 ? (
+          <HomeLoader type="all-flocks" />
+        ) : (
+          <InfiniteScroll
+            dataLength={filteredFlockList.length}
+            next={fetchNextPage}
+            hasMore={!!hasNextPage}
+            loader={
+              <div className="flex flex-col gap-16 py-10">
+                <ScrollLoader />
+              </div>
+            }
+            endMessage={
+              <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more flocks are there.</p>
+            }
+          >
+            <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {filteredFlockList.map((flock) => (
+                <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
+                  <NearbyFlock flock={flock} />
+                </Link>
+              ))}
             </div>
-          }
-          endMessage={
-            <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more flocks are there.</p>
-          }
-        >
-          <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {filteredFlockList.map((flock) => (
-              <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
-                <NearbyFlock flock={flock} />
-              </Link>
-            ))}
-          </div>
-        </InfiniteScroll>
+          </InfiniteScroll>
+        )}
       </section>
     </main>
   );

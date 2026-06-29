@@ -132,7 +132,13 @@ const ActivitiesDetails = () => {
                   <div className="flex items-center gap-1">
                     {" "}
                     <Icons.watch size={17} />{" "}
-                    <span className="">{dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}</span>
+                    <span className="">
+                      {selected_activities?.end_date_time
+                        ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY")
+                        : selected_activities?.end_date
+                        ? dayjs(selected_activities.end_date).format("D ddd, MMM YYYY")
+                        : dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}
+                    </span>
                   </div>
                 </div>
                 <div className=""></div>
@@ -212,8 +218,22 @@ const ActivitiesDetails = () => {
                     <span className="text-secondary/80">Last Date to Join</span>
                   </div>
                   <p className="pl-8 font-medium text-nowrap sm:pl-0">
+                    {selected_activities?.ebd_date
+                      ? dayjs(selected_activities.ebd_date).format("D ddd, MMM YYYY")
+                      : "N/A"}
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-start gap-2 text-base font-normal text-black/80 sm:flex-row sm:items-center sm:gap-4">
+                  <div className="flex items-center gap-2">
+                    <Icons.watch width={22} height={22} className="text-secondary" />
+                    <span className="text-secondary/80">Activity Timing</span>
+                  </div>
+                  <p className="pl-8 font-medium text-nowrap sm:pl-0">
                     {selected_activities?.end_date_time
-                      ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY")
+                      ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY, h:mm A")
+                      : selected_activities?.end_date
+                      ? dayjs(selected_activities.end_date).format("D ddd, MMM YYYY")
                       : "N/A"}
                   </p>
                 </div>

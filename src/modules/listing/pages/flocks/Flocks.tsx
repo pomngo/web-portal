@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
-import HomeLoader from "../../../../components/common/HomeLoader";
+import HomeLoader, { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
@@ -63,13 +63,6 @@ const Flocks = () => {
     refetch: refetchCommunity,
   } = useFlocks(communityFlockQueryString);
 
-  const {
-    data: unfilteredFlockList = [],
-    isLoading: unfilteredLoading,
-    error: unfilteredError,
-    refetch: refetchUnfiltered,
-  } = useFlocks("");
-
   const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
   useSEO({
@@ -81,20 +74,13 @@ const Flocks = () => {
   const handleRetry = () => {
     refetchNearby();
     refetchCommunity();
-    refetchUnfiltered();
   };
 
-  const loading = nearbyLoading || communityLoading || unfilteredLoading;
-  const error = nearbyError || communityError || unfilteredError;
+  const loading = nearbyLoading || communityLoading;
+  const error = nearbyError || communityError;
   const flockList = nearbyFlockList; // placeholder for initial length check
 
-  if (loading && flockList.length === 0) {
-    return (
-      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <HomeLoader type="flocks" />
-      </div>
-    );
-  }
+
 
   if (error && flockList.length === 0) {
     return (
@@ -104,12 +90,12 @@ const Flocks = () => {
     );
   }
 
-  // Fallback Logic: matching/nearby first, fallback to all flocks if no matches found
-  const isNearbyFlocksFallback = nearbyFlockList.length === 0 && isFlockFiltered;
-  const filteredNearbyFlocks = nearbyFlockList.length > 0 ? nearbyFlockList : unfilteredFlockList;
+  // Fallback Logic
+  const isNearbyFlocksFallback = nearbyFlockList.some((flock: any) => flock.is_fallback);
+  const filteredNearbyFlocks = nearbyFlockList;
 
-  const isCommunityFlocksFallback = communityFlockList.length === 0 && isFlockFiltered;
-  const filteredCommunityFlocks = communityFlockList.length > 0 ? communityFlockList : unfilteredFlockList;
+  const isCommunityFlocksFallback = communityFlockList.some((flock: any) => flock.is_fallback);
+  const filteredCommunityFlocks = communityFlockList;
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -133,7 +119,9 @@ const Flocks = () => {
           </p>
         )}
 
-        {filteredNearbyFlocks.length === 0 ? (
+        {nearbyLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredNearbyFlocks.length === 0 ? (
           <EmptyState message="No nearby flocks found" />
         ) : (
           <>
@@ -185,7 +173,9 @@ const Flocks = () => {
           </p>
         )}
 
-        {filteredCommunityFlocks.length === 0 ? (
+        {communityLoading ? (
+          <ResponsiveBentoFlockListSkeleton />
+        ) : filteredCommunityFlocks.length === 0 ? (
           <EmptyState message="No flocks found" />
         ) : (
           <>

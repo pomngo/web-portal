@@ -4,7 +4,7 @@ type HomeLoaderProps = {
   type?: "home" | "flocks" | "activities" | "all-flocks" | "all-activities";
 };
 
-const CardSkeleton = () => (
+export const CardSkeleton = () => (
   <div className="flex w-full flex-col gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-xs">
     <Skeleton variant="rounded" width="100%" height={208} sx={{ borderRadius: "16px" }} />
 
@@ -42,7 +42,7 @@ const BentoFlockCardSkeleton = ({ index }: { index: number }) => {
   );
 };
 
-const CategoryFiltersSkeleton = () => (
+export const CategoryFiltersSkeleton = () => (
   <div className="scrollbar-hide flex gap-4 overflow-x-auto py-2">
     {Array.from({ length: 7 }).map((_, index) => (
       <Skeleton
@@ -57,7 +57,7 @@ const CategoryFiltersSkeleton = () => (
   </div>
 );
 
-const SectionHeaderSkeleton = ({ hasSubtitle = true }: { hasSubtitle?: boolean }) => (
+export const SectionHeaderSkeleton = ({ hasSubtitle = true }: { hasSubtitle?: boolean }) => (
   <div className="mb-4 flex items-center justify-between">
     <div className="flex w-2/3 flex-col gap-1.5">
       <Skeleton variant="text" width="40%" height={32} />
@@ -67,7 +67,7 @@ const SectionHeaderSkeleton = ({ hasSubtitle = true }: { hasSubtitle?: boolean }
   </div>
 );
 
-const ResponsiveCardListSkeleton = () => (
+export const ResponsiveCardListSkeleton = () => (
   <>
     <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
       {Array.from({ length: 5 }).map((_, index) => (
@@ -85,7 +85,7 @@ const ResponsiveCardListSkeleton = () => (
   </>
 );
 
-const ResponsiveBentoFlockListSkeleton = () => (
+export const ResponsiveBentoFlockListSkeleton = () => (
   <>
     <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
       {Array.from({ length: 5 }).map((_, index) => (

@@ -54,7 +54,7 @@ const InterestChips = ({ selectedFilter, setSelectedFilter }: InterestChipsProps
               onClick={() => handleSelect(category.label)}
               className={`flex snap-center items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold tracking-wide border transition-all duration-300 outline-hidden cursor-pointer select-none whitespace-nowrap hover:scale-105 active:scale-95 ${
                 isSelected
-                  ? "bg-gradient-to-r from-[#EF7F23] to-[#F2A900] text-white border-transparent shadow-md transform scale-[1.02]"
+                  ? "bg-primary-dark/20 border-transparent shadow-md transform scale-[1.02]"
                   : "bg-white/80 text-[#1F2E4D] border-slate-200/60 hover:bg-slate-50 hover:border-slate-300 backdrop-blur-md"
               }`}
             >

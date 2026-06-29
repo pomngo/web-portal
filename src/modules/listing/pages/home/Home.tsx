@@ -4,7 +4,7 @@ import InterestChips from "../../components/common/InterestChips";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import { useState } from "react";
-import HomeLoader from "../../../../components/common/HomeLoader";
+import HomeLoader, { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import ErrorState from "../../../../components/common/ErrorState";
@@ -69,13 +69,6 @@ const Home = () => {
   } = useFlocks(flockQueryString);
 
   const {
-    data: unfilteredFlockList = [],
-    isLoading: unfilteredFlockLoading,
-    error: unfilteredFlockError,
-    refetch: refetchUnfilteredFlocks,
-  } = useFlocks("");
-
-  const {
     data: nearbyActivities = [],
     isLoading: nearbyActivityLoading,
     error: nearbyActivityError,
@@ -98,21 +91,14 @@ const Home = () => {
 
   const handleRetry = () => {
     refetchFlocks();
-    refetchUnfilteredFlocks();
     refetchNearbyActivities();
     refetchExploreActivities();
   };
 
   const activityLoading = nearbyActivityLoading || exploreActivityLoading;
-  const activityError = nearbyActivityError || exploreActivityError || unfilteredFlockError;
+  const activityError = nearbyActivityError || exploreActivityError;
 
-  if (flockLoading || activityLoading || unfilteredFlockLoading) {
-    return (
-      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <HomeLoader type="home" />
-      </div>
-    );
-  }
+
 
   if ((flockError || activityError) && flockList.length === 0 && nearbyActivities.length === 0 && exploreActivities.length === 0) {
     return (
@@ -130,12 +116,12 @@ const Home = () => {
   const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
   const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
-  // Fallback Logic: matching/nearby first, fallback to all activities/flocks if no matches found
-  const isNearbyActivitiesFallback = nearbyActivities.length === 0 && isActivityFiltered;
-  const filteredNearbyActivities = nearbyActivities.length > 0 ? nearbyActivities : exploreActivities;
+  // Fallback Logic
+  const isNearbyActivitiesFallback = nearbyActivities.some((act: any) => act.is_fallback);
+  const filteredNearbyActivities = nearbyActivities;
   
-  const isCommunityFlocksFallback = flockList.length === 0 && isFlockFiltered;
-  const filteredCommunityFlocks = flockList.length > 0 ? flockList : unfilteredFlockList;
+  const isCommunityFlocksFallback = flockList.some((flock: any) => flock.is_fallback);
+  const filteredCommunityFlocks = flockList;
 
   const filteredExploreActivities = exploreActivities;
 
@@ -161,7 +147,9 @@ const Home = () => {
           </p>
         )}
 
-        {filteredNearbyActivities.length === 0 ? (
+        {nearbyActivityLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredNearbyActivities.length === 0 ? (
           <EmptyState message="No nearby activities found" />
         ) : (
           <>
@@ -176,7 +164,7 @@ const Home = () => {
             {/* Activities List */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredNearbyActivities.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
@@ -209,7 +197,9 @@ const Home = () => {
           </p>
         )}
 
-        {filteredCommunityFlocks.length === 0 ? (
+        {flockLoading ? (
+          <ResponsiveBentoFlockListSkeleton />
+        ) : filteredCommunityFlocks.length === 0 ? (
           <EmptyState message="No flocks found" />
         ) : (
           <>
@@ -245,7 +235,9 @@ const Home = () => {
             <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-        {filteredExploreActivities.length === 0 ? (
+        {exploreActivityLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredExploreActivities.length === 0 ? (
           <EmptyState message="No activities found" />
         ) : (
           <>
@@ -253,7 +245,7 @@ const Home = () => {
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
                 <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                  <Link to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>
@@ -263,7 +255,7 @@ const Home = () => {
             {/* Desktop Grid */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <ExploreActivitiesCard activity={activity} />
                 </Link>
               ))}

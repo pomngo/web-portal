@@ -119,6 +119,12 @@ const FlocksDetails = () => {
   const displayTags = activityNames.slice(0, 3).join(", ");
   const remainingCount = activityNames.length - 3;
 
+  // Flock interests tags generation
+  const flockInterests = selected_flock?.flock_details?.interests || [];
+  const interestTags = flockInterests.map((i: any) => i.name) || [];
+  const displayInterestTags = interestTags.slice(0, 3).join(", ");
+  const remainingInterestCount = interestTags.length - 3;
+
   return (
     <>
       {/* Desktop view (>= lg) */}
@@ -137,6 +143,15 @@ const FlocksDetails = () => {
             <div className="max-w-[1440px] mx-auto flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
               <div className="flex flex-col gap-3">
                 <div>
+                  <p className="text-xs font-bold text-[#EF7F23] tracking-wide mb-1.5 uppercase">
+                    {interestTags.length > 0 ? (
+                      <>#{displayInterestTags} {remainingInterestCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingInterestCount}</span>}</>
+                    ) : activityNames.length > 0 ? (
+                      <>#{displayTags} {remainingCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingCount}</span>}</>
+                    ) : (
+                      `# Community, Social, Meetup`
+                    )}
+                  </p>
                   <h1 className="text-[28px] font-semibold text-slate-800">{selected_flock?.flock_details?.flock_name}</h1>
                   <p className="text-slate-600 mt-1 max-w-2xl text-[15px] leading-relaxed">
                     {selected_flock?.flock_details?.description}
@@ -341,7 +356,9 @@ const FlocksDetails = () => {
         <div className="bg-[#FAF5EF] px-6 py-6 flex flex-col gap-4">
           {/* Tags */}
           <p className="text-sm font-semibold text-[#EF7F23] tracking-wide">
-            {activityNames.length > 0 ? (
+            {interestTags.length > 0 ? (
+              <>#{displayInterestTags} {remainingInterestCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingInterestCount}</span>}</>
+            ) : activityNames.length > 0 ? (
               <>#{displayTags} {remainingCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingCount}</span>}</>
             ) : (
               `# Community, Social, Meetup`

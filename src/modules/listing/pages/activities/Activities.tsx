@@ -7,7 +7,7 @@ import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
-import HomeLoader from "../../../../components/common/HomeLoader";
+import HomeLoader, { ResponsiveCardListSkeleton } from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useActivities } from "../../../../hooks/useActivitiesQuery";
 import { useQueryClient } from "@tanstack/react-query";
@@ -77,13 +77,7 @@ const Activities = () => {
   const loading = nearbyLoading || exploreLoading;
   const error = nearbyError || exploreError;
 
-  if (loading && nearbyActivitiesList.length === 0 && exploreActivitiesList.length === 0) {
-    return (
-      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <HomeLoader type="activities" />
-      </div>
-    );
-  }
+
 
   if (error && nearbyActivitiesList.length === 0 && exploreActivitiesList.length === 0) {
     return (
@@ -93,9 +87,9 @@ const Activities = () => {
     );
   }
 
-  // Fallback Logic: matching/nearby first, fallback to all activities if no matches found
-  const isNearbyActivitiesFallback = nearbyActivitiesList.length === 0 && isActivityFiltered;
-  const filteredNearbyActivities = nearbyActivitiesList.length > 0 ? nearbyActivitiesList : exploreActivitiesList;
+  // Fallback Logic
+  const isNearbyActivitiesFallback = nearbyActivitiesList.some((act: any) => act.is_fallback);
+  const filteredNearbyActivities = nearbyActivitiesList;
 
   const filteredExploreActivities = exploreActivitiesList;
 
@@ -120,7 +114,9 @@ const Activities = () => {
           </p>
         )}
 
-        {filteredNearbyActivities.length === 0 ? (
+        {nearbyLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredNearbyActivities.length === 0 ? (
           <EmptyState message="No nearby activities found" />
         ) : (
           <>
@@ -135,7 +131,7 @@ const Activities = () => {
             {/* Activities List */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredNearbyActivities.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
@@ -163,7 +159,9 @@ const Activities = () => {
             <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-        {filteredExploreActivities.length === 0 ? (
+        {exploreLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredExploreActivities.length === 0 ? (
           <EmptyState message="No activities found" />
         ) : (
           <>
@@ -171,7 +169,7 @@ const Activities = () => {
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
                 <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                  <Link to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>
@@ -181,7 +179,7 @@ const Activities = () => {
             {/* Desktop Grid */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <ExploreActivitiesCard activity={activity} />
                 </Link>
               ))}
