@@ -10,19 +10,13 @@ class LocationService {
     try {
       const gpsLocation = await this.getGPSLocation();
 
-      localStorage.setItem(
-        "user_location",
-        JSON.stringify(gpsLocation)
-      );
+      localStorage.setItem("user_location", JSON.stringify(gpsLocation));
 
       return gpsLocation;
     } catch {
       const ipLocation = await this.getIPLocation();
 
-      localStorage.setItem(
-        "user_location",
-        JSON.stringify(ipLocation)
-      );
+      localStorage.setItem("user_location", JSON.stringify(ipLocation));
 
       return ipLocation;
     }
@@ -36,10 +30,27 @@ class LocationService {
       }
 
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          let city: string | undefined = undefined;
+
+          try {
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              city = data.city || data.locality || data.principalSubdivision;
+            }
+          } catch (error) {
+            console.error("GPS reverse geocoding failed:", error);
+          }
+
           resolve({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+            lat,
+            lng,
+            city,
             source: "gps",
           });
         },

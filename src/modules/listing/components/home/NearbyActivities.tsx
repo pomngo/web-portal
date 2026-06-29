@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -9,87 +10,61 @@ type NearbyActivitiesProps = {
     title?: string;
     campaign_location?: string;
     cover_image_s3key?: string;
+    last_cover_image?: string | null;
     image?: string;
     flock_members_count?: number;
+    joined_member_count?: number;
   };
 };
 
 const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
-  const imageUrl = activity?.cover_image_s3key
-    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
-    : activity?.image || images.not_found;
+  const imageUrl = activity?.last_cover_image
+    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+    : activity?.cover_image_s3key
+      ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
+      : activity?.image || images.default_flock_banner;
 
   const activityName = activity?.name || activity?.title || "Title not found";
   const location = activity?.campaign_location || "Location not found";
-  const members = activity?.flock_members_count || 0;
+  const members = activity?.joined_member_count ?? activity?.flock_members_count ?? 0;
 
   return (
-    <div
-      className="
-        w-full
-        rounded-2xl
-        bg-white
-        p-3
-        flex flex-col gap-3
-        cursor-pointer
-        active:scale-95
-        hover:scale-[1.02]
-        transition-all duration-300
-        shadow-sm hover:shadow-lg
-      "
-    >
+    <div className="flex w-full cursor-pointer flex-col gap-3 rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95">
       {/* Image */}
-      <div className="w-full h-52 overflow-hidden rounded-2xl">
+      <div className="h-52 w-full overflow-hidden rounded-2xl">
         <img
           src={imageUrl}
           alt={activityName}
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = images.not_found;
+            e.currentTarget.onerror = null;
+            (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
-          className="
-            w-full h-full object-cover
-            rounded-2xl
-            hover:scale-110
-            transition-all duration-500
-          "
+          className="h-full w-full rounded-2xl object-cover transition-all duration-500 hover:scale-110"
         />
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-1 mt-1">
-        <h2 className="text-[16px] font-semibold line-clamp-1">
-          {activityName}
-        </h2>
+      <div className="mt-1 flex flex-col gap-1">
+        <h2 className="line-clamp-1 text-[16px] font-semibold">{activityName}</h2>
 
-        <p className="text-secondary text-[12px] flex items-center gap-1">
+        <p className="text-secondary flex items-center gap-1 text-[12px]">
           <Icons.map height={14} width={14} />
           {location}
         </p>
 
-        <p className="text-secondary text-[12px] flex items-center gap-1">
+        <p className="text-secondary flex items-center gap-1 text-[12px]">
           <Icons.users height={14} width={14} />
           {members} members
         </p>
       </div>
 
       {/* Button */}
-      <button
-        className="
-          w-full rounded-xl
-          bg-linear-to-tr from-btn02 to-btn01 to-75%
-          px-5 py-2 text-primary
-          transition-all duration-300
-          hover:scale-[1.02]
-          active:scale-95
-          cursor-pointer
-          mt-3
-        "
-      >
+      <button className="from-btn02 to-btn01 text-primary mt-3 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-5 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95">
         Join Now
       </button>
     </div>
   );
 };
 
-export default NearbyActivities;
+export default memo(NearbyActivities);

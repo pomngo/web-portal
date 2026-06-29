@@ -16,10 +16,7 @@ const ScrollManager = (): null => {
   // Save scroll position when leaving current page
   useEffect(() => {
     const saveScrollPosition = () => {
-      sessionStorage.setItem(
-        `scroll-${prevPathRef.current}`,
-        window.scrollY.toString(),
-      );
+      sessionStorage.setItem(`scroll-${prevPathRef.current}`, window.scrollY.toString());
     };
 
     const handleBeforeUnload = () => {

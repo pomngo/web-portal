@@ -1,53 +1,83 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { getActivitiesDetails } from "../../../../store/slices/activitySlice";
 import dayjs from "dayjs";
 import { useParams, Link } from "react-router-dom";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
 import DetailBanner from "../../components/common/DetailBanner";
+import { useSEO } from "../../../../hooks/useSEO";
+import { useActivityDetails } from "../../../../hooks/useActivitiesQuery";
+import JoinPromptPopup from "../../components/common/JoinPromptPopup";
+import { ENDPOINTS } from "../../../../services/api/endpoints";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
   const activityId = Number(id);
-  const { selected_activities, selected_activities_id, selected_activities_loading, error, errorStatus } = useAppSelector((state) => state.activities);
-  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (selected_activities_id !== activityId) {
-      dispatch(getActivitiesDetails(activityId));
-    }
-  }, [dispatch, activityId, selected_activities_id]);
+  const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
+  const [joinPopupMessage, setJoinPopupMessage] = useState("");
 
-  useEffect(() => {
-    document.title = "Activities Details | Flockn Go";
-  }, []);
+  const handleActionClick = (label: string) => {
+    setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
+    setIsJoinPopupOpen(true);
+  };
+
+  const {
+    data: selected_activities,
+    isLoading: selected_activities_loading,
+    error,
+    refetch,
+  } = useActivityDetails(activityId);
+
+  useSEO({
+    title: selected_activities?.name
+      ? `${selected_activities.name} | FlocknGo`
+      : "Activity Details | FlocknGo",
+    description: selected_activities?.description
+      ? selected_activities.description.slice(0, 160)
+      : "Discover local community activities and events with FlocknGo.",
+    keywords: selected_activities?.name
+      ? `${selected_activities.name}, local activity, community events`
+      : "local activity, community events",
+    ogImage:
+      selected_activities?.cover_image?.[0] ||
+      (selected_activities?.last_cover_image
+        ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.last_cover_image)
+        : undefined),
+  });
 
   if (selected_activities_loading) {
     return <ActivityDetailsLoader />;
   }
 
   if (error && !selected_activities) {
-    const isNotFound = errorStatus === 404 || error.toLowerCase().includes("not found") || error.toLowerCase().includes("does not exist");
+    const axiosError = error as any;
+    const errorStatus = axiosError?.response?.status;
+    const errorMsg = axiosError?.response?.data?.message || axiosError?.message || "";
+
+    const isNotFound =
+      errorStatus === 404 ||
+      errorMsg.toLowerCase().includes("not found") ||
+      errorMsg.toLowerCase().includes("does not exist");
 
     if (isNotFound) {
       return (
         <>
           <DetailsTopNav />
-          <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-[#F9F9F9]">
-            <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-slate-100 rounded-3xl shadow-xs max-w-md mx-auto my-12 animate-fade-in">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-400 mb-6">
+          <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#F9F9F9] p-6">
+            <div className="animate-fade-in mx-auto my-12 flex max-w-md flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white p-8 text-center shadow-xs">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-400">
                 <Icons.serarch1 size={32} />
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Activity Not Found</h3>
-              <p className="text-slate-500 text-sm mb-8 max-w-xs leading-relaxed">
+              <h3 className="mb-2 text-xl font-bold text-slate-800">Activity Not Found</h3>
+              <p className="mb-8 max-w-xs text-sm leading-relaxed text-slate-500">
                 This activity may have been deleted, or the URL link you followed might be incorrect.
               </p>
               <Link
                 to="/activities"
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-semibold bg-linear-to-tr from-btn02 to-btn01 transition-all duration-300 hover:scale-105 active:scale-95 shadow-md shadow-orange-500/10 cursor-pointer"
+                className="from-btn02 to-btn01 flex cursor-pointer items-center gap-2 rounded-2xl bg-linear-to-tr px-6 py-3 font-semibold text-white shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-105 active:scale-95"
               >
                 Go to Activities
               </Link>
@@ -58,31 +88,35 @@ const ActivitiesDetails = () => {
     }
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <ErrorState
           title="Activity Details Unavailable"
-          message={error}
-          onRetry={() => dispatch(getActivitiesDetails(activityId))}
+          message={errorMsg}
+          onRetry={refetch}
         />
       </div>
     );
   }
+
   return (
     <>
       <DetailsTopNav />
 
       <div className="min-h-screen bg-[#F9F9F9]">
         <DetailBanner
-          coverImage={selected_activities?.cover_image?.[0]}
+          coverImage={
+            selected_activities?.cover_image?.[0] ||
+            (selected_activities?.last_cover_image
+              ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.last_cover_image)
+              : undefined)
+          }
           altText={selected_activities?.name}
         />
         <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-3">
               <div>
-                <h2 className="text-[24px] font-bold text-primary-dark/80">
-                  {selected_activities?.name}
-                </h2>
+                <h1 className="text-primary-dark/80 text-[24px] font-bold">{selected_activities?.name}</h1>
 
                 <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-black/70">
                   {selected_activities?.description}
@@ -93,116 +127,141 @@ const ActivitiesDetails = () => {
                 <div className="flex items-center gap-4 text-base font-medium">
                   <div className="flex items-center gap-1">
                     {" "}
-                    <Icons.map size={17} />{" "}
-                    <span className="">{selected_activities?.campaign_location}</span>
+                    <Icons.map size={17} /> <span className="">{selected_activities?.campaign_location}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {" "}
                     <Icons.watch size={17} />{" "}
-                    <span className="">{dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}</span>
+                    <span className="">
+                      {selected_activities?.end_date_time
+                        ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY")
+                        : selected_activities?.end_date
+                        ? dayjs(selected_activities.end_date).format("D ddd, MMM YYYY")
+                        : dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}
+                    </span>
                   </div>
                 </div>
                 <div className=""></div>
               </div>
 
               <div className="flex items-center gap-2 text-base font-normal text-black/80">
-                <Icons.users
-                  width={22}
-                  height={22}
-                  className="text-secondary"
-                />
+                <Icons.users width={22} height={22} className="text-secondary" />
 
                 <span className="underline underline-offset-4">
-                  {selected_activities?.flock_members_count || 0} Members
+                  {selected_activities?.joined_member_count ?? selected_activities?.flock_members_count ?? 0} Members
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-5">
-              {[
-                {
-                  icon: <Icons.flag />,
-                  label: "Updates",
-                },
-                {
-                  icon: <Icons.film />,
-                  label: "Polls",
-                },
-                {
-                  icon: <Icons.camera />,
-                  label: "Gallery",
-                },
-                {
-                  icon: <Icons.heartHandshake />,
-                  label: "Files",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <button className="flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:bg-secondary/10 active:scale-95">
-                    {item.icon}
-                  </button>
-
-                  <span className="text-xs text-black/70">{item.label}</span>
-                </div>
-              ))}
-            </div>
+            <Tooltip.Provider delayDuration={150}>
+              <div className="flex items-center gap-5">
+                {[
+                  {
+                    icon: <Icons.update />,
+                    label: "Updates",
+                  },
+                  {
+                    icon: <Icons.polls />,
+                    label: "Polls",
+                  },
+                  {
+                    icon: <Icons.chat />,
+                    label: "Chat",
+                  },
+                ].map((item) => (
+                  <Tooltip.Root key={item.label}>
+                    <Tooltip.Trigger asChild>
+                      <div className="flex flex-col items-center gap-2">
+                        <button
+                          onClick={() => handleActionClick(item.label)}
+                          className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                        >
+                          {item.icon}
+                        </button>
+                        <span className="text-xs text-black/70">{item.label}</span>
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        side="top"
+                        sideOffset={5}
+                        className="rt-TooltipContent z-50 max-w-48 text-center bg-slate-900/95 text-white text-[11px] rounded-lg py-2 px-3 shadow-lg font-medium leading-normal border border-slate-700/30 backdrop-blur-xs select-none"
+                      >
+                        Join us first then you can see {item.label.toLowerCase()} and all things
+                        <Tooltip.Arrow className="fill-slate-900" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                ))}
+              </div>
+            </Tooltip.Provider>
           </div>
         </div>
 
-        <div className="px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-2">
+        <div className="mt-2 px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex gap-6">
-            <main className="flex-1 rounded-xl bg-primary p-6 md:p-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-xs">
-              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center text-md gap-6 sm:gap-8 md:gap-12 w-full lg:w-auto">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-base font-normal text-black/80">
+            <main className="bg-primary flex flex-1 flex-col items-start justify-between gap-6 rounded-xl p-6 shadow-xs md:p-8 lg:flex-row lg:items-center">
+              <div className="text-md flex w-full flex-col flex-wrap items-start gap-6 sm:flex-row sm:items-center sm:gap-8 md:gap-12 lg:w-auto">
+                <div className="flex flex-col items-start gap-2 text-base font-normal text-black/80 sm:flex-row sm:items-center sm:gap-4">
                   <div className="flex items-center gap-2">
-                    <Icons.users
-                      width={22}
-                      height={22}
-                      className="text-secondary"
-                    />
+                    <Icons.users width={22} height={22} className="text-secondary" />
                     <span className="text-secondary/80">Max Participants</span>
                   </div>
-                  <p className="font-medium pl-8 sm:pl-0">
+                  <p className="pl-8 font-medium sm:pl-0">
                     {selected_activities?.max_participants || selected_activities?.max_size || "N/A"}
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-base font-normal text-black/80">
+                <div className="flex flex-col items-start gap-2 text-base font-normal text-black/80 sm:flex-row sm:items-center sm:gap-4">
                   <div className="flex items-center gap-2">
-                    <Icons.calendar
-                      width={22}
-                      height={22}
-                      className="text-secondary"
-                    />
+                    <Icons.calendar width={22} height={22} className="text-secondary" />
                     <span className="text-secondary/80">Last Date to Join</span>
                   </div>
-                  <p className="font-medium pl-8 sm:pl-0 text-nowrap">
+                  <p className="pl-8 font-medium text-nowrap sm:pl-0">
+                    {selected_activities?.ebd_date
+                      ? dayjs(selected_activities.ebd_date).format("D ddd, MMM YYYY")
+                      : "N/A"}
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-start gap-2 text-base font-normal text-black/80 sm:flex-row sm:items-center sm:gap-4">
+                  <div className="flex items-center gap-2">
+                    <Icons.watch width={22} height={22} className="text-secondary" />
+                    <span className="text-secondary/80">Activity Timing</span>
+                  </div>
+                  <p className="pl-8 font-medium text-nowrap sm:pl-0">
                     {selected_activities?.end_date_time
-                      ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY")
+                      ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY, h:mm A")
+                      : selected_activities?.end_date
+                      ? dayjs(selected_activities.end_date).format("D ddd, MMM YYYY")
                       : "N/A"}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 text-base font-normal text-black/80">
                   <Icons.link size={17} className="text-secondary" />
-                  <span className="underline underline-offset-4 text-nowrap cursor-pointer hover:text-btn01 transition-colors">
+                  <span className="hover:text-btn01 cursor-pointer text-nowrap underline underline-offset-4 transition-colors">
                     Social Links
                   </span>
                 </div>
               </div>
 
-              <div className="w-full lg:w-sm flex justify-end">
-                <button className="bg-linear-to-tl from-btn01 to-btn02 to-75% rounded-xl py-3 px-6 w-full text-white text-md font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-xs">
+              <div className="flex w-full justify-end lg:w-sm">
+                <button className="from-btn01 to-btn02 text-md w-full cursor-pointer rounded-xl bg-linear-to-tl to-75% px-6 py-3 font-semibold text-white shadow-xs transition-all duration-300 hover:scale-[1.02] active:scale-95">
                   Join
                 </button>
               </div>
             </main>
           </div>
+
+
         </div>
       </div>
+      <JoinPromptPopup
+        isOpen={isJoinPopupOpen}
+        onClose={() => setIsJoinPopupOpen(false)}
+        message={joinPopupMessage}
+      />
     </>
   );
 };

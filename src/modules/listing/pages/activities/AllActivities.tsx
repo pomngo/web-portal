@@ -1,98 +1,94 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import { useEffect, useState } from "react";
 import HomeLoader from "../../../../components/common/HomeLoader";
 import PageHeader from "../../../../components/common/PageHeader";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { fetchActivitiesPage } from "../../../../store/slices/activitySlice";
 import InfiniteScroll from "react-infinite-scroll-component";
-
 import ErrorState from "../../../../components/common/ErrorState";
+import { useSEO } from "../../../../hooks/useSEO";
+import { useInfiniteActivities } from "../../../../hooks/useActivitiesQuery";
+import { useSyncFilters } from "../../../../utils/filter";
 
 const AllActivities = () => {
+  useSyncFilters();
   const { search_by } = useParams();
-  const dispatch = useAppDispatch();
-  const { activities, loading, hasMore, error } = useAppSelector((state) => state.activities);
-  const [page, setPage] = useState(1);
+  const [searchParams] = useSearchParams();
+  const activityQueryString = (() => {
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
+    return params.toString() ? `?${params.toString()}` : "";
+  })();
 
-  // Initial load
-  useEffect(() => {
-    dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
-  }, [dispatch]);
+  const {
+    data,
+    isLoading: loading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+  } = useInfiniteActivities(activityQueryString, 5);
+
+  const activityList = data?.pages.flatMap((page) => page.items) || [];
+
+  const filteredActivityList = activityList;
+
+  useSEO({
+    title: `All Activities - ${search_by || "Nearby"} | FlocknGo`,
+    description: `Discover all our local activities, experiences, and events matching ${search_by || "your interest"}. Join now on FlocknGo!`,
+    keywords: "discover activities, find local events, local experiences, social meetup activities",
+  });
 
   const handleRetry = () => {
-    dispatch(fetchActivitiesPage({ page: 1, offset: 5 }));
-    setPage(1);
+    refetch();
   };
 
-  const fetchMore = async () => {
-    const nextPage = page + 1;
-    try {
-      await dispatch(fetchActivitiesPage({ page: nextPage, offset: 5 })).unwrap();
-      setPage(nextPage);
-    } catch {
-      // Managed by the slice
-    }
-  };
 
-  useEffect(() => {
-    document.title = "All Activities | Flockn Go";
-  }, []);
-
-  const activityList = activities;
-
-  if (loading && activityList.length === 0) {
-    return (
-      <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
-        <HomeLoader type="all-activities" />
-      </div>
-    );
-  }
 
   if (error && activityList.length === 0) {
     return (
-      <div className="min-h-screen px-16 flex items-center justify-center py-10">
-        <ErrorState
-          title="Unable to load Activities"
-          message={error}
-          onRetry={handleRetry}
-        />
+      <div className="flex min-h-screen items-center justify-center px-16 py-10">
+        <ErrorState title="Unable to load Activities" message={error.message} onRetry={handleRetry} />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen px-4  sm:px-6 md:px-8 lg:px-12 xl:px-16 flex flex-col gap-16 py-10">
+    <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <h1 className="sr-only">Explore All Activities - {search_by || "Nearby"}</h1>
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />
 
-        {/* Activities List */}
-        <InfiniteScroll
-          dataLength={activityList.length}
-          next={fetchMore}
-          hasMore={hasMore}
-          loader={<div className=" flex flex-col gap-16 py-10">
-            <ScrollLoader />
-          </div>}
-          endMessage={
-            <p className="text-center my-6 font-medium py-4 text-sm text-secondary">
-              No more activities to load.
-            </p>
-          }
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-x-4 gap-y-16">
-            {activityList.map((activity) => (
-              <Link
-                key={activity.id}
-                to={`/flocks/${activity.id}/activities/${activity.id}/detail`}
-              >
-                <NearbyActivities activity={activity} />
-              </Link>
-            ))}
-          </div>
-        </InfiniteScroll>
+        {loading && activityList.length === 0 ? (
+          <HomeLoader type="all-activities" />
+         ) : (
+          <InfiniteScroll
+            dataLength={filteredActivityList.length}
+            next={fetchNextPage}
+            hasMore={!!hasNextPage}
+            loader={
+              <div className="flex flex-col gap-16 py-10">
+                <ScrollLoader />
+              </div>
+            }
+            endMessage={
+              <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more activities to load.</p>
+            }
+          >
+            <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {filteredActivityList.map((activity) => (
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
+                  <NearbyActivities activity={activity} />
+                </Link>
+              ))}
+            </div>
+          </InfiniteScroll>
+        )}
       </section>
     </main>
   );

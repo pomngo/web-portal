@@ -6,18 +6,13 @@ interface EmptyStateProps {
   icon?: React.ReactNode;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({
-  message = "No data found",
-  icon,
-}) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ message = "No data found", icon }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-slate-100 rounded-3xl shadow-xs my-4 w-full animate-fade-in">
-      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-50 text-slate-400 mb-4">
+    <div className="animate-fade-in my-4 flex w-full flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white p-8 text-center shadow-xs">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400">
         {icon || <Icons.searchLucide size={24} />}
       </div>
-      <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs">
-        {message}
-      </p>
+      <p className="max-w-xs text-sm leading-relaxed font-medium text-slate-500">{message}</p>
     </div>
   );
 };

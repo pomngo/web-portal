@@ -20,7 +20,7 @@ const App = () => {
   //   );
   // }
   return (
-    <div className="min-h-screen overflow-y-auto bg-primary text-secondary scrollbar-hide">
+    <div className="bg-primary text-secondary scrollbar-hide min-h-screen overflow-y-auto">
       <ScrollManager />
       <MainRouting />
     </div>

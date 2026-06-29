@@ -14,21 +14,21 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, slug }) => {
   const formattedTitle = title
     ? title
     : slug
-    ? slug
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(" ")
-    : "";
+      ? slug
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(" ")
+      : "";
 
   return (
-    <div className="flex justify-between items-center mb-4">
+    <div className="mb-4 flex items-center justify-between">
       <div className="">
         <TitleText title={formattedTitle} />
       </div>
       <div className="">
         <button
           onClick={() => navigate(-1)}
-          className="bg-linear-to-tr from-btn02 to-btn01 to-75% px-5 py-2 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 flex items-center gap-2 cursor-pointer"
+          className="from-btn02 to-btn01 flex cursor-pointer items-center gap-2 bg-linear-to-tr to-75% bg-clip-text px-5 py-2 text-transparent transition-all duration-300 hover:scale-105"
         >
           <Icons.leftArrow className="text-btn01" /> Back
         </button>

@@ -27,6 +27,11 @@ import LeftArrow from "../components/icons/LeftArrow";
 import UsersIcon from "../components/icons/UsersIcon";
 import CompassIcon from "../components/icons/CompassIcon";
 import SearchIcon from "../components/icons/SearchIcon";
+import UpdateIcon from "../components/icons/UpdateIcon";
+import ChatIcon from "../components/icons/ChatIcon";
+import GalleryIcon from "../components/icons/GalleryIcon";
+import PollsIcon from "../components/icons/PollsIcon";
+import FilesIcon from "../components/icons/FilesIcon";
 
 export const Icons = {
   // Main icons
@@ -61,4 +66,10 @@ export const Icons = {
   trees: Trees,
   utensils: Utensils,
   link: Link,
+  update: UpdateIcon,
+  chat: ChatIcon,
+  gallery: GalleryIcon,
+  polls: PollsIcon,
+  file: FilesIcon,
+
 };
