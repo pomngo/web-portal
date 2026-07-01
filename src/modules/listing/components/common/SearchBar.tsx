@@ -1,10 +1,9 @@
-import { useState, lazy, Suspense, useEffect, useRef } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import Popover from "@mui/material/Popover";
 
-import { useUserLocation } from "../../../../hooks/useUserLocation";
 import { locationService } from "../../../../services/location.service";
 import LocationPermissionPopup from "./LocationPermissionPopup";
 import SearchIcon from "../../../../components/icons/SearchIcon";
@@ -17,7 +16,6 @@ import { keywordMap } from "../../../../utils/filter";
 const DateCalendarValue = lazy(() => import("../../../../components/ui/DateCalendarValue"));
 
 const SearchBar = () => {
-  const { location } = useUserLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -33,7 +31,6 @@ const SearchBar = () => {
   const [locationAnchorEl, setLocationAnchorEl] = useState<null | HTMLElement>(null);
   const [locLoading, setLocLoading] = useState(false);
   const [isPermissionPopupOpen, setIsPermissionPopupOpen] = useState(false);
-  const locationInitialized = useRef(false);
 
   // Sync inputs with URL search parameters
   useEffect(() => {
@@ -42,15 +39,6 @@ const SearchBar = () => {
     const dateParam = searchParams.get("created_date");
     setValue(dateParam ? dayjs(dateParam) : null);
   }, [searchParams]);
-
-  useEffect(() => {
-    if (searchParams.get("location")) {
-      locationInitialized.current = true;
-    } else if (!locationInitialized.current && location?.city && !locInput) {
-      setLocInput(location.city.split(" ")[0]);
-      locationInitialized.current = true;
-    }
-  }, [location, searchParams]);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

@@ -7,7 +7,7 @@ import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
-import HomeLoader, { ResponsiveCardListSkeleton } from "../../../../components/common/HomeLoader";
+import { ResponsiveCardListSkeleton } from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useActivities } from "../../../../hooks/useActivitiesQuery";
 import { useQueryClient } from "@tanstack/react-query";
@@ -74,7 +74,6 @@ const Activities = () => {
     refetchExplore();
   };
 
-  const loading = nearbyLoading || exploreLoading;
   const error = nearbyError || exploreError;
 
 
