@@ -217,17 +217,17 @@ const FlocksDetails = () => {
           </div>
 
           {/* Two Column Layout: Calendar Sidebar & Activities Grid */}
-          <div className="max-w-[1440px] mx-auto px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-6">
+          <div className="max-w-[1500px] mx-auto px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-6">
             <div className="grid grid-cols-12 gap-8">
               {/* Left Column (Calendar Sidebar) */}
-              <div className="col-span-12 lg:col-span-3 flex flex-col gap-6">
+              <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
                 <div className="bg-white rounded-3xl p-4 xl:p-6 border border-slate-100 shadow-xs">
                   <SidebarCalendar activities={selected_flock?.public_activities} />
                 </div>
               </div>
 
               {/* Right Column (Activities Grid) */}
-              <div className="col-span-12 lg:col-span-9 bg-white rounded-3xl p-8 border border-slate-100 shadow-xs flex flex-col gap-10">
+              <div className="col-span-12 lg:col-span-8 bg-white rounded-3xl p-8 border border-slate-100 shadow-xs flex flex-col gap-10">
                 {Object.keys(groupedActivities).length > 0 ? (
                   Object.entries(groupedActivities).map(([monthYear, activities]) => (
                     <div key={monthYear} className="flex flex-col gap-6">
@@ -241,47 +241,50 @@ const FlocksDetails = () => {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {activities.map((activity: ActivityItem) => (
-                          <Link
-                            to={`/flocks/${id}/activities/${activity?.id}/detail`}
-                            key={activity.id}
-                            className="flex cursor-pointer flex-col gap-4 rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:p-2 hover:shadow-md"
-                          >
-                            <div className="">
-                              <p className="text-base font-semibold text-slate-800 whitespace-nowrap">{dayjs(activity?.created_at).format("ddd, MMM D")}</p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <img
-                                src={
-                                  activity?.last_cover_image
-                                    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
-                                    : activity?.cover_image?.[0] || images.default_flock_banner
-                                }
-                                alt={activity?.name}
-                                loading="lazy"
-                                onError={(e) => {
-                                  e.currentTarget.onerror = null;
-                                  (e.target as HTMLImageElement).src = images.default_flock_banner;
-                                }}
-                                className="h-24 w-24 rounded-2xl object-cover flex-shrink-0"
-                              />
+                        {activities.map((activity: ActivityItem) => {
+                          const status = (activity?.status || activity?.current_tab || "ONGOING").toUpperCase();
+                          return (
+                            <Link
+                              to={`/flocks/${id}/activities/${activity?.id}/detail`}
+                              key={activity.id}
+                              className="flex cursor-pointer flex-col gap-4 rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:p-2 hover:shadow-md"
+                            >
                               <div className="">
-                                <div className="flex flex-col items-start justify-between gap-2">
-                                  <h3 className="text-lg font-semibold text-nowrap">
-                                    {activity?.name.slice(0, 12).trim()}
-                                    {activity?.name.toString().length > 12 && "..."}
-                                  </h3>
+                                <p className="text-base font-semibold text-slate-800 whitespace-nowrap">{dayjs(activity?.created_at).format("ddd, MMM D")}</p>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <img
+                                  src={
+                                    activity?.last_cover_image
+                                      ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+                                      : activity?.cover_image?.[0] || images.default_flock_banner
+                                  }
+                                  alt={activity?.name}
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    (e.target as HTMLImageElement).src = images.default_flock_banner;
+                                  }}
+                                  className="h-24 w-24 rounded-2xl object-cover flex-shrink-0"
+                                />
+                                <div className="">
+                                  <div className="flex flex-col items-start justify-between gap-2">
+                                    <h3 className="text-lg font-semibold text-nowrap">
+                                      {activity?.name.slice(0, 12).trim()}
+                                      {activity?.name.toString().length > 12 && "..."}
+                                    </h3>
 
-                                  <span
-                                    className={`rounded-full ${activity?.current_tab === "draft" ? "bg-btn-biget03/50 border-btn-biget03 border-2" : activity?.current_tab === "ONGOING" ? "bg-btn-biget01/50 border-btn-biget01 border-2" : "bg-btn-biget02/50 border-btn-biget02 border-2"} text-secondary px-3 py-1 text-xs font-medium`}
-                                  >
-                                    {activity?.current_tab}
-                                  </span>
+                                    <span
+                                      className={`rounded-full ${status === "DRAFT" ? "bg-btn-biget03/50 border-btn-biget03 border-2" : status === "ONGOING" || status === "LIVE" ? "bg-btn-biget01/50 border-btn-biget01 border-2" : "bg-btn-biget02/50 border-btn-biget02 border-2"} text-secondary px-3 py-1 text-xs font-medium`}
+                                    >
+                                      {status}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </Link>
-                        ))}
+                            </Link>
+                          );
+                        })}
                       </div>
                     </div>
                   ))
@@ -456,38 +459,41 @@ const FlocksDetails = () => {
           <div className="p-5">
             {activeDetailsTab === "activities" ? (
               <div className="flex flex-col gap-4">
-                {selected_flock?.public_activities?.map((activity: ActivityItem, index: number) => (
-                  <Link
-                    to={`/flocks/${id}/activities/${activity?.id}/detail`}
-                    key={index}
-                    className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-100 active:scale-98 transition"
-                  >
-                    <img
-                      src={
-                        activity?.last_cover_image
-                          ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
-                          : activity?.cover_image?.[0] || images.default_flock_banner
-                      }
-                      alt={activity?.name}
-                      className="h-16 w-16 rounded-xl object-cover flex-shrink-0"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        (e.target as HTMLImageElement).src = images.default_flock_banner;
-                      }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-bold text-[#EF7F23] whitespace-nowrap">
-                        {dayjs(activity?.created_at).format("ddd, MMM D")}
-                      </p>
-                      <h3 className="text-sm font-bold text-slate-800 truncate mt-0.5">
-                        {activity?.name}
-                      </h3>
-                      <span className="inline-block bg-orange-100 text-[#EF7F23] text-[9px] font-bold px-2 py-0.5 rounded-full mt-1.5 uppercase">
-                        {activity?.current_tab}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
+                {selected_flock?.public_activities?.map((activity: ActivityItem, index: number) => {
+                  const status = (activity?.status || activity?.current_tab || "ONGOING").toUpperCase();
+                  return (
+                    <Link
+                      to={`/flocks/${id}/activities/${activity?.id}/detail`}
+                      key={index}
+                      className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-100 active:scale-98 transition"
+                    >
+                      <img
+                        src={
+                          activity?.last_cover_image
+                            ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+                            : activity?.cover_image?.[0] || images.default_flock_banner
+                        }
+                        alt={activity?.name}
+                        className="h-16 w-16 rounded-xl object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          (e.target as HTMLImageElement).src = images.default_flock_banner;
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-bold text-[#EF7F23] whitespace-nowrap">
+                          {dayjs(activity?.created_at).format("ddd, MMM D")}
+                        </p>
+                        <h3 className="text-sm font-bold text-slate-800 truncate mt-0.5">
+                          {activity?.name}
+                        </h3>
+                        <span className="inline-block bg-orange-100 text-[#EF7F23] text-[9px] font-bold px-2 py-0.5 rounded-full mt-1.5 uppercase">
+                          {status}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
 
                 {selected_flock?.public_activities?.length === 0 && (
                   <div className="bg-slate-50 rounded-2xl p-8 text-center border border-slate-100 text-slate-400 text-sm">

@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
-import HomeLoader, { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
+import { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
@@ -76,7 +76,6 @@ const Flocks = () => {
     refetchCommunity();
   };
 
-  const loading = nearbyLoading || communityLoading;
   const error = nearbyError || communityError;
   const flockList = nearbyFlockList; // placeholder for initial length check
 

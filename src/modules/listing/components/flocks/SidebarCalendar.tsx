@@ -29,13 +29,13 @@ const CustomDayButton = (props: any) => {
 
   const modifierClasses: string[] = [];
   if (modifiers.holiday) modifierClasses.push("!bg-[#F8D5E5] !text-black hover:!bg-[#F8D5E5]");
-  if (modifiers.activity) modifierClasses.push("!bg-[#C9C2FF] !text-black hover:!bg-[#C9C2FF]");
+  if (modifiers.activity) modifierClasses.push("!bg-[#C9C2FF] !text-black hover:!bg-[#C9C2FF] rounded-full");
   if (modifiers.draft) modifierClasses.push("!bg-[#F8E6D5] !text-black hover:!bg-[#F8E6D5]");
-  if (modifiers.selected) modifierClasses.push("!bg-[#C9C2FF] !text-black");
-  if (modifiers.today) modifierClasses.push("border border-[#FF5B2E]");
+  if (modifiers.selected) modifierClasses.push("!bg-[#f97316] !text-black");
+  if (modifiers.today) modifierClasses.push("border border-[#f97316]");
 
   const combinedClassName = [
-    "relative flex w-full aspect-square max-w-[32px] sm:max-w-[38px] lg:max-w-[26px] xl:max-w-[32px] mx-auto items-center justify-center rounded-full text-xs sm:text-sm lg:text-xs xl:text-sm font-semibold text-[#333] transition-all hover:bg-black/5 focus:outline-none flex-shrink-0",
+    // "relative flex w-full aspect-square max-w-[32px] sm:max-w-[32px] lg:max-w-[32px] xl:max-w-[32px] mx-auto items-center justify-center rounded-full text-xs sm:text-sm lg:text-xs xl:text-sm font-semibold text-[#333] transition-all hover:bg-black/5 focus:outline-none flex-shrink-0",
     ...modifierClasses,
     className
   ]
@@ -72,7 +72,8 @@ const SidebarCalendar = ({ activities }: SidebarCalendarProps) => {
       activities.forEach((activity) => {
         const d = new Date(activity.created_at);
         if (!isNaN(d.getTime())) {
-          if (activity.current_tab === "draft") {
+          const status = (activity.status || activity.current_tab || "").toLowerCase();
+          if (status === "draft") {
             drf.push(d);
           } else {
             act.push(d);
@@ -162,7 +163,7 @@ const SidebarCalendar = ({ activities }: SidebarCalendarProps) => {
 
           weekday: "flex items-center justify-center text-xs sm:text-[15px] font-semibold text-black/60",
 
-          day: "p-0 text-center align-middle relative",
+          // day: "p-0 text-center align-middle relative",
 
           outside: "text-[#B8B8B8] opacity-50",
 
@@ -232,7 +233,7 @@ const SidebarCalendar = ({ activities }: SidebarCalendarProps) => {
           <div className="bg-secondary/5 mt-5 rounded-xl px-5 py-1">
             {activities && activities.length > 0 ? (
               activities
-                .filter((item) => item.current_tab !== "draft")
+                .filter((item) => (item.status || item.current_tab || "").toLowerCase() !== "draft")
                 .map((item) => (
                   <div
                     key={item.id}

@@ -4,7 +4,7 @@ import InterestChips from "../../components/common/InterestChips";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import { useState } from "react";
-import HomeLoader, { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
+import { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import ErrorState from "../../../../components/common/ErrorState";
@@ -95,7 +95,6 @@ const Home = () => {
     refetchExploreActivities();
   };
 
-  const activityLoading = nearbyActivityLoading || exploreActivityLoading;
   const activityError = nearbyActivityError || exploreActivityError;
 
 
