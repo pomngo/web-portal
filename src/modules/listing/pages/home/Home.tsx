@@ -203,7 +203,7 @@ const Home = () => {
         ) : (
           <>
             {/* Mobile Carousel */}
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
                 <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
                   <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
@@ -212,7 +212,7 @@ const Home = () => {
             </div>
 
             {/* Desktop Grid */}
-            <div className="hidden auto-rows-auto grid-cols-1 gap-4 md:grid md:grid-cols-12">
+            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
                 <CommunityFlocksCard key={flock.id} card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
               ))}

@@ -91,7 +91,7 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
             {description.length > 0 && "..."}
           </p>
 
-          <button className="from-btn02 to-btn01 cursor-pointer rounded-xl bg-linear-to-tl to-65% px-5 py-2 text-sm font-semibold shadow-lg transition-all duration-300 active:scale-95 w-fit">
+          <button className="from-btn02 to-btn01 text-white cursor-pointer rounded-xl bg-linear-to-tl to-65% px-4 py-2 text-xs sm:text-sm font-bold shadow-lg transition-all duration-300 active:scale-95 w-fit">
             Join Now
           </button>
         </div>
