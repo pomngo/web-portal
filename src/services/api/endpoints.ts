@@ -6,11 +6,11 @@ export const ENDPOINTS = {
     BASE_IMAGE_URL: (url: string) => `${import.meta.env.VITE_IMAGE_URL}/${url}`,
   },
   CAMPAIGN: {
-    LIST: "/public/flocks/",
-    DETAILS: (id: string | number) => `/public/flocks/?flock_id=${id}`,
+    LIST: "/public/flocks/listing/",
+    DETAILS: (id: string | number) => `/public/flocks/listing/?flock_id=${id}`,
   },
   ACTIVITY: {
-    LIST: "/public/activities/",
-    DETAILS: (id: string | number) => `/public/activities/?activity_id=${id}`,
+    LIST: "/public/activities/listing/",
+    DETAILS: (id: string | number) => `/public/activities/listing/?activity_id=${id}`,
   },
 };
