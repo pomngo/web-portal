@@ -114,17 +114,6 @@ const FlocksDetails = () => {
     );
   }
 
-  // Activity tags generation
-  const activityNames = selected_flock?.public_activities?.map((a: any) => a.name) || [];
-  const displayTags = activityNames.slice(0, 3).join(", ");
-  const remainingCount = activityNames.length - 3;
-
-  // Flock interests tags generation
-  const flockInterests = selected_flock?.flock_details?.interests || [];
-  const interestTags = flockInterests.map((i: any) => i.name) || [];
-  const displayInterestTags = interestTags.slice(0, 3).join(", ");
-  const remainingInterestCount = interestTags.length - 3;
-
   return (
     <>
       {/* Desktop view (>= lg) */}
@@ -143,16 +132,7 @@ const FlocksDetails = () => {
             <div className="max-w-[1440px] mx-auto flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
               <div className="flex flex-col gap-3">
                 <div>
-                  <p className="text-xs font-bold text-[#EF7F23] tracking-wide mb-1.5 uppercase">
-                    {interestTags.length > 0 ? (
-                      <>#{displayInterestTags} {remainingInterestCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingInterestCount}</span>}</>
-                    ) : activityNames.length > 0 ? (
-                      <>#{displayTags} {remainingCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingCount}</span>}</>
-                    ) : (
-                      `# Community, Social, Meetup`
-                    )}
-                  </p>
-                  <h1 className="text-[28px] font-semibold text-slate-800">{selected_flock?.flock_details?.flock_name}</h1>
+                  <h1 className="text-[28px] font-semibold text-slate-800">{selected_flock?.flock_details?.name}</h1>
                   <p className="text-slate-600 mt-1 max-w-2xl text-[15px] leading-relaxed">
                     {selected_flock?.flock_details?.description}
                   </p>
@@ -301,14 +281,14 @@ const FlocksDetails = () => {
       </div>
 
       {/* Mobile/Tablet view (< lg) */}
-      <div className="block lg:hidden min-h-screen bg-white">
-        {/* Header Section */}
+      <div className="block lg:hidden min-h-screen bg-slate-50 pb-20">
+        {/* Header Banner Section */}
         <div
           className={`${
             selected_flock?.flock_details?.cover_image_s3key
-              ? "h-56 p-4 flex flex-col justify-between"
-              : "p-4 pb-8 flex flex-col gap-6"
-          } bg-[#0e52d6] text-white rounded-b-[2.5rem] relative shadow-md overflow-hidden`}
+              ? "h-48 sm:h-64 p-4 flex flex-col justify-between"
+              : "p-4 pb-6 flex flex-col gap-4"
+          } bg-[#0e52d6] text-white rounded-b-3xl sm:rounded-b-[2.5rem] relative shadow-md overflow-hidden`}
         >
           {/* Background image if available */}
           {selected_flock?.flock_details?.cover_image_s3key && (
@@ -322,29 +302,29 @@ const FlocksDetails = () => {
                   (e.target as HTMLImageElement).src = images.default_flock_banner;
                 }}
               />
-              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
             </>
           )}
 
-          {/* Top Bar */}
+          {/* Top Navigation Bar */}
           <div className="flex items-center justify-between relative z-10">
-            <button onClick={() => navigate(-1)} className="p-1.5 hover:bg-white/10 rounded-full transition cursor-pointer">
-              <ChevronLeft className="h-6 w-6 text-white" />
+            <button onClick={() => navigate(-1)} className="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition cursor-pointer">
+              <ChevronLeft className="h-5 w-5 text-white" />
             </button>
-            <div className="flex items-center gap-3">
-              <button onClick={() => handleActionClick("Chat")} className="p-1.5 hover:bg-white/10 rounded-full transition cursor-pointer">
-                <MessageSquare className="h-6 w-6 text-white" />
+            <div className="flex items-center gap-2">
+              <button onClick={() => handleActionClick("Chat")} className="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition cursor-pointer">
+                <MessageSquare className="h-5 w-5 text-white" />
               </button>
-              <button onClick={() => handleActionClick("Options")} className="p-1.5 hover:bg-white/10 rounded-full transition cursor-pointer">
-                <MoreVertical className="h-6 w-6 text-white" />
+              <button onClick={() => handleActionClick("Options")} className="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition cursor-pointer">
+                <MoreVertical className="h-5 w-5 text-white" />
               </button>
             </div>
           </div>
 
-          {/* Center Portrait Image Card (only if cover image is NOT available) */}
+          {/* Fallback Card Image */}
           {!selected_flock?.flock_details?.cover_image_s3key && (
             <div className="flex justify-center">
-              <div className="bg-white p-1.5 rounded-3xl shadow-xl w-[140px] h-[190px] overflow-hidden flex items-center justify-center">
+              <div className="bg-white p-1.5 rounded-3xl shadow-xl w-[120px] h-[160px] sm:w-[140px] sm:h-[190px] overflow-hidden flex items-center justify-center">
                 <img
                   src={images.default_flock_banner}
                   alt={selected_flock?.flock_details?.flock_name}
@@ -355,26 +335,15 @@ const FlocksDetails = () => {
           )}
         </div>
 
-        {/* Details Section (Beige background) */}
-        <div className="bg-[#FAF5EF] px-6 py-6 flex flex-col gap-4">
-          {/* Tags */}
-          <p className="text-sm font-semibold text-[#EF7F23] tracking-wide">
-            {interestTags.length > 0 ? (
-              <>#{displayInterestTags} {remainingInterestCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingInterestCount}</span>}</>
-            ) : activityNames.length > 0 ? (
-              <>#{displayTags} {remainingCount > 0 && <span className="text-[#EF7F23] font-bold">+{remainingCount}</span>}</>
-            ) : (
-              `# Community, Social, Meetup`
-            )}
-          </p>
-
+        {/* Details Section */}
+        <div className="bg-[#FAF5EF] px-4 py-5 sm:px-6 sm:py-6 flex flex-col gap-4">
           {/* Title */}
-          <h1 className="text-[26px] font-bold text-slate-800 leading-tight">
-            {selected_flock?.flock_details?.flock_name}
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">
+            {selected_flock?.flock_details?.name}
           </h1>
 
           {/* Description */}
-          <div className="text-slate-600 text-sm leading-relaxed">
+          <div className="text-slate-600 text-xs sm:text-sm leading-relaxed">
             {selected_flock?.flock_details?.description ? (
               <>
                 {isDescriptionExpanded ? (
@@ -398,44 +367,43 @@ const FlocksDetails = () => {
 
           {/* Members */}
           <div className="flex items-center gap-2 mt-1">
-            <Icons.users className="text-[#EF7F23] h-5 w-5" />
-            <span className="text-slate-700 text-sm font-semibold underline underline-offset-4 cursor-pointer" onClick={() => handleActionClick("Members")}>
+            <Icons.users className="text-[#EF7F23] h-4.5 w-4.5" />
+            <span className="text-slate-700 text-xs sm:text-sm font-semibold underline underline-offset-4 cursor-pointer" onClick={() => handleActionClick("Members")}>
               {selected_flock?.flock_details?.participants_count || 0} Members
             </span>
-            <button onClick={() => handleActionClick("Invite")} className="text-[#EF7F23] text-lg font-bold p-1 leading-none cursor-pointer">
+            <button onClick={() => handleActionClick("Invite")} className="text-[#EF7F23] text-base font-bold p-1 leading-none cursor-pointer">
               +
             </button>
           </div>
 
           {/* Actions Grid */}
-          <div className="grid grid-cols-4 gap-2.5 mt-4">
+          <div className="grid grid-cols-4 gap-2 mt-2">
             {[
-              { icon: <Icons.update className="text-[#EF7F23] h-5 w-5" />, label: "Updates" },
-              { icon: <Icons.polls className="text-[#EF7F23] h-5 w-5" />, label: "Polls" },
-              { icon: <Icons.gallery className="text-[#EF7F23] h-5 w-5" />, label: "Gallery" },
-              { icon: <Icons.file className="text-[#EF7F23] h-5 w-5" />, label: "Files" },
+              { icon: <Icons.update className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Updates" },
+              { icon: <Icons.polls className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Polls" },
+              { icon: <Icons.gallery className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Gallery" },
+              { icon: <Icons.file className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Files" },
             ].map((item) => (
               <button
                 key={item.label}
                 onClick={() => handleActionClick(item.label)}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white shadow-xs active:scale-95 transition cursor-pointer gap-2"
+                className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl bg-white shadow-xs active:scale-95 transition cursor-pointer gap-1.5 border border-slate-100"
               >
                 <div className="bg-orange-50 p-2 rounded-full flex items-center justify-center">
                   {item.icon}
                 </div>
-                <span className="text-[11px] font-semibold text-slate-700">{item.label}</span>
+                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-700">{item.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Tabs & Content Area */}
-        <div className="bg-white">
-          {/* Tab bar */}
-          <div className="flex border-b border-slate-100">
+        {/* Tabs & Content Area with Radix Accordion / Tab structure */}
+        <div className="bg-white px-4 py-4 sm:px-6">
+          <div className="flex border-b border-slate-100 mb-4">
             <button
               onClick={() => setActiveDetailsTab("activities")}
-              className={`flex-1 py-4 text-center text-sm font-bold border-b-2 transition cursor-pointer ${
+              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold border-b-2 transition cursor-pointer ${
                 activeDetailsTab === "activities"
                   ? "border-[#EF7F23] text-slate-900"
                   : "border-transparent text-slate-400"
@@ -445,7 +413,7 @@ const FlocksDetails = () => {
             </button>
             <button
               onClick={() => setActiveDetailsTab("calendar")}
-              className={`flex-1 py-4 text-center text-sm font-bold border-b-2 transition cursor-pointer ${
+              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold border-b-2 transition cursor-pointer ${
                 activeDetailsTab === "calendar"
                   ? "border-[#EF7F23] text-slate-900"
                   : "border-transparent text-slate-400"
@@ -455,17 +423,17 @@ const FlocksDetails = () => {
             </button>
           </div>
 
-          {/* Tab Content */}
-          <div className="p-5">
+          {/* Content */}
+          <div>
             {activeDetailsTab === "activities" ? (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {selected_flock?.public_activities?.map((activity: ActivityItem, index: number) => {
                   const status = (activity?.status || activity?.current_tab || "ONGOING").toUpperCase();
                   return (
                     <Link
                       to={`/flocks/${id}/activities/${activity?.id}/detail`}
                       key={index}
-                      className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-100 active:scale-98 transition"
+                      className="flex items-center gap-3 bg-slate-50/80 p-3 rounded-2xl border border-slate-100 active:scale-98 transition"
                     >
                       <img
                         src={
@@ -474,20 +442,20 @@ const FlocksDetails = () => {
                             : activity?.cover_image?.[0] || images.default_flock_banner
                         }
                         alt={activity?.name}
-                        className="h-16 w-16 rounded-xl object-cover flex-shrink-0"
+                        className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl object-cover flex-shrink-0"
                         onError={(e) => {
                           e.currentTarget.onerror = null;
                           (e.target as HTMLImageElement).src = images.default_flock_banner;
                         }}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-[#EF7F23] whitespace-nowrap">
+                        <p className="text-[10px] sm:text-[11px] font-bold text-[#EF7F23] whitespace-nowrap">
                           {dayjs(activity?.created_at).format("ddd, MMM D")}
                         </p>
-                        <h3 className="text-sm font-bold text-slate-800 truncate mt-0.5">
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-800 truncate mt-0.5">
                           {activity?.name}
                         </h3>
-                        <span className="inline-block bg-orange-100 text-[#EF7F23] text-[9px] font-bold px-2 py-0.5 rounded-full mt-1.5 uppercase">
+                        <span className="inline-block bg-orange-100 text-[#EF7F23] text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full mt-1 uppercase">
                           {status}
                         </span>
                       </div>
@@ -496,13 +464,13 @@ const FlocksDetails = () => {
                 })}
 
                 {selected_flock?.public_activities?.length === 0 && (
-                  <div className="bg-slate-50 rounded-2xl p-8 text-center border border-slate-100 text-slate-400 text-sm">
+                  <div className="bg-slate-50 rounded-2xl p-8 text-center border border-slate-100 text-slate-400 text-xs sm:text-sm">
                     No activities found.
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center p-2">
+              <div className="flex flex-col items-center justify-center p-1">
                 <div className="w-full max-w-lg bg-white rounded-2xl shadow-xs border border-slate-100">
                   <SidebarCalendar activities={selected_flock?.public_activities} />
                 </div>
@@ -522,3 +490,4 @@ const FlocksDetails = () => {
 };
 
 export default FlocksDetails;
+
