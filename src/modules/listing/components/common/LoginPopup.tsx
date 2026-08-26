@@ -1,5 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icons } from "../../../../constants/icons";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 type LoginPopupProps = {
   isOpen: boolean;
@@ -28,12 +29,18 @@ const LoginPopup = ({ isOpen, onClose }: LoginPopupProps) => {
           </div>
 
           {/* Sign In */}
-          <button className="hover:text-secondary/90 flex items-center justify-center h-12 sm:h-14 w-full rounded-2xl border border-gray-300 font-semibold transition duration-300 cursor-pointer active:scale-98">
+          <button
+            onClick={() => handleExternalRedirect()}
+            className="hover:text-secondary/90 flex items-center justify-center h-12 sm:h-14 w-full rounded-2xl border border-gray-300 font-semibold transition duration-300 cursor-pointer active:scale-98"
+          >
             Sign In
           </button>
 
           {/* Create Account */}
-          <button className="text-white from-btn02 to-btn01 mt-4 flex items-center justify-center h-12 sm:h-14 w-full rounded-2xl bg-linear-to-r to-65% font-semibold shadow-md transition duration-300 hover:opacity-90 cursor-pointer active:scale-98">
+          <button
+            onClick={() => handleExternalRedirect()}
+            className="text-white from-btn02 to-btn01 mt-4 flex items-center justify-center h-12 sm:h-14 w-full rounded-2xl bg-linear-to-r to-65% font-semibold shadow-md transition duration-300 hover:opacity-90 cursor-pointer active:scale-98"
+          >
             Create Account
           </button>
 
@@ -45,13 +52,19 @@ const LoginPopup = ({ isOpen, onClose }: LoginPopupProps) => {
           </div>
 
           {/* Google */}
-          <button className="border-secondary/20 flex h-12 sm:h-14 w-full items-center justify-center gap-3 rounded-2xl border transition duration-300 hover:bg-gray-50 cursor-pointer active:scale-98">
+          <button
+            onClick={() => handleExternalRedirect()}
+            className="border-secondary/20 flex h-12 sm:h-14 w-full items-center justify-center gap-3 rounded-2xl border transition duration-300 hover:bg-gray-50 cursor-pointer active:scale-98"
+          >
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="google" className="h-5 w-5" />
             <span className="font-medium text-slate-700 text-xs sm:text-sm">Continue With Google</span>
           </button>
 
           {/* Apple */}
-          <button className="border-secondary/20 mt-3 flex h-12 sm:h-14 w-full items-center justify-center gap-3 rounded-2xl border transition duration-300 hover:bg-gray-50 cursor-pointer active:scale-98">
+          <button
+            onClick={() => handleExternalRedirect()}
+            className="border-secondary/20 mt-3 flex h-12 sm:h-14 w-full items-center justify-center gap-3 rounded-2xl border transition duration-300 hover:bg-gray-50 cursor-pointer active:scale-98"
+          >
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
               alt="apple"

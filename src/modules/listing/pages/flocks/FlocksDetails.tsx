@@ -15,6 +15,7 @@ import { useFlockDetails } from "../../../../hooks/useFlocksQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { ChevronLeft, MoreVertical, MessageSquare } from "lucide-react";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 const FlocksDetails = () => {
   const { id } = useParams();
@@ -484,6 +485,7 @@ const FlocksDetails = () => {
         isOpen={isJoinPopupOpen}
         onClose={() => setIsJoinPopupOpen(false)}
         message={joinPopupMessage}
+        onJoin={handleExternalRedirect}
       />
     </>
   );

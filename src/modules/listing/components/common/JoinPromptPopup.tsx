@@ -1,5 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icons } from "../../../../constants/icons";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 type JoinPromptPopupProps = {
   isOpen: boolean;
@@ -37,6 +38,7 @@ const JoinPromptPopup = ({ isOpen, onClose, message, onJoin }: JoinPromptPopupPr
             <button
               onClick={() => {
                 if (onJoin) onJoin();
+                handleExternalRedirect();
                 onClose();
               }}
               className="from-btn01 to-btn02 w-full cursor-pointer rounded-xl bg-linear-to-tl to-75% py-3 sm:py-3.5 font-semibold text-white shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-[1.01] active:scale-95 text-xs sm:text-sm"

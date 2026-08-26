@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 type NearbyActivitiesProps = {
   activity: {
@@ -62,7 +63,14 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
       </div>
 
       {/* Button */}
-      <button className="from-btn02 to-btn01 text-white font-semibold text-xs sm:text-sm mt-2 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-4 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs">
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleExternalRedirect();
+        }}
+        className="from-btn02 to-btn01 text-white font-semibold text-xs sm:text-sm mt-2 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-4 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
+      >
         Join Now
       </button>
     </div>

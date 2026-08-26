@@ -11,6 +11,7 @@ import { useActivityDetails } from "../../../../hooks/useActivitiesQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
@@ -262,6 +263,7 @@ const ActivitiesDetails = () => {
         isOpen={isJoinPopupOpen}
         onClose={() => setIsJoinPopupOpen(false)}
         message={joinPopupMessage}
+        onJoin={handleExternalRedirect}
       />
     </>
   );
