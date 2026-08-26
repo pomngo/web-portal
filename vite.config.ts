@@ -8,4 +8,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1600,
   },
+  server: {
+    allowedHosts: ['series-crate-detail.ngrok-free.dev'],
+  },
 });

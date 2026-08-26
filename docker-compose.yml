@@ -1,0 +1,20 @@
+services:
+  web-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://127.0.0.1:8000/campaign_api/v1}
+        VITE_IMAGE_URL: ${VITE_IMAGE_URL:-https://du27z4qz38jyx.cloudfront.net}
+    container_name: flockngo-web-portal
+    ports:
+      - "8080:80"
+    restart: always
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

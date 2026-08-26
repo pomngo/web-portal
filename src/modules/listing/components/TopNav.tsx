@@ -39,12 +39,12 @@ const TopNav = () => {
   }, [location.pathname]);
 
   return (
-    <div className="from-nav01 via-nav02 bg-linear-to-b to-[10%_15%] px-4 py-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <div className="from-nav01 via-nav02 bg-linear-to-b to-[10%_15%] px-3 py-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* top */}
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <Link to={"/"}>
-          <img src={images.logo} alt="Logo" className="h-16" />
+        <Link to={"/"} className="flex-shrink-0">
+          <img src={images.logo} alt="Logo" className="h-12 sm:h-16 transition-all" />
         </Link>
 
         {/* Navigation */}
@@ -104,13 +104,13 @@ const TopNav = () => {
         </div>
 
         {/* Button */}
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <button
             onClick={() => {
               setOpen(true);
               setHasBeenOpened(true);
             }}
-            className="from-btn02 to-btn01 text-primary cursor-pointer rounded-full bg-linear-to-tr to-75% px-5 py-2 text-[12px] text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px]"
+            className="from-btn02 to-btn01 text-white cursor-pointer rounded-full bg-linear-to-tr to-75% px-3.5 py-1.5 text-xs sm:px-5 sm:py-2 text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] font-semibold"
           >
             Become Organizer
           </button>

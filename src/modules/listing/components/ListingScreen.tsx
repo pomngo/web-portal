@@ -4,9 +4,11 @@ import LabelBottomNavigation from "./LabelBottomNavigation";
 
 const ListingScreen = () => {
   return (
-    <div>
+    <div className="min-h-screen pb-28 sm:pb-0 relative">
       <TopNav />
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
       <div className="sm:hidden">
         <LabelBottomNavigation />
       </div>
@@ -15,3 +17,4 @@ const ListingScreen = () => {
 };
 
 export default ListingScreen;
+

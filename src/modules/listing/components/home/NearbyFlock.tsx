@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 type NearbyFlockProps = {
   flock: {
@@ -46,7 +47,14 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
       </div>
 
       {/* Button */}
-      <button className="from-btn02 to-btn01 text-primary mt-3 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-5 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95">
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleExternalRedirect();
+        }}
+        className="from-btn02 to-btn01 text-primary mt-3 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-5 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95"
+      >
         Join Now
       </button>
     </div>

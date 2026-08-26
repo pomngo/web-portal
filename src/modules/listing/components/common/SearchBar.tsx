@@ -3,17 +3,48 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import Popover from "@mui/material/Popover";
+import * as Dialog from "@radix-ui/react-dialog";
 
 import { locationService } from "../../../../services/location.service";
 import LocationPermissionPopup from "./LocationPermissionPopup";
 import SearchIcon from "../../../../components/icons/SearchIcon";
-import CalendarIcon from "../../../../components/icons/CalendarIcon";
 import LocationIcon from "../../../../components/icons/LocationIcon";
 import HeartIcon from "../../../../components/icons/HeartIcon";
 import { Icons } from "../../../../constants/icons";
 import { keywordMap } from "../../../../utils/filter";
 
 const DateCalendarValue = lazy(() => import("../../../../components/ui/DateCalendarValue"));
+
+const POPULAR_CITIES = [
+  "Mumbai",
+  "Pune",
+  "Delhi",
+  "Bangalore",
+  "Hyderabad",
+  "Chennai",
+  "Kolkata",
+  "Ahmedabad",
+  "Jaipur",
+  "Surat",
+  "Lucknow",
+];
+
+const INTEREST_CATEGORIES = [
+  { value: "adventure", label: "Adventure", description: "Trekking, camping, hiking, rides", icon: "🚵" },
+  { value: "social", label: "Social", description: "Meetups, parties, clubs, campfires", icon: "🎉" },
+  { value: "creative", label: "Creative", description: "Art, crafts, paint, design", icon: "🎨" },
+  { value: "tech", label: "Technology", description: "Hackathons, coding, web, apps", icon: "💻" },
+  { value: "wellness", label: "Wellness", description: "Yoga, meditation, healthy lifestyles", icon: "🧘" },
+  { value: "culinary", label: "Culinary", description: "Food trips, street food, cooking", icon: "🍽️" },
+  { value: "history", label: "History", description: "Forts, heritage, museums", icon: "🏛️" },
+  { value: "music", label: "Music", description: "Concerts, acoustic jams, bands", icon: "🎵" },
+  { value: "photography", label: "Photography", description: "Photo walks, camera shoots", icon: "📷" },
+  { value: "travel", label: "Travel", description: "Tours, beaches, road trips", icon: "✈️" },
+  { value: "fitness", label: "Fitness", description: "Workouts, runs, cycling, sports", icon: "💪" },
+  { value: "gaming", label: "Gaming", description: "Board games, video games, play", icon: "🎮" },
+  { value: "movies", label: "Movies & Shows", description: "Cinema, films, theaters", icon: "🎬" },
+  { value: "nature", label: "Nature", description: "Lake visits, sunsets, parks, gardens", icon: "🌳" }
+];
 
 const SearchBar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,6 +62,7 @@ const SearchBar = () => {
   const [locationAnchorEl, setLocationAnchorEl] = useState<null | HTMLElement>(null);
   const [locLoading, setLocLoading] = useState(false);
   const [isPermissionPopupOpen, setIsPermissionPopupOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   // Sync inputs with URL search parameters
   useEffect(() => {
@@ -39,10 +71,6 @@ const SearchBar = () => {
     const dateParam = searchParams.get("created_date");
     setValue(dateParam ? dayjs(dateParam) : null);
   }, [searchParams]);
-
-  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -109,16 +137,16 @@ const SearchBar = () => {
   };
 
   const searchBarContent = (
-    <div className="bg-primary flex w-full flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 sm:gap-6 rounded-3xl sm:rounded-full p-4 sm:p-3 sm:min-w-xl lg:min-w-4xl">
+    <div className="bg-primary flex w-full items-center justify-between gap-4 sm:gap-6 rounded-full p-2.5 sm:p-3 sm:min-w-xl lg:min-w-4xl shadow-sm">
       {/* Location */}
       <div
         onClick={handleLocationClick}
-        className="flex cursor-pointer gap-2 px-5 py-2 transition-all duration-300 hover:scale-105 items-center flex-1"
+        className="flex cursor-pointer gap-2 px-4 py-1.5 transition-all duration-300 hover:scale-105 items-center flex-1 min-w-0"
       >
-        <LocationIcon />
+        <LocationIcon className="text-btn01 h-5 w-5 flex-shrink-0" />
         <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-primary-dark text-sm font-medium">Location</p>
-          <div className="text-secondary/40 text-xs font-medium flex items-center gap-1.5">
+          <p className="text-primary-dark text-xs sm:text-sm font-semibold">Location</p>
+          <div className="text-secondary/40 text-xs font-medium flex items-center gap-1.5 min-w-0">
             <input
               type="text"
               value={locInput}
@@ -171,12 +199,12 @@ const SearchBar = () => {
         onClick={(e) => {
           setInterestAnchorEl(e.currentTarget);
         }}
-        className="flex cursor-pointer gap-2 border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-5 px-5 py-2 transition-all duration-300 hover:scale-105 items-center flex-1"
+        className="flex cursor-pointer gap-2 border-l border-slate-200/80 pl-4 sm:pl-5 px-4 py-1.5 transition-all duration-300 hover:scale-105 items-center flex-1 min-w-0"
       >
-        <HeartIcon />
+        <HeartIcon className="text-btn01 h-5 w-5 flex-shrink-0" />
         <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-primary-dark text-sm font-medium">Interest</p>
-          <div className="text-secondary/40 text-xs font-medium">
+          <p className="text-primary-dark text-xs sm:text-sm font-semibold">Interest</p>
+          <div className="text-secondary/40 text-xs font-medium min-w-0">
             <input
               type="text"
               value={interestInput}
@@ -202,56 +230,253 @@ const SearchBar = () => {
         </div>
       </div>
 
-      {/* Date */}
-      <div
-        onClick={handleOpen}
-        className="flex cursor-pointer gap-2 border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-5 px-5 py-2 transition-all duration-300 hover:scale-105 items-center"
-      >
-        <CalendarIcon />
-        <div className="flex flex-col">
-          <p className="text-primary-dark text-sm font-medium">Date</p>
-          <div className="flex items-center gap-1.5">
-            <span className="text-secondary/40 text-xs font-medium text-nowrap">
-              {!value ? "Select Date" : value.format("DD MMM YYYY")}
-            </span>
-            {value && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setValue(null);
-                  const newParams = new URLSearchParams(searchParams);
-                  newParams.delete("created_date");
-                  setSearchParams(newParams);
-                }}
-                className="text-secondary/60 hover:text-secondary cursor-pointer rounded-full p-0.5 transition-colors hover:bg-slate-100"
-                title="Clear Date"
-              >
-                <Icons.close size={14} className="text-btn01 h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Search Button */}
       <button
         onClick={handleSearch}
-        className="from-btn02 to-btn01 text-white flex h-12 items-center justify-center gap-2 rounded-2xl bg-linear-to-tr to-75% p-3.5 shadow-md transition-all duration-200 active:scale-95 sm:h-12 sm:w-12 sm:rounded-full cursor-pointer hover:scale-105 flex-shrink-0"
+        className="from-btn02 to-btn01 text-white flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-linear-to-tr to-75% p-3 shadow-md transition-all duration-200 active:scale-95 cursor-pointer hover:scale-105 flex-shrink-0"
+        aria-label="Search"
       >
         <SearchIcon className="text-white h-5 w-5 flex-shrink-0" />
-        <span className="sm:hidden text-sm font-semibold">Search Now</span>
       </button>
     </div>
   );
 
+  const activeFiltersCount = (locInput ? 1 : 0) + (interestInput ? 1 : 0);
+
   return (
-    <div className="items-center mt-6 flex w-full flex-col sm:flex-row justify-center gap-4 px-2">
-      {/* Search Inputs */}
-      <div className="from-btn01/10 to-btn02/10 flex w-full items-center justify-center rounded-3xl sm:rounded-full bg-linear-to-r p-0.5 shadow-md md:w-fit flex-1 max-w-4xl">
+    <div className="items-center mt-4 sm:mt-6 flex w-full flex-col justify-center gap-4 px-2">
+      {/* Mobile Compact Search Trigger Bar (< sm) */}
+      <div className="sm:hidden w-full">
+        <div
+          onClick={() => setIsMobileSearchOpen(true)}
+          className="from-btn01/10 to-btn02/10 bg-linear-to-r p-0.5 rounded-full shadow-md cursor-pointer hover:shadow-lg transition-all duration-300 active:scale-[0.98]"
+        >
+          <div className="bg-primary flex items-center justify-between rounded-full px-4 py-2.5 gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="h-9 w-9 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                <SearchIcon className="text-btn01 h-4 w-4" />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-primary-dark text-xs font-bold truncate">
+                  {locInput || interestInput ? (
+                    <span className="flex items-center gap-1.5 truncate">
+                      <span className="text-primary-dark font-semibold truncate">{locInput || "Any Location"}</span>
+                      <span className="text-secondary/40">•</span>
+                      <span className="text-btn01 font-semibold truncate">{interestInput || "Any Interest"}</span>
+                    </span>
+                  ) : (
+                    "Where & What do you want to explore?"
+                  )}
+                </span>
+                <span className="text-secondary/60 text-[11px] font-medium truncate">
+                  {activeFiltersCount > 0 ? `${activeFiltersCount} filter(s) applied • Tap to change` : "Tap to search location, interest"}
+                </span>
+              </div>
+            </div>
+            <div className="from-btn02 to-btn01 text-white flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-tr shadow-xs flex-shrink-0">
+              <SearchIcon className="text-white h-4 w-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop/Tablet Expanded Search Bar (>= sm) */}
+      <div className="hidden sm:flex from-btn01/10 to-btn02/10 w-full items-center justify-center rounded-full bg-linear-to-r p-0.5 shadow-md md:w-fit flex-1 max-w-4xl">
         {searchBarContent}
       </div>
 
-      {/* Location Popover */}
+      {/* Mobile Radix UI Search Dialog Popup */}
+      <Dialog.Root open={isMobileSearchOpen} onOpenChange={setIsMobileSearchOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          <Dialog.Content className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[90vh] flex-col rounded-t-3xl bg-white p-5 shadow-2xl transition-transform duration-300 sm:hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom overflow-hidden border-t border-slate-100">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-orange-50 flex items-center justify-center">
+                  <SearchIcon className="text-btn01 h-4 w-4" />
+                </div>
+                <div>
+                  <Dialog.Title className="text-primary-dark text-base font-bold">
+                    Search & Filter
+                  </Dialog.Title>
+                  <Dialog.Description className="sr-only">
+                    Filter events and flocks by location and interest
+                  </Dialog.Description>
+                  <p className="text-secondary/60 text-[11px] font-medium">Find experiences near you</p>
+                </div>
+              </div>
+              <Dialog.Close className="text-secondary/60 hover:text-primary-dark cursor-pointer rounded-full p-2 hover:bg-slate-100 transition-colors">
+                <Icons.close size={18} />
+              </Dialog.Close>
+            </div>
+
+            {/* Scrollable Form Body */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-5 pr-1">
+              {/* Location Input Section */}
+              <div className="space-y-2">
+                <label className="text-primary-dark text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <LocationIcon className="text-btn01 h-4 w-4" />
+                  <span>Location</span>
+                </label>
+                <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-btn01 focus-within:ring-2 focus-within:ring-btn01/20 transition-all">
+                  <input
+                    type="text"
+                    value={locInput}
+                    onChange={(e) => setLocInput(e.target.value)}
+                    placeholder="Search city or location..."
+                    className="w-full bg-transparent text-sm font-semibold text-primary-dark outline-none placeholder:text-secondary/40"
+                  />
+                  {locInput && (
+                    <button
+                      type="button"
+                      onClick={() => setLocInput("")}
+                      className="text-secondary/50 hover:text-secondary p-1"
+                    >
+                      <Icons.close size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {/* GPS Detect Location Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileSearchOpen(false);
+                    setIsPermissionPopupOpen(true);
+                  }}
+                  disabled={locLoading}
+                  className="w-full flex items-center justify-between p-2.5 bg-orange-50/80 border border-orange-200/60 rounded-xl text-left active:scale-[0.99] transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <LocationIcon className="text-btn01 h-4.5 w-4.5" />
+                    <div>
+                      <p className="text-xs font-bold text-primary-dark">Use Current Location</p>
+                      <p className="text-[10px] text-secondary/60">GPS automatic location detection</p>
+                    </div>
+                  </div>
+                  <span className="text-btn01 text-xs font-bold">Detect →</span>
+                </button>
+
+                {/* Popular Cities Quick Select Chips */}
+                <div className="pt-1">
+                  <p className="text-[11px] font-semibold text-secondary/60 mb-2">Popular Cities</p>
+                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
+                    {POPULAR_CITIES.filter((city) =>
+                      city.toLowerCase().includes(locInput.toLowerCase().trim())
+                    ).map((city) => {
+                      const isSelected = locInput.toLowerCase() === city.toLowerCase();
+                      return (
+                        <button
+                          key={city}
+                          type="button"
+                          onClick={() => setLocInput(city)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 ${
+                            isSelected
+                              ? "bg-btn01 text-white shadow-xs"
+                              : "bg-slate-100 text-secondary hover:bg-slate-200"
+                          }`}
+                        >
+                          📍 {city}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Interest Input Section */}
+              <div className="space-y-2 pt-2 border-t border-slate-100">
+                <label className="text-primary-dark text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <HeartIcon className="text-btn01 h-4 w-4" />
+                  <span>Interest</span>
+                </label>
+                <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-btn01 focus-within:ring-2 focus-within:ring-btn01/20 transition-all">
+                  <input
+                    type="text"
+                    value={interestInput}
+                    onChange={(e) => setInterestInput(e.target.value)}
+                    placeholder="Search interest category..."
+                    className="w-full bg-transparent text-sm font-semibold text-primary-dark outline-none placeholder:text-secondary/40"
+                  />
+                  {interestInput && (
+                    <button
+                      type="button"
+                      onClick={() => setInterestInput("")}
+                      className="text-secondary/50 hover:text-secondary p-1"
+                    >
+                      <Icons.close size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Interest Quick Select Cards / Chips */}
+                <div className="pt-1">
+                  <p className="text-[11px] font-semibold text-secondary/60 mb-2">Categories</p>
+                  <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
+                    {INTEREST_CATEGORIES.filter((cat) => {
+                      const q = interestInput.toLowerCase().trim();
+                      if (!q) return true;
+                      if (cat.label.toLowerCase().includes(q)) return true;
+                      const keywords = keywordMap[cat.value] || [];
+                      return keywords.some((kw: string) => kw.includes(q));
+                    }).map((category) => {
+                      const isSelected = interestInput.toLowerCase() === category.label.toLowerCase();
+                      return (
+                        <button
+                          key={category.value}
+                          type="button"
+                          onClick={() => setInterestInput(category.label)}
+                          className={`flex items-center gap-2 p-2 rounded-xl text-left transition-all cursor-pointer active:scale-95 border ${
+                            isSelected
+                              ? "bg-orange-50 border-btn01 text-btn01 font-bold shadow-xs"
+                              : "bg-slate-50 border-slate-100 text-secondary hover:bg-slate-100"
+                          }`}
+                        >
+                          <span className="text-base">{category.icon}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold truncate">{category.label}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Bottom Actions */}
+            <div className="pt-3 border-t border-slate-100 flex items-center gap-3">
+              {(locInput || interestInput) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocInput("");
+                    setInterestInput("");
+                    localStorage.removeItem("user_location");
+                  }}
+                  className="px-4 py-3 rounded-xl border border-slate-200 text-secondary font-semibold text-xs hover:bg-slate-50 active:scale-95 transition-all"
+                >
+                  Reset
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  handleSearch();
+                  setIsMobileSearchOpen(false);
+                }}
+                className="flex-1 from-btn02 to-btn01 text-white font-bold text-sm py-3 px-4 rounded-xl bg-linear-to-tr shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <SearchIcon className="text-white h-4 w-4" />
+                <span>Search Now</span>
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Location Popover (Desktop) */}
       <Popover
         open={Boolean(locationAnchorEl)}
         anchorEl={locationAnchorEl}
@@ -312,19 +537,6 @@ const SearchBar = () => {
           </p>
 
           {(() => {
-            const POPULAR_CITIES = [
-              "Mumbai",
-              "Pune",
-              "Delhi",
-              "Bangalore",
-              "Hyderabad",
-              "Chennai",
-              "Kolkata",
-              "Ahmedabad",
-              "Jaipur",
-              "Surat",
-              "Lucknow",
-            ];
             const query = locInput.toLowerCase().trim();
             const filtered = POPULAR_CITIES.filter((city) =>
               city.toLowerCase().includes(query)
@@ -354,7 +566,7 @@ const SearchBar = () => {
         </div>
       </Popover>
 
-      {/* Interest Popover */}
+      {/* Interest Popover (Desktop) */}
       <Popover
         open={Boolean(interestAnchorEl)}
         anchorEl={interestAnchorEl}
@@ -389,22 +601,6 @@ const SearchBar = () => {
             Select or Search Interest
           </p>
           {(() => {
-            const INTEREST_CATEGORIES = [
-              { value: "adventure", label: "Adventure", description: "Trekking, camping, hiking, rides", icon: "🚵" },
-              { value: "social", label: "Social", description: "Meetups, parties, clubs, campfires", icon: "🎉" },
-              { value: "creative", label: "Creative", description: "Art, crafts, paint, design", icon: "🎨" },
-              { value: "tech", label: "Technology", description: "Hackathons, coding, web, apps", icon: "💻" },
-              { value: "wellness", label: "Wellness", description: "Yoga, meditation, healthy lifestyles", icon: "🧘" },
-              { value: "culinary", label: "Culinary", description: "Food trips, street food, cooking", icon: "🍽️" },
-              { value: "history", label: "History", description: "Forts, heritage, museums", icon: "🏛️" },
-              { value: "music", label: "Music", description: "Concerts, acoustic jams, bands", icon: "🎵" },
-              { value: "photography", label: "Photography", description: "Photo walks, camera shoots", icon: "📷" },
-              { value: "travel", label: "Travel", description: "Tours, beaches, road trips", icon: "✈️" },
-              { value: "fitness", label: "Fitness", description: "Workouts, runs, cycling, sports", icon: "💪" },
-              { value: "gaming", label: "Gaming", description: "Board games, video games, play", icon: "🎮" },
-              { value: "movies", label: "Movies & Shows", description: "Cinema, films, theaters", icon: "🎬" },
-              { value: "nature", label: "Nature", description: "Lake visits, sunsets, parks, gardens", icon: "🌳" }
-            ];
             const query = interestInput.toLowerCase().trim();
             const filtered = INTEREST_CATEGORIES.filter((category) => {
               if (!query) return true;
@@ -446,7 +642,7 @@ const SearchBar = () => {
         </div>
       </Popover>
 
-      {/* Date Popover */}
+      {/* Date Popover (Desktop) */}
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -475,6 +671,7 @@ const SearchBar = () => {
           </Suspense>
         )}
       </Popover>
+
       {/* Location Permission Modal */}
       <LocationPermissionPopup
         isOpen={isPermissionPopupOpen}
