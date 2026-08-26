@@ -9,7 +9,10 @@
     "build:release": "vite build --mode release",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:build": "docker build -t flockngo-web-portal:latest .",
+    "docker:run": "docker run -d -p 8080:80 --name flockngo-web-portal flockngo-web-portal:latest",
+    "docker:compose": "docker compose up --build -d"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
