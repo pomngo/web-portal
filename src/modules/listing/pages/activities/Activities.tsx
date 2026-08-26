@@ -1,36 +1,67 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { filterOptions } from "../../../../constants/data";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import FilterButton from "../../components/common/FilterButton";
+import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
-import HomeLoader from "../../../../components/common/HomeLoader";
+import { ResponsiveCardListSkeleton } from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useActivities } from "../../../../hooks/useActivitiesQuery";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
 
 const Activities = () => {
-  const [selectedFilter, setSelectedFilter] = useState("");
+  useSyncFilters();
+  const queryClient = useQueryClient();
+  const [selectedFilter, setSelectedFilter] = useState(() => sessionStorage.getItem("activities_page_filter") || "");
   const [searchParams] = useSearchParams();
 
-  // Combine URL search params and selected category filter for Activities
+  const handleSetSelectedFilter = (value: React.SetStateAction<string>) => {
+    setSelectedFilter((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      if (next) {
+        sessionStorage.setItem("activities_page_filter", next);
+      } else {
+        sessionStorage.removeItem("activities_page_filter");
+        if (prev) {
+          evictFilterFromCache(queryClient, "interest", prev);
+        }
+      }
+      return next;
+    });
+  };
+
+  // Combine query parameters for React Query key-based caching
   const activityQueryString = (() => {
-    const params = new URLSearchParams(searchParams);
-    if (selectedFilter) {
-      params.set("interest", selectedFilter);
-    }
-    return `?${params.toString()}`;
+    const params = new URLSearchParams();
+    const loc = searchParams.get("location");
+    const interest = selectedFilter || searchParams.get("interest");
+    const date = searchParams.get("created_date");
+    if (loc) params.set("location", loc);
+    if (interest) params.set("interest", interest);
+    if (date) params.set("created_date", date);
+    return params.toString() ? `?${params.toString()}` : "";
   })();
 
+  // Fetch activities (Query Keys include the query strings for caching)
   const {
-    data: activities = [],
-    isLoading: loading,
-    error,
-    refetch,
+    data: nearbyActivitiesList = [],
+    isLoading: nearbyLoading,
+    error: nearbyError,
+    refetch: refetchNearby,
   } = useActivities(activityQueryString);
+
+  const {
+    data: exploreActivitiesList = [],
+    isLoading: exploreLoading,
+    error: exploreError,
+    refetch: refetchExplore,
+  } = useActivities("");
+
+  const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
 
   useSEO({
     title: "Activities | FlocknGo - Explore Events & Experiences",
@@ -39,24 +70,28 @@ const Activities = () => {
   });
 
   const handleRetry = () => {
-    refetch();
+    refetchNearby();
+    refetchExplore();
   };
 
-  if (loading && activities.length === 0) {
+  const error = nearbyError || exploreError;
+
+
+
+  if (error && nearbyActivitiesList.length === 0 && exploreActivitiesList.length === 0) {
     return (
-      <div className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <HomeLoader type="activities" />
+      <div className="flex min-h-screen items-center justify-center px-16 py-10">
+        <ErrorState title="Unable to load Activities" message={error?.message || "An error occurred."} onRetry={handleRetry} />
       </div>
     );
   }
 
-  if (error && activities.length === 0) {
-    return (
-      <div className="flex min-h-screen items-center justify-center px-16 py-10">
-        <ErrorState title="Unable to load Activities" message={error.message} onRetry={handleRetry} />
-      </div>
-    );
-  }
+  // Fallback Logic
+  const isNearbyActivitiesFallback = nearbyActivitiesList.some((act: any) => act.is_fallback);
+  const filteredNearbyActivities = nearbyActivitiesList;
+
+  const filteredExploreActivities = exploreActivitiesList;
+
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <h1 className="sr-only">Discover Local Activities and Upcoming Events - FlocknGo</h1>
@@ -64,7 +99,7 @@ const Activities = () => {
         {/* Heading */}
         <div className="mb-4 flex justify-between">
           <div className="">
-            <TitleText title="Nearby Activities" />
+            <TitleText title={isActivityFiltered ? "Filtered Activities" : "Nearby Activities"} />
             <p className="text-secondary text-base">Enable your location to get personalized results.</p>
           </div>
           <div className="">
@@ -72,12 +107,20 @@ const Activities = () => {
           </div>
         </div>
 
-        {activities?.length === 0 ? (
+        {isNearbyActivitiesFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No activities match your current search/location. Showing fallback recommendations:
+          </p>
+        )}
+
+        {nearbyLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredNearbyActivities.length === 0 ? (
           <EmptyState message="No nearby activities found" />
         ) : (
           <>
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-              {activities?.map((activity) => (
+              {filteredNearbyActivities.map((activity) => (
                 <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
                   <NearbyActivities activity={activity} />
                 </div>
@@ -86,8 +129,8 @@ const Activities = () => {
 
             {/* Activities List */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
-              {activities?.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+              {filteredNearbyActivities.slice(0, 5).map((activity) => (
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
@@ -95,18 +138,11 @@ const Activities = () => {
           </>
         )}
 
-        {/* Filter button */}
-        <div className="scrollbar-hide mt-16 flex gap-4 overflow-scroll overflow-y-hidden">
-          {filterOptions.map((item, index) => (
-            <FilterButton
-              key={index}
-              Icon={item.icon}
-              label={item.label}
-              selectedFilter={selectedFilter}
-              setSelectedFilter={setSelectedFilter}
-            />
-          ))}
-        </div>
+        {/* Filter Chips */}
+        <InterestChips
+          selectedFilter={selectedFilter}
+          setSelectedFilter={handleSetSelectedFilter}
+        />
       </section>
 
       {/* Explore Activities */}
@@ -122,15 +158,17 @@ const Activities = () => {
             <GradientLinkButton to="/activities/explore-activities" />
           </div>
         </div>
-        {activities?.length === 0 ? (
+        {exploreLoading ? (
+          <ResponsiveCardListSkeleton />
+        ) : filteredExploreActivities.length === 0 ? (
           <EmptyState message="No activities found" />
         ) : (
           <>
             {/* Mobile Carousel */}
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
-              {activities?.slice(0, 5).map((activity) => (
+              {filteredExploreActivities.slice(0, 5).map((activity) => (
                 <div key={activity.id} className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+                  <Link to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>
@@ -139,8 +177,8 @@ const Activities = () => {
 
             {/* Desktop Grid */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
-              {activities?.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.id}/activities/${activity.id}/detail`}>
+              {filteredExploreActivities.slice(0, 5).map((activity) => (
+                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <ExploreActivitiesCard activity={activity} />
                 </Link>
               ))}

@@ -5,14 +5,18 @@ import type { FlockItem } from "../types";
 
 const buildListUrl = (filter?: string) => {
   const cleanFilter = (filter || "").trim();
-  const query = cleanFilter
-    ? cleanFilter.startsWith("?")
-      ? `&${cleanFilter.slice(1)}`
-      : cleanFilter.startsWith("&")
-        ? cleanFilter
-        : `&${cleanFilter}`
-    : "";
-  return `${ENDPOINTS.CAMPAIGN.LIST}${query}`;
+  if (!cleanFilter) return ENDPOINTS.CAMPAIGN.LIST;
+
+  const baseHasQuery = ENDPOINTS.CAMPAIGN.LIST.includes("?");
+  const filterHasQuery = cleanFilter.startsWith("?") || cleanFilter.startsWith("&");
+
+  let query = cleanFilter;
+  if (filterHasQuery) {
+    query = cleanFilter.slice(1);
+  }
+
+  const separator = baseHasQuery ? "&" : "?";
+  return `${ENDPOINTS.CAMPAIGN.LIST}${separator}${query}`;
 };
 
 const normalizeFlockList = (payload: unknown): FlockItem[] => {

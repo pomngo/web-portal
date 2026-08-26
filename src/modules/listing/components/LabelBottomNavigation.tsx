@@ -1,89 +1,114 @@
-import * as React from "react";
-import BottomNavigation from "@mui/material/BottomNavigation";
-import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import { useEffect, useRef, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { navItems } from "../../../constants/data";
-import { useNavigate } from "react-router-dom";
 
 export default function LabelBottomNavigation() {
-  const [value, setValue] = React.useState("/");
-  const navigate = useNavigate();
+  const location = useLocation();
+  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  const actionRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
-
-  const [sliderStyle, setSliderStyle] = React.useState({
+  const [sliderStyle, setSliderStyle] = useState({
     width: 0,
     left: 0,
   });
 
-  React.useEffect(() => {
-    const activeIndex = navItems.findIndex((item) => item.name === value);
-
-    const activeItem = actionRefs.current[activeIndex];
-
-    if (activeItem) {
-      setSliderStyle({
-        width: activeItem.offsetWidth,
-        left: activeItem.offsetLeft,
+  useEffect(() => {
+    const updateSlider = () => {
+      const activeIndex = navItems.findIndex((item) => {
+        if (item.path === "/") {
+          return location.pathname === "/";
+        }
+        return location.pathname.startsWith(item.path);
       });
-    }
-  }, [value]);
+
+      const activeItem = activeIndex >= 0 ? itemRefs.current[activeIndex] : null;
+
+      if (activeItem) {
+        setSliderStyle({
+          width: activeItem.offsetWidth,
+          left: activeItem.offsetLeft,
+        });
+      }
+    };
+
+    // Small delay to ensure DOM dimensions are ready on initial load
+    const timer = setTimeout(updateSlider, 50);
+    window.addEventListener("resize", updateSlider);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateSlider);
+    };
+  }, [location.pathname]);
 
   return (
-    <div className="from-nav01 to-nav02 fixed right-0 bottom-5 left-0 z-50 mx-auto h-20 w-[80%] rounded-full bg-linear-to-b to-60% p-2">
-      {/* Sliding Background */}
-      <div
-        className="absolute top-1 h-[56px] rounded-xl bg-orange-100 transition-all duration-300 ease-in-out"
-        style={{
-          width: sliderStyle.width,
-          transform: `translateX(${sliderStyle.left}px)`,
-        }}
-      />
+    <Tooltip.Provider delayDuration={200}>
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex h-16 w-[92%] max-w-sm items-center justify-around rounded-full bg-white/95 p-1.5 shadow-xl shadow-black/10 backdrop-blur-md border border-slate-200/80 transition-all duration-300">
+        {/* Sliding Active Pill Background */}
+        <div
+          className="absolute top-1.5 left-0 h-[52px] rounded-full bg-orange-50/90 border border-orange-200/60 transition-all duration-300 ease-out pointer-events-none"
+          style={{
+            width: sliderStyle.width,
+            transform: `translateX(${sliderStyle.left}px)`,
+          }}
+        />
 
-      <BottomNavigation
-        value={value}
-        onChange={(_, newValue) => {
-          setValue(newValue);
-        }}
-        sx={{
-          width: "100%",
-          backgroundColor: "transparent",
-          position: "relative",
-          zIndex: 10,
-        }}
-      >
+        {/* Nav Items */}
         {navItems.map((item, index) => {
           const Icon = item.icon;
+          const isActive =
+            item.path === "/"
+              ? location.pathname === "/"
+              : location.pathname.startsWith(item.path);
 
           return (
-            <BottomNavigationAction
-              key={item.name}
-              ref={(el) => {
-                actionRefs.current[index] = el;
-              }}
-              label={item.name}
-              value={item.path}
-              onClick={() => navigate(item.path)}
-              icon={
-                <Icon
-                  className={`h-5 w-5 stroke-2 transition-colors duration-300 ${
-                    value === item.path ? "text-orange-500" : "text-gray-500"
-                  }`}
-                />
-              }
-              sx={{
-                borderRadius: "12px",
-                minWidth: "auto",
+            <Tooltip.Root key={item.path}>
+              <Tooltip.Trigger asChild>
+                <NavLink
+                  to={item.path}
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
+                  className="relative z-10 flex flex-1 flex-col items-center justify-center py-1 text-center transition-all duration-300 active:scale-95 cursor-pointer rounded-full"
+                >
+                  <div className="flex flex-col items-center gap-0.5">
+                    {Icon && (
+                      <Icon
+                        className={`h-5 w-5 transition-all duration-300 ${
+                          isActive
+                            ? "text-btn01 scale-110"
+                            : "text-secondary/60 hover:text-primary-dark"
+                        }`}
+                      />
+                    )}
+                    <span
+                      className={`text-[11px] font-semibold transition-all duration-300 ${
+                        isActive
+                          ? "from-btn01 to-btn02 bg-linear-to-tr bg-clip-text text-transparent font-bold"
+                          : "text-secondary/70 font-medium"
+                      }`}
+                    >
+                      {item.name}
+                    </span>
+                  </div>
+                </NavLink>
+              </Tooltip.Trigger>
 
-                transition: "all 0.3s ease",
-
-                "&.Mui-selected": {
-                  color: "#f97316",
-                },
-              }}
-            />
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  className="z-50 rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-white shadow-md animate-in fade-in-0 zoom-in-95"
+                  sideOffset={6}
+                  side="top"
+                >
+                  {item.name}
+                  <Tooltip.Arrow className="fill-slate-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
           );
         })}
-      </BottomNavigation>
-    </div>
+      </div>
+    </Tooltip.Provider>
   );
 }
+
+

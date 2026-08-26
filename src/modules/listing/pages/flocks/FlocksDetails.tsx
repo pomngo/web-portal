@@ -1,19 +1,36 @@
+import { useState, useMemo } from "react";
 import dayjs from "dayjs";
 import { Icons } from "../../../../constants/icons";
 import DetailsTopNav from "../../components/DetailsTopNav";
 import SidebarCalendar from "../../components/flocks/SidebarCalendar";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import { images } from "../../../../constants/images";
 import ErrorState from "../../../../components/common/ErrorState";
 import type { ActivityItem } from "../../../../types";
+import { ENDPOINTS } from "../../../../services/api/endpoints";
 import DetailBanner from "../../components/common/DetailBanner";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useFlockDetails } from "../../../../hooks/useFlocksQuery";
+import JoinPromptPopup from "../../components/common/JoinPromptPopup";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import { ChevronLeft, MoreVertical, MessageSquare } from "lucide-react";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 const FlocksDetails = () => {
   const { id } = useParams();
   const flockId = Number(id);
+  const navigate = useNavigate();
+
+  const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
+  const [joinPopupMessage, setJoinPopupMessage] = useState("");
+  const [activeDetailsTab, setActiveDetailsTab] = useState<"activities" | "calendar">("activities");
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  const handleActionClick = (label: string) => {
+    setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
+    setIsJoinPopupOpen(true);
+  };
 
   const {
     data: selected_flock,
@@ -21,6 +38,19 @@ const FlocksDetails = () => {
     error,
     refetch,
   } = useFlockDetails(flockId);
+
+  // Group activities by month-year for desktop side-by-side view
+  const groupedActivities = useMemo(() => {
+    const groups: Record<string, ActivityItem[]> = {};
+    selected_flock?.public_activities?.forEach((activity: ActivityItem) => {
+      const monthYear = dayjs(activity.created_at).format("MMMM YYYY");
+      if (!groups[monthYear]) {
+        groups[monthYear] = [];
+      }
+      groups[monthYear].push(activity);
+    });
+    return groups;
+  }, [selected_flock?.public_activities]);
 
   useSEO({
     title: selected_flock?.flock_details?.flock_name
@@ -87,136 +117,379 @@ const FlocksDetails = () => {
 
   return (
     <>
-      <DetailsTopNav />
+      {/* Desktop view (>= lg) */}
+      <div className="hidden lg:block">
+        <DetailsTopNav />
 
-      <div className="min-h-screen bg-[#F9F9F9]">
-        <DetailBanner
-          coverImage={selected_flock?.flock_details?.cover_image_s3key}
-          altText={selected_flock?.flock_details?.flock_name}
-        />
+        <div className="min-h-screen bg-[#F9F9F9] pb-16">
+          <DetailBanner
+            coverImage={selected_flock?.flock_details?.cover_image_s3key}
+            altText={selected_flock?.flock_details?.flock_name}
+            defaultImage={images.default_flock_banner}
+          />
 
-        <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-            <div className="flex flex-col gap-3">
-              <div>
-                <h1 className="text-[28px] font-semibold">{selected_flock?.flock_details?.flock_name}</h1>
-
-                <p className="text-primary-dark/70 mt-1 max-w-2xl text-[15px] leading-relaxed">
-                  {selected_flock?.flock_details?.description}
-                </p>
-              </div>
-
-              <div className="text-primary-dark/80 flex items-center gap-2 text-[15px]">
-                <Icons.users width={22} height={22} className="text-secondary" />
-
-                <span className="underline underline-offset-4">
-                  {selected_flock?.flock_details?.participants_count || 0} Members
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-5">
-              {[
-                {
-                  icon: <Icons.flag />,
-                  label: "Updates",
-                },
-                {
-                  icon: <Icons.film />,
-                  label: "Polls",
-                },
-                {
-                  icon: <Icons.camera />,
-                  label: "Gallery",
-                },
-                {
-                  icon: <Icons.heartHandshake />,
-                  label: "Files",
-                },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-2">
-                  <button className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95">
-                    {item.icon}
-                  </button>
-
-                  <span className="text-primary-dark/70 text-xs">{item.label}</span>
+          {/* Details Row */}
+          <div className="bg-primary px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+            <div className="max-w-[1440px] mx-auto flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+              <div className="flex flex-col gap-3">
+                <div>
+                  <h1 className="text-[28px] font-semibold text-slate-800">{selected_flock?.flock_details?.name}</h1>
+                  <p className="text-slate-600 mt-1 max-w-2xl text-[15px] leading-relaxed">
+                    {selected_flock?.flock_details?.description}
+                  </p>
                 </div>
-              ))}
+
+                <div className="text-slate-700 flex items-center gap-2 text-[15px] font-semibold">
+                  <Icons.users width={20} height={20} className="text-[#EF7F23]" />
+                  <span className="underline underline-offset-4 cursor-pointer" onClick={() => handleActionClick("Members")}>
+                    {selected_flock?.flock_details?.participants_count || 0} Members
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions Grid with Tooltips */}
+              <Tooltip.Provider delayDuration={150}>
+                <div className="flex items-center gap-5">
+                  {[
+                    {
+                      icon: <Icons.update />,
+                      label: "Updates",
+                    },
+                    {
+                      icon: <Icons.polls />,
+                      label: "Polls",
+                    },
+                    {
+                      icon: <Icons.gallery />,
+                      label: "Gallery",
+                    },
+                    {
+                      icon: <Icons.file />,
+                      label: "Files",
+                    },
+                  ].map((item) => (
+                    <Tooltip.Root key={item.label}>
+                      <Tooltip.Trigger asChild>
+                        <div className="flex flex-col items-center gap-2">
+                          <button
+                            onClick={() => handleActionClick(item.label)}
+                            className="hover:bg-secondary/10 flex size-12 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                          >
+                            {item.icon}
+                          </button>
+                          <span className="text-primary-dark/70 text-xs font-semibold">{item.label}</span>
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content
+                          side="top"
+                          sideOffset={5}
+                          className="rt-TooltipContent z-50 max-w-48 text-center bg-slate-900/95 text-white text-[11px] rounded-lg py-2 px-3 shadow-lg font-medium leading-normal border border-slate-700/30 backdrop-blur-xs select-none"
+                        >
+                          Join us first then you can see {item.label.toLowerCase()} and all things
+                          <Tooltip.Arrow className="fill-slate-900" />
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  ))}
+                </div>
+              </Tooltip.Provider>
+            </div>
+          </div>
+
+          {/* Two Column Layout: Calendar Sidebar & Activities Grid */}
+          <div className="max-w-[1500px] mx-auto px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-6">
+            <div className="grid grid-cols-12 gap-8">
+              {/* Left Column (Calendar Sidebar) */}
+              <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white rounded-3xl p-4 xl:p-6 border border-slate-100 shadow-xs">
+                  <SidebarCalendar activities={selected_flock?.public_activities} />
+                </div>
+              </div>
+
+              {/* Right Column (Activities Grid) */}
+              <div className="col-span-12 lg:col-span-8 bg-white rounded-3xl p-8 border border-slate-100 shadow-xs flex flex-col gap-10">
+                {Object.keys(groupedActivities).length > 0 ? (
+                  Object.entries(groupedActivities).map(([monthYear, activities]) => (
+                    <div key={monthYear} className="flex flex-col gap-6">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 className="text-lg font-bold text-[#EF7F23] tracking-wide">
+                          {monthYear.toUpperCase()}
+                        </h3>
+                        <p className="text-slate-400 text-xs font-semibold">
+                          {activities.length} {activities.length === 1 ? "Activity" : "Activities"}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {activities.map((activity: ActivityItem) => {
+                          const status = (activity?.status || activity?.current_tab || "ONGOING").toUpperCase();
+                          return (
+                            <Link
+                              to={`/flocks/${id}/activities/${activity?.id}/detail`}
+                              key={activity.id}
+                              className="flex cursor-pointer flex-col gap-4 rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:p-2 hover:shadow-md"
+                            >
+                              <div className="">
+                                <p className="text-base font-semibold text-slate-800 whitespace-nowrap">{dayjs(activity?.created_at).format("ddd, MMM D")}</p>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <img
+                                  src={
+                                    activity?.last_cover_image
+                                      ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+                                      : activity?.cover_image?.[0] || images.default_flock_banner
+                                  }
+                                  alt={activity?.name}
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    (e.target as HTMLImageElement).src = images.default_flock_banner;
+                                  }}
+                                  className="h-24 w-24 rounded-2xl object-cover flex-shrink-0"
+                                />
+                                <div className="">
+                                  <div className="flex flex-col items-start justify-between gap-2">
+                                    <h3 className="text-lg font-semibold text-nowrap">
+                                      {activity?.name.slice(0, 12).trim()}
+                                      {activity?.name.toString().length > 12 && "..."}
+                                    </h3>
+
+                                    <span
+                                      className={`rounded-full ${status === "DRAFT" ? "bg-btn-biget03/50 border-btn-biget03 border-2" : status === "ONGOING" || status === "LIVE" ? "bg-btn-biget01/50 border-btn-biget01 border-2" : "bg-btn-biget02/50 border-btn-biget02 border-2"} text-secondary px-3 py-1 text-xs font-medium`}
+                                    >
+                                      {status}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-16 text-slate-400">
+                    <p className="text-lg font-semibold">No activities found</p>
+                    <p className="text-sm mt-1">This community flock has no public activities yet.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-6 px-4 py-8 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-          <div className="flex gap-6">
-            <aside className="hidden w-sm shrink-0 lg:block">
-              <div className="sticky top-4 space-y-4">
-                <SidebarCalendar />
+      {/* Mobile/Tablet view (< lg) */}
+      <div className="block lg:hidden min-h-screen bg-slate-50 pb-20">
+        {/* Header Banner Section */}
+        <div
+          className={`${
+            selected_flock?.flock_details?.cover_image_s3key
+              ? "h-48 sm:h-64 p-4 flex flex-col justify-between"
+              : "p-4 pb-6 flex flex-col gap-4"
+          } bg-[#0e52d6] text-white rounded-b-3xl sm:rounded-b-[2.5rem] relative shadow-md overflow-hidden`}
+        >
+          {/* Background image if available */}
+          {selected_flock?.flock_details?.cover_image_s3key && (
+            <>
+              <img
+                src={ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_flock.flock_details.cover_image_s3key)}
+                alt={selected_flock?.flock_details?.flock_name}
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  (e.target as HTMLImageElement).src = images.default_flock_banner;
+                }}
+              />
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
+            </>
+          )}
+
+          {/* Top Navigation Bar */}
+          <div className="flex items-center justify-between relative z-10">
+            <button onClick={() => navigate(-1)} className="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition cursor-pointer">
+              <ChevronLeft className="h-5 w-5 text-white" />
+            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => handleActionClick("Chat")} className="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition cursor-pointer">
+                <MessageSquare className="h-5 w-5 text-white" />
+              </button>
+              <button onClick={() => handleActionClick("Options")} className="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition cursor-pointer">
+                <MoreVertical className="h-5 w-5 text-white" />
+              </button>
+            </div>
+          </div>
+
+          {/* Fallback Card Image */}
+          {!selected_flock?.flock_details?.cover_image_s3key && (
+            <div className="flex justify-center">
+              <div className="bg-white p-1.5 rounded-3xl shadow-xl w-[120px] h-[160px] sm:w-[140px] sm:h-[190px] overflow-hidden flex items-center justify-center">
+                <img
+                  src={images.default_flock_banner}
+                  alt={selected_flock?.flock_details?.flock_name}
+                  className="w-full h-full object-cover rounded-[20px]"
+                />
               </div>
-            </aside>
+            </div>
+          )}
+        </div>
 
-            <main className="bg-primary flex-1 rounded-xl p-8">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="from-btn-light to-btn01 bg-linear-to-bl to-65% bg-clip-text text-base font-medium text-transparent">
-                  MAY 2026
-                </h2>
+        {/* Details Section */}
+        <div className="bg-[#FAF5EF] px-4 py-5 sm:px-6 sm:py-6 flex flex-col gap-4">
+          {/* Title */}
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">
+            {selected_flock?.flock_details?.name}
+          </h1>
 
-                <p className="text-primary-dark/60 text-sm">
-                  {selected_flock?.public_activities?.length} Activities Found
-                </p>
-              </div>
+          {/* Description */}
+          <div className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            {selected_flock?.flock_details?.description ? (
+              <>
+                {isDescriptionExpanded ? (
+                  selected_flock.flock_details.description
+                ) : (
+                  `${selected_flock.flock_details.description.slice(0, 100)}${selected_flock.flock_details.description.length > 100 ? '...' : ''}`
+                )}
+                {selected_flock.flock_details.description.length > 100 && (
+                  <button
+                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                    className="text-[#EF7F23] font-semibold ml-1 cursor-pointer hover:underline"
+                  >
+                    {isDescriptionExpanded ? "Show Less" : "Read More"}
+                  </button>
+                )}
+              </>
+            ) : (
+              "No description available."
+            )}
+          </div>
 
-              <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+          {/* Members */}
+          <div className="flex items-center gap-2 mt-1">
+            <Icons.users className="text-[#EF7F23] h-4.5 w-4.5" />
+            <span className="text-slate-700 text-xs sm:text-sm font-semibold underline underline-offset-4 cursor-pointer" onClick={() => handleActionClick("Members")}>
+              {selected_flock?.flock_details?.participants_count || 0} Members
+            </span>
+            <button onClick={() => handleActionClick("Invite")} className="text-[#EF7F23] text-base font-bold p-1 leading-none cursor-pointer">
+              +
+            </button>
+          </div>
+
+          {/* Actions Grid */}
+          <div className="grid grid-cols-4 gap-2 mt-2">
+            {[
+              { icon: <Icons.update className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Updates" },
+              { icon: <Icons.polls className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Polls" },
+              { icon: <Icons.gallery className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Gallery" },
+              { icon: <Icons.file className="text-[#EF7F23] h-4.5 w-4.5" />, label: "Files" },
+            ].map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleActionClick(item.label)}
+                className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl bg-white shadow-xs active:scale-95 transition cursor-pointer gap-1.5 border border-slate-100"
+              >
+                <div className="bg-orange-50 p-2 rounded-full flex items-center justify-center">
+                  {item.icon}
+                </div>
+                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-700">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tabs & Content Area with Radix Accordion / Tab structure */}
+        <div className="bg-white px-4 py-4 sm:px-6">
+          <div className="flex border-b border-slate-100 mb-4">
+            <button
+              onClick={() => setActiveDetailsTab("activities")}
+              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold border-b-2 transition cursor-pointer ${
+                activeDetailsTab === "activities"
+                  ? "border-[#EF7F23] text-slate-900"
+                  : "border-transparent text-slate-400"
+              }`}
+            >
+              Activities ({selected_flock?.public_activities?.length || 0})
+            </button>
+            <button
+              onClick={() => setActiveDetailsTab("calendar")}
+              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold border-b-2 transition cursor-pointer ${
+                activeDetailsTab === "calendar"
+                  ? "border-[#EF7F23] text-slate-900"
+                  : "border-transparent text-slate-400"
+              }`}
+            >
+              Calendar
+            </button>
+          </div>
+
+          {/* Content */}
+          <div>
+            {activeDetailsTab === "activities" ? (
+              <div className="flex flex-col gap-3">
                 {selected_flock?.public_activities?.map((activity: ActivityItem, index: number) => {
+                  const status = (activity?.status || activity?.current_tab || "ONGOING").toUpperCase();
                   return (
                     <Link
                       to={`/flocks/${id}/activities/${activity?.id}/detail`}
                       key={index}
-                      className="flex cursor-pointer flex-col gap-4 rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:p-2 hover:shadow-md"
+                      className="flex items-center gap-3 bg-slate-50/80 p-3 rounded-2xl border border-slate-100 active:scale-98 transition"
                     >
-                      <div className="">
-                        <p className="text-base font-semibold">{dayjs(activity?.created_at).format("ddd, MMM D")}</p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <img
-                          src={activity?.cover_image[0] || images.not_found}
-                          alt={activity?.name}
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = images.not_found;
-                          }}
-                          className="h-24 w-24 rounded-2xl object-cover"
-                        />
-                        <div className="">
-                          <div className="flex flex-col items-start justify-between gap-2">
-                            <h3 className="text-lg font-semibold text-nowrap">
-                              {activity?.name.slice(0, 12).trim()}
-                              {activity?.name.toString().length > 12 && "..."}
-                            </h3>
-
-                            <span
-                              className={`rounded-full ${activity?.current_tab === "draft" ? "bg-btn-biget03/50 border-btn-biget03 border-2" : activity?.current_tab === "ONGOING" ? "bg-btn-biget01/50 border-btn-biget01 border-2" : "bg-btn-biget02/50 border-btn-biget02 border-2"} text-secondary px-3 py-1 text-xs font-medium`}
-                            >
-                              {activity?.current_tab}
-                            </span>
-                          </div>
-                        </div>
+                      <img
+                        src={
+                          activity?.last_cover_image
+                            ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
+                            : activity?.cover_image?.[0] || images.default_flock_banner
+                        }
+                        alt={activity?.name}
+                        className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          (e.target as HTMLImageElement).src = images.default_flock_banner;
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] sm:text-[11px] font-bold text-[#EF7F23] whitespace-nowrap">
+                          {dayjs(activity?.created_at).format("ddd, MMM D")}
+                        </p>
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-800 truncate mt-0.5">
+                          {activity?.name}
+                        </h3>
+                        <span className="inline-block bg-orange-100 text-[#EF7F23] text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full mt-1 uppercase">
+                          {status}
+                        </span>
                       </div>
                     </Link>
                   );
                 })}
 
                 {selected_flock?.public_activities?.length === 0 && (
-                  <div className="bg-primary rounded-3xl border p-10 text-center shadow-sm">
-                    <p className="text-primary-dark/60">No activities found for selected date.</p>
+                  <div className="bg-slate-50 rounded-2xl p-8 text-center border border-slate-100 text-slate-400 text-xs sm:text-sm">
+                    No activities found.
                   </div>
                 )}
               </div>
-            </main>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-1">
+                <div className="w-full max-w-lg bg-white rounded-2xl shadow-xs border border-slate-100">
+                  <SidebarCalendar activities={selected_flock?.public_activities} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <JoinPromptPopup
+        isOpen={isJoinPopupOpen}
+        onClose={() => setIsJoinPopupOpen(false)}
+        message={joinPopupMessage}
+        onJoin={handleExternalRedirect}
+      />
     </>
   );
 };
 
 export default FlocksDetails;
+
