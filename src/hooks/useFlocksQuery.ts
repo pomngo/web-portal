@@ -49,7 +49,7 @@ export const useFlocks = (filter = "") => {
 };
 
 // 2. Hook for infinite paginated flocks list
-export const useInfiniteFlocks = (filter = "", offset = 5) => {
+export const useInfiniteFlocks = (filter = "", offset = 6) => {
   return useInfiniteQuery<{ items: FlockItem[]; page: number }, Error>({
     queryKey: ["flocks", "infinite", filter, offset],
     queryFn: async ({ pageParam = 1, signal }) => {

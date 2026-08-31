@@ -29,7 +29,7 @@ export const useActivities = (filter = "") => {
 };
 
 // 2. Hook for infinite paginated activities list
-export const useInfiniteActivities = (filter = "", offset = 5) => {
+export const useInfiniteActivities = (filter = "", offset = 6) => {
   return useInfiniteQuery<{ items: ActivityItem[]; page: number }, Error>({
     queryKey: ["activities", "infinite", filter, offset],
     queryFn: async ({ pageParam = 1, signal }) => {
