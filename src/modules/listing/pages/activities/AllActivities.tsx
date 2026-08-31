@@ -1,6 +1,6 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
-import HomeLoader from "../../../../components/common/HomeLoader";
+import HomeLoader, { CardSkeleton } from "../../../../components/common/HomeLoader";
 import PageHeader from "../../../../components/common/PageHeader";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -27,6 +27,7 @@ const AllActivities = () => {
   const {
     data,
     isLoading: loading,
+    isFetchingNextPage,
     error,
     fetchNextPage,
     hasNextPage,
@@ -36,6 +37,10 @@ const AllActivities = () => {
   const activityList = data?.pages.flatMap((page) => page.items) || [];
 
   const filteredActivityList = activityList;
+
+  const skeletonCount = isFetchingNextPage
+    ? (filteredActivityList.length % 2 !== 0 ? 3 : 2)
+    : (hasNextPage && filteredActivityList.length % 2 !== 0 ? 1 : 0);
 
   useSEO({
     title: `All Activities - ${search_by || "Nearby"} | FlocknGo`,
@@ -71,20 +76,19 @@ const AllActivities = () => {
             dataLength={filteredActivityList.length}
             next={fetchNextPage}
             hasMore={!!hasNextPage}
-            loader={
-              <div className="flex flex-col gap-16 py-10">
-                <ScrollLoader />
-              </div>
-            }
+            loader={null}
             endMessage={
               <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more activities to load.</p>
             }
           >
-            <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2.5 gap-y-8 sm:gap-4 sm:gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
               {filteredActivityList.map((activity) => (
                 <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
+              ))}
+              {Array.from({ length: skeletonCount }).map((_, i) => (
+                <CardSkeleton key={`skeleton-${i}`} />
               ))}
             </div>
           </InfiniteScroll>
