@@ -2,7 +2,6 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import HomeLoader, { CardSkeleton } from "../../../../components/common/HomeLoader";
 import PageHeader from "../../../../components/common/PageHeader";
-import ScrollLoader from "../../../../components/common/ScrollLoader";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ErrorState from "../../../../components/common/ErrorState";
 import { useSEO } from "../../../../hooks/useSEO";
