@@ -30,9 +30,9 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
   const members = activity?.joined_member_count ?? activity?.flock_members_count ?? 0;
 
   return (
-    <div className="flex w-full cursor-pointer flex-col gap-2.5 rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 border border-slate-100/80">
+    <div className="flex w-full cursor-pointer flex-col gap-2 sm:gap-2.5 rounded-2xl bg-white p-2 sm:p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 border border-slate-100/80">
       {/* Image */}
-      <div className="h-44 sm:h-52 w-full overflow-hidden rounded-xl sm:rounded-2xl">
+      <div className="h-28 xs:h-32 sm:h-52 w-full overflow-hidden rounded-xl sm:rounded-2xl">
         <img
           src={imageUrl}
           alt={activityName}
@@ -47,16 +47,16 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
 
       {/* Content */}
       <div className="mt-0.5 flex flex-col gap-1">
-        <h2 className="line-clamp-1 text-sm sm:text-[16px] font-bold text-slate-800">{activityName}</h2>
+        <h2 className="line-clamp-1 text-xs sm:text-[16px] font-bold text-slate-800">{activityName}</h2>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-slate-500 flex items-center gap-1 text-[11px] sm:text-[12px] truncate">
-            <Icons.map height={14} width={14} className="text-[#EF7F23] flex-shrink-0" />
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
+          <p className="text-slate-500 flex items-center gap-1 text-[10px] sm:text-[12px] truncate">
+            <Icons.map className="h-3 w-3 sm:h-[14px] sm:w-[14px] text-[#EF7F23] flex-shrink-0" />
             <span className="truncate">{location}</span>
           </p>
 
-          <p className="text-slate-500 flex items-center gap-1 text-[11px] sm:text-[12px]">
-            <Icons.users height={14} width={14} className="text-[#EF7F23] flex-shrink-0" />
+          <p className="text-slate-500 flex items-center gap-1 text-[10px] sm:text-[12px]">
+            <Icons.users className="h-3 w-3 sm:h-[14px] sm:w-[14px] text-[#EF7F23] flex-shrink-0" />
             <span>{members} members</span>
           </p>
         </div>
@@ -69,7 +69,7 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
           e.stopPropagation();
           handleExternalRedirect();
         }}
-        className="from-btn02 to-btn01 text-white font-semibold text-xs sm:text-sm mt-2 w-full cursor-pointer rounded-xl bg-linear-to-tr to-75% px-4 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
+        className="from-btn02 to-btn01 text-white font-semibold text-[11px] sm:text-sm mt-1 sm:mt-2 w-full cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2.5 py-1.5 sm:px-4 sm:py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
       >
         Join Now
       </button>
