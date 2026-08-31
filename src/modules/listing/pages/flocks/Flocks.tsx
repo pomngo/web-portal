@@ -124,12 +124,12 @@ const Flocks = () => {
           <EmptyState message="No nearby flocks found" />
         ) : (
           <>
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
                 <Link
                   key={flock.id}
                   to={`/flocks/${flock.id}/detail`}
-                  className="min-w-[85%] flex-shrink-0 snap-center sm:min-w-[65%] md:min-w-[45%]"
+                  className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]"
                 >
                   <NearbyFlock flock={flock} />
                 </Link>
@@ -179,9 +179,9 @@ const Flocks = () => {
         ) : (
           <>
             {/* Mobile Carousel */}
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:hidden">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <div key={flock.id} className="min-w-[90%] flex-shrink-0 snap-center sm:min-w-[70%]">
+                <div key={flock.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%]">
                   <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
                 </div>
               ))}

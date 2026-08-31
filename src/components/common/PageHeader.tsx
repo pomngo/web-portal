@@ -11,6 +11,16 @@ interface PageHeaderProps {
 const PageHeader: React.FC<PageHeaderProps> = ({ title, slug }) => {
   const navigate = useNavigate();
 
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.history.state && typeof window.history.state.idx === "number" && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const formattedTitle = title
     ? title
     : slug
@@ -27,10 +37,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, slug }) => {
       </div>
       <div className="">
         <button
-          onClick={() => navigate(-1)}
-          className="from-btn02 to-btn01 flex cursor-pointer items-center gap-2 bg-linear-to-tr to-75% bg-clip-text px-5 py-2 text-transparent transition-all duration-300 hover:scale-105"
+          type="button"
+          onClick={handleBack}
+          className="from-btn02 to-btn01 flex cursor-pointer items-center gap-1.5 rounded-full bg-linear-to-tr px-3.5 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all duration-300 hover:scale-105 active:scale-95"
         >
-          <Icons.leftArrow className="text-btn01" /> Back
+          <Icons.leftArrow className="text-white h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <span>Back</span>
         </button>
       </div>
     </div>
