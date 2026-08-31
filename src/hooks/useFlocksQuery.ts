@@ -45,6 +45,8 @@ export const useFlocks = (filter = "") => {
       const res = await api.get(url, { signal });
       return normalizeFlockList(res.data);
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 15,
   });
 };
 
@@ -66,6 +68,8 @@ export const useInfiniteFlocks = (filter = "", offset = 6) => {
     getNextPageParam: (lastPage) => {
       return lastPage.items.length === offset ? lastPage.page + 1 : undefined;
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 15,
   });
 };
 
