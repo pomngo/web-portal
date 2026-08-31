@@ -73,6 +73,7 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
         }
         alt={card.name || "Cover Image"}
         loading="lazy"
+        decoding="async"
         onError={(e) => {
           e.currentTarget.onerror = null;
           (e.target as HTMLImageElement).src = images.default_flock_banner;

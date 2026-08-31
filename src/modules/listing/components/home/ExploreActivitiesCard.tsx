@@ -32,6 +32,7 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
           src={imageUrl}
           alt={activity?.name || "Activity"}
           loading="lazy"
+          decoding="async"
           onError={(e) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;

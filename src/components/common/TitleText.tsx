@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 type TitleTextProps = {
   title: string;
   className?: string;
@@ -11,4 +13,4 @@ const TitleText = ({ title, className = "" }: TitleTextProps) => {
   );
 };
 
-export default TitleText;
+export default memo(TitleText);

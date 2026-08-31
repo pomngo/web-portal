@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, memo } from "react";
 
 // List of categories matching the keys in keywordMap
 const CATEGORIES = [
@@ -68,4 +68,4 @@ const InterestChips = ({ selectedFilter, setSelectedFilter }: InterestChipsProps
   );
 };
 
-export default InterestChips;
+export default memo(InterestChips);
