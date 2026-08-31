@@ -4,7 +4,7 @@ import NearbyFlock from "../../components/home/NearbyFlock";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ScrollLoader from "../../../../components/common/ScrollLoader";
 import ErrorState from "../../../../components/common/ErrorState";
-import HomeLoader from "../../../../components/common/HomeLoader";
+import HomeLoader, { CardSkeleton } from "../../../../components/common/HomeLoader";
 import { useSEO } from "../../../../hooks/useSEO";
 import { useInfiniteFlocks } from "../../../../hooks/useFlocksQuery";
 import { useSyncFilters } from "../../../../utils/filter";
@@ -27,6 +27,7 @@ const AllFlocks = () => {
   const {
     data,
     isLoading: loading,
+    isFetchingNextPage,
     error,
     fetchNextPage,
     hasNextPage,
@@ -36,6 +37,10 @@ const AllFlocks = () => {
   const flockList = data?.pages.flatMap((page) => page.items) || [];
 
   const filteredFlockList = flockList;
+
+  const skeletonCount = isFetchingNextPage
+    ? (filteredFlockList.length % 2 !== 0 ? 3 : 2)
+    : (hasNextPage && filteredFlockList.length % 2 !== 0 ? 1 : 0);
 
   useSEO({
     title: `All Flocks - ${search_by || "Nearby"} | FlocknGo`,
@@ -71,20 +76,19 @@ const AllFlocks = () => {
             dataLength={filteredFlockList.length}
             next={fetchNextPage}
             hasMore={!!hasNextPage}
-            loader={
-              <div className="flex flex-col gap-16 py-10">
-                <ScrollLoader />
-              </div>
-            }
+            loader={null}
             endMessage={
               <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more flocks are there.</p>
             }
           >
-            <div className="grid grid-cols-1 gap-4 gap-x-4 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2.5 gap-y-8 sm:gap-4 sm:gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {filteredFlockList.map((flock) => (
                 <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
                   <NearbyFlock flock={flock} />
                 </Link>
+              ))}
+              {Array.from({ length: skeletonCount }).map((_, i) => (
+                <CardSkeleton key={`skeleton-${i}`} />
               ))}
             </div>
           </InfiniteScroll>
