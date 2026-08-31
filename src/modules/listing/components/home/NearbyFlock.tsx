@@ -23,6 +23,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
           src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.default_flock_banner}`}
           alt={flock.name}
           loading="lazy"
+          decoding="async"
           onError={(e) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;

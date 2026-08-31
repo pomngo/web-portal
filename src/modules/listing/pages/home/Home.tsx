@@ -3,7 +3,7 @@ import NearbyActivities from "../../components/home/NearbyActivities";
 import InterestChips from "../../components/common/InterestChips";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
@@ -21,7 +21,7 @@ const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState(() => sessionStorage.getItem("home_activity_filter") || "");
   const [searchParams] = useSearchParams();
 
-  const handleSetSelectedFilter = (value: React.SetStateAction<string>) => {
+  const handleSetSelectedFilter = useCallback((value: React.SetStateAction<string>) => {
     setSelectedFilter((prev) => {
       const next = typeof value === "function" ? value(prev) : value;
       if (next) {
@@ -34,11 +34,9 @@ const Home = () => {
       }
       return next;
     });
-  };
+  }, [queryClient]);
 
-
-
-  const flockQueryString = (() => {
+  const flockQueryString = useMemo(() => {
     const params = new URLSearchParams();
     const loc = searchParams.get("location");
     const interest = selectedFilter || searchParams.get("interest");
@@ -47,9 +45,9 @@ const Home = () => {
     if (interest) params.set("interest", interest);
     if (date) params.set("created_date", date);
     return params.toString() ? `?${params.toString()}` : "";
-  })();
+  }, [searchParams, selectedFilter]);
 
-  const activityQueryString = (() => {
+  const activityQueryString = useMemo(() => {
     const params = new URLSearchParams();
     const loc = searchParams.get("location");
     const interest = selectedFilter || searchParams.get("interest");
@@ -58,7 +56,7 @@ const Home = () => {
     if (date) params.set("created_date", date);
     if (interest) params.set("interest", interest);
     return params.toString() ? `?${params.toString()}` : "";
-  })();
+  }, [searchParams, selectedFilter]);
 
   // Fetch flocks and activities (Query Key includes flockQueryString/activityQueryString for caching)
   const {

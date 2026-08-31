@@ -25,6 +25,8 @@ export const useActivities = (filter = "") => {
       const res = await api.get(url, { signal });
       return normalizeActivityList(res.data);
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 15,
   });
 };
 
@@ -46,6 +48,8 @@ export const useInfiniteActivities = (filter = "", offset = 6) => {
     getNextPageParam: (lastPage) => {
       return lastPage.items.length === offset ? lastPage.page + 1 : undefined;
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 15,
   });
 };
 
