@@ -5,38 +5,18 @@ import "react-day-picker/dist/style.css";
 import type { ActivityItem } from "../../../../types";
 import dayjs from "dayjs";
 
-const holidayDates = [new Date(2025, 9, 9), new Date(2025, 9, 10), new Date(2025, 9, 11)];
-const fallbackActivityDates = [new Date(2025, 9, 9), new Date(2025, 9, 17)];
-const fallbackDraftDates = [new Date(2025, 9, 11), new Date(2025, 9, 23)];
-
-const mockHolidays = [
-  {
-    title: "Diwali",
-    date: "Oct 9",
-  },
-  {
-    title: "Goverdhan Pooja",
-    date: "Oct 10",
-  },
-  {
-    title: "Bhai Dooj",
-    date: "Oct 11",
-  },
-];
-
 const CustomDayButton = (props: any) => {
   const { day, modifiers, className, ...buttonProps } = props;
 
   const modifierClasses: string[] = [];
-  if (modifiers.holiday) modifierClasses.push("!bg-[#F8D5E5] !text-black hover:!bg-[#F8D5E5]");
-  if (modifiers.activity) modifierClasses.push("!bg-[#C9C2FF] !text-black hover:!bg-[#C9C2FF] rounded-full");
-  if (modifiers.draft) modifierClasses.push("!bg-[#F8E6D5] !text-black hover:!bg-[#F8E6D5]");
-  if (modifiers.selected) modifierClasses.push("!bg-[#f97316] !text-black");
-  if (modifiers.today) modifierClasses.push("border border-[#f97316]");
+  if (modifiers.holiday) modifierClasses.push("!bg-[#FCE4EC] !text-[#D81B60] font-bold rounded-full");
+  if (modifiers.activity) modifierClasses.push("!bg-[#E8E5FF] !text-[#5B4EFF] font-bold rounded-full");
+  if (modifiers.draft) modifierClasses.push("!bg-[#FFF0E6] !text-[#E75B28] font-bold rounded-full");
+  if (modifiers.selected) modifierClasses.push("!bg-[#E75B28] !text-white !font-extrabold rounded-full shadow-xs");
+  if (modifiers.today) modifierClasses.push("border border-[#E75B28]");
 
   const combinedClassName = [
-    // "relative flex w-full aspect-square max-w-[32px] sm:max-w-[32px] lg:max-w-[32px] xl:max-w-[32px] mx-auto items-center justify-center rounded-full text-xs sm:text-sm lg:text-xs xl:text-sm font-semibold text-[#333] transition-all hover:bg-black/5 focus:outline-none flex-shrink-0",
-    ...modifierClasses,
+    modifierClasses.join(" "),
     className
   ]
     .filter(Boolean)
@@ -60,23 +40,30 @@ const CustomDayButton = (props: any) => {
 
 interface SidebarCalendarProps {
   activities?: ActivityItem[];
+  onActionClick?: (label: string) => void;
 }
 
-const SidebarCalendar = ({ activities }: SidebarCalendarProps) => {
+const SidebarCalendar = ({ activities, onActionClick }: SidebarCalendarProps) => {
+  // Default selected date to CURRENT DATE
   const [selected, setSelected] = useState<Date | undefined>(new Date());
+  // Default month to CURRENT DATE
+  const [month, setMonth] = useState<Date>(new Date());
 
   const { derivedActivityDates, derivedDraftDates } = useMemo(() => {
     const act: Date[] = [];
     const drf: Date[] = [];
     if (activities && activities.length > 0) {
       activities.forEach((activity) => {
-        const d = new Date(activity.created_at);
-        if (!isNaN(d.getTime())) {
-          const status = (activity.status || activity.current_tab || "").toLowerCase();
-          if (status === "draft") {
-            drf.push(d);
-          } else {
-            act.push(d);
+        const dateStr = activity.start_date_time || activity.created_at;
+        if (dateStr) {
+          const d = new Date(dateStr);
+          if (!isNaN(d.getTime())) {
+            const status = (activity.status || activity.current_tab || "").toLowerCase();
+            if (status === "draft") {
+              drf.push(d);
+            } else {
+              act.push(d);
+            }
           }
         }
       });
@@ -84,58 +71,53 @@ const SidebarCalendar = ({ activities }: SidebarCalendarProps) => {
     return { derivedActivityDates: act, derivedDraftDates: drf };
   }, [activities]);
 
-  const finalActivityDates = activities && activities.length > 0 ? derivedActivityDates : fallbackActivityDates;
-  const finalDraftDates = activities && activities.length > 0 ? derivedDraftDates : fallbackDraftDates;
-
-  const initialMonth = useMemo(() => {
-    if (activities && activities.length > 0) {
-      const firstActDate = new Date(activities[0].created_at);
-      if (!isNaN(firstActDate.getTime())) {
-        return firstActDate;
-      }
-    }
-    return new Date(2025, 9, 1); // fallback to Oct 2025 for mock data
-  }, [activities]);
-
-  const [month, setMonth] = useState(initialMonth);
-
-  useEffect(() => {
-    setMonth(initialMonth);
-  }, [initialMonth]);
-
   const modifiers = useMemo(
     () => ({
-      holiday: holidayDates,
-      activity: finalActivityDates,
-      draft: finalDraftDates,
+      activity: derivedActivityDates,
+      draft: derivedDraftDates,
     }),
-    [finalActivityDates, finalDraftDates]
+    [derivedActivityDates, derivedDraftDates]
   );
 
+  // Activities on the selected day
+  const selectedDayActivities = useMemo(() => {
+    if (!selected || !activities) return [];
+    const selYear = selected.getFullYear();
+    const selMonth = selected.getMonth();
+    const selDate = selected.getDate();
+
+    return activities.filter((act) => {
+      const dateStr = act.start_date_time || act.created_at;
+      if (!dateStr) return false;
+      const d = new Date(dateStr);
+      return d.getFullYear() === selYear && d.getMonth() === selMonth && d.getDate() === selDate;
+    });
+  }, [selected, activities]);
+
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-0">
+    <div className="w-full">
       {/* HEADER */}
-      <div className="mb-10 flex items-center justify-between">
-        <h2 className="from-btn01 to-btn-light bg-linear-to-br to-65% bg-clip-text text-base font-medium text-transparent">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-[#E75B28] font-bold text-base tracking-wide">
           {month.toLocaleString("default", {
             month: "long",
             year: "numeric",
           })}
         </h2>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1))}
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-black/5 active:scale-95"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-slate-100 text-slate-600 active:scale-95"
           >
-            <ChevronLeft className="text-secondary h-8 w-8 stroke-[1.5]" />
+            <ChevronLeft className="h-5 w-5 stroke-[2]" />
           </button>
 
           <button
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1))}
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-black/5 active:scale-95"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-slate-100 text-slate-600 active:scale-95"
           >
-            <ChevronRight className="text-secondary h-8 w-8 stroke-[1.5]" />
+            <ChevronRight className="h-5 w-5 stroke-[2]" />
           </button>
         </div>
       </div>
@@ -156,122 +138,84 @@ const SidebarCalendar = ({ activities }: SidebarCalendarProps) => {
         classNames={{
           months: "w-full",
           month: "w-full",
-
-          weekdays: "grid grid-cols-7 mb-4 sm:mb-5 gap-1 xl:gap-2",
-
-          week: "grid grid-cols-7 mb-2 sm:mb-3 gap-1 xl:gap-2",
-
-          weekday: "flex items-center justify-center text-xs sm:text-[15px] font-semibold text-black/60",
-
-          // day: "p-0 text-center align-middle relative",
-
-          outside: "text-[#B8B8B8] opacity-50",
-
+          weekdays: "grid grid-cols-7 mb-3 gap-1",
+          week: "grid grid-cols-7 mb-2 gap-1",
+          weekday: "flex items-center justify-center text-xs font-semibold text-slate-400 uppercase",
+          outside: "text-slate-300 opacity-50",
           hidden: "invisible",
-
           nav: "hidden",
-
           month_caption: "hidden",
         }}
       />
 
       {/* LEGEND */}
-      <div className="mt-6 flex items-center justify-center gap-6">
-        <div className="flex items-center gap-2">
-          <span className="h-4 w-4 rounded-full bg-[#F8E6D5]" />
-
-          <span className="text-[14px] text-black/75">Draft</span>
+      <div className="mt-5 flex items-center justify-center gap-5 text-xs font-semibold text-slate-600 border-t border-slate-100 pt-4">
+        <div className="flex items-center gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-[#FFF0E6] border border-[#E75B28]/30" />
+          <span>Draft</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="h-4 w-4 rounded-full bg-[#C9C2FF]" />
-
-          <span className="text-[14px] text-black/75">Activity</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="h-4 w-4 rounded-full bg-[#F8D5E5]" />
-
-          <span className="text-[14px] text-black/75">Holiday</span>
+        <div className="flex items-center gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-[#E8E5FF] border border-[#5B4EFF]/30" />
+          <span>Activity</span>
         </div>
       </div>
 
-      {/* EVENTS */}
-      <div className="mt-12">
-        <h3 className="text-secondary text-[16px] font-semibold">Events List</h3>
-
-        {/* HOLIDAY */}
-        <div className="mt-7">
-          <h4 className="text-[14px] font-semibold text-[#0066FF]">Holiday</h4>
-
-          <div className="bg-secondary/5 mt-5 rounded-xl px-5 py-1">
-            {mockHolidays.map((item) => (
-              <div
-                key={item.title}
-                className="flex items-center justify-between border-b border-black/10 py-3 last:border-none"
-              >
-                <div className="flex items-center gap-4">
-                  <span className="h-4 w-4 rounded-full border-2 border-pink-300 flex-shrink-0" />
-
-                  <p className="text-[14px] font-medium text-black/80">
-                    {item.date} - {item.title}
-                  </p>
-                </div>
-
-                <button className="text-[#FF5B2E] transition hover:scale-110">
-                  <Plus className="h-6 w-6 stroke-1" />
-                </button>
-              </div>
-            ))}
-          </div>
+      {/* EVENTS LIST */}
+      <div className="mt-8 pt-4 border-t border-slate-100 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+            Events on {selected ? dayjs(selected).format("MMM D, YYYY") : "Selected Date"}
+          </h3>
+          {onActionClick && (
+            <button
+              onClick={() => onActionClick("Create Event")}
+              className="text-[#E75B28] hover:text-orange-700 text-xs font-bold flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Event</span>
+            </button>
+          )}
         </div>
 
-        {/* ACTIVITY */}
-        <div className="mt-9">
-          <h4 className="text-[14px] font-semibold text-[#0066FF]">Activity</h4>
-
-          <div className="bg-secondary/5 mt-5 rounded-xl px-5 py-1">
-            {activities && activities.length > 0 ? (
-              activities
-                .filter((item) => (item.status || item.current_tab || "").toLowerCase() !== "draft")
-                .map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between border-b border-black/10 py-3 last:border-none"
-                  >
-                    <div className="flex gap-4">
-                      <span className="h-4 w-4 rounded-full bg-[#C9C2FF] flex-shrink-0" />
-
-                      <p className="flex flex-col text-[14px] font-medium">
-                        <span className="text-primary-dark/80">{item.name}</span>
-                        <span className="text-secondary/80 text-[12px]">
-                          {dayjs(item.created_at).format("MMM D")}
-                        </span>
-                      </p>
+        <div className="space-y-2">
+          {selectedDayActivities.length > 0 ? (
+            selectedDayActivities.map((act) => {
+              const status = (act.status || act.current_tab || "ONGOING").toUpperCase();
+              return (
+                <div
+                  key={act.id}
+                  className="flex items-center justify-between bg-white rounded-xl px-3.5 py-2.5 border border-slate-100 shadow-2xs"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        status === "DRAFT" ? "bg-[#E75B28]" : "bg-[#5B4EFF]"
+                      } flex-shrink-0`}
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">{act.name || act.title}</p>
+                      <p className="text-[10px] text-slate-400 font-semibold">{status}</p>
                     </div>
-
-                    <button className="text-[#FF5B2E] transition hover:scale-110">
-                      <Eye className="h-6 w-6 stroke-1" />
-                    </button>
                   </div>
-                ))
-            ) : (
-              <div className="flex items-center justify-between py-3">
-                <div className="flex gap-4">
-                  <span className="h-4 w-4 rounded-full bg-[#C9C2FF] flex-shrink-0" />
 
-                  <p className="flex flex-col text-[14px] font-medium">
-                    <span className="text-primary-dark/80">Road Trip Meetup</span>
-                    <span className="text-secondary/80 text-[12px]">Oct 17</span>
-                  </p>
+                  {onActionClick && (
+                    <button
+                      onClick={() => onActionClick(act.name || "Activity Details")}
+                      className="text-[#E75B28] hover:text-orange-700 transition cursor-pointer p-1 rounded-full hover:bg-orange-50"
+                      title="View Activity Details"
+                    >
+                      <Eye className="h-4 w-4 stroke-[2]" />
+                    </button>
+                  )}
                 </div>
-
-                <button className="text-[#FF5B2E] transition hover:scale-110">
-                  <Eye className="h-6 w-6 stroke-1" />
-                </button>
-              </div>
-            )}
-          </div>
+              );
+            })
+          ) : (
+            <p className="text-xs text-slate-400 font-medium py-2">
+              No activities scheduled on this date.
+            </p>
+          )}
         </div>
       </div>
     </div>
