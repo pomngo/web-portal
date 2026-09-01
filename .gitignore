@@ -27,3 +27,7 @@ dist-ssr
 .env.development
 .env.release
 .env.production
+
+# Cache & Temp
+.vite/
+
