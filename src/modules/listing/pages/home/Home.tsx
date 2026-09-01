@@ -140,7 +140,7 @@ const Home = () => {
 
         {isNearbyActivitiesFallback && (
           <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
-            No activities match your current search/location. Showing fallback recommendations:
+            No activities match your current search/location. Showing recommendations:
           </p>
         )}
 
@@ -192,7 +192,7 @@ const Home = () => {
 
         {isCommunityFlocksFallback && (
           <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
-            No flocks match your current search/location. Showing fallback recommendations:
+            No flocks match your current search/location. Showing recommendations:
           </p>
         )}
 
