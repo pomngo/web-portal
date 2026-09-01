@@ -9,7 +9,7 @@ const DetailsTopNav = () => {
   const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
   return (
-    <div className="from-nav01 via-nav02 bg-linear-to-b to-[10%_15%] px-4 py-2 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <div className="from-nav01  px-4 py-2 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <div className="flex items-center justify-between">
         <Link to={"/"}>
           <img src={images.logo} alt="Logo" className="h-16" />
