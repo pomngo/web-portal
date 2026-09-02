@@ -220,7 +220,7 @@ const SearchBar = () => {
         <HeartIcon className="text-btn01 h-5 w-5 flex-shrink-0" />
         <div className="flex flex-col flex-1 min-w-0">
           <p className="text-primary-dark text-xs sm:text-sm font-semibold">Interest</p>
-          <div className="text-secondary/40 text-xs font-medium min-w-0">
+          <div className="text-secondary/40 text-xs font-medium flex items-center gap-1.5 min-w-0">
             <input
               type="text"
               value={interestInput}
@@ -239,9 +239,25 @@ const SearchBar = () => {
                   setInterestAnchorEl(null);
                 }
               }}
-              className="text-secondary/70 bg-transparent w-full text-xs font-medium outline-none truncate"
+              className="text-secondary/70 bg-transparent w-full text-xs font-medium outline-none truncate flex-1"
               placeholder="Search Interest"
             />
+            {interestInput && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setInterestInput("");
+                  sessionStorage.removeItem("flocks_page_filter");
+                  const newParams = new URLSearchParams(searchParams);
+                  newParams.delete("interest");
+                  setSearchParams(newParams);
+                }}
+                className="text-secondary/60 hover:text-secondary cursor-pointer rounded-full p-0.5 transition-colors hover:bg-slate-100 flex-shrink-0"
+                title="Clear Interest"
+              >
+                <Icons.close size={14} className="text-btn01 h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -427,8 +443,15 @@ const SearchBar = () => {
                   {interestInput && (
                     <button
                       type="button"
-                      onClick={() => setInterestInput("")}
-                      className="text-secondary/50 hover:text-secondary p-1"
+                      onClick={() => {
+                        setInterestInput("");
+                        sessionStorage.removeItem("flocks_page_filter");
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.delete("interest");
+                        setSearchParams(newParams);
+                      }}
+                      className="text-secondary/50 hover:text-secondary p-1 cursor-pointer"
+                      title="Clear Interest"
                     >
                       <Icons.close size={16} />
                     </button>
