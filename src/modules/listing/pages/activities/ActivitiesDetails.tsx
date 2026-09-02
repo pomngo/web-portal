@@ -15,7 +15,7 @@ import {
 import DetailsTopNav from "../../components/DetailsTopNav";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
-import { useSEO } from "../../../../hooks/useSEO";
+import SEOHead from "../../../../components/common/SEOHead";
 import { useActivityDetails } from "../../../../hooks/useActivitiesQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -63,13 +63,6 @@ const ActivitiesDetails = () => {
     (selected_activities?.last_cover_image
       ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(selected_activities.last_cover_image)
       : undefined);
-
-  useSEO({
-    title: actName ? `${actName} | Activity Details - FlocknGo` : "Activity Details | FlocknGo",
-    description: actDesc.slice(0, 160),
-    keywords: `${actName}, local activity, community events, FlocknGo`,
-    ogImage: coverImageUrl,
-  });
 
   if (selected_activities_loading) {
     return <ActivityDetailsLoader />;
@@ -131,6 +124,20 @@ const ActivitiesDetails = () => {
 
   return (
     <div className="min-h-screen text-slate-800 flex flex-col font-sans pb-24 bg-[#F8FAFC]">
+      <SEOHead
+        title={`${actName} - Local Event & Activity in ${actLocation} | FlocknGo Events`}
+        description={actDesc.slice(0, 160)}
+        keywords={`${actName}, ${actLocation} events, join local activity, community event, FlocknGo`}
+        canonicalPath={`/flocks/${selected_activities?.flock_id || 1}/activities/${activityId}/detail`}
+        domain="events"
+        ogImage={coverImageUrl}
+        schemaType="Event"
+        schemaData={{
+          name: actName,
+          location: actLocation,
+          startDate: selected_activities?.created_at || selected_activities?.start_date,
+        }}
+      />
       {/* Top Header Navbar */}
       <DetailsTopNav />
 

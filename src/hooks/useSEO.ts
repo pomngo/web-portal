@@ -1,82 +1,112 @@
 import { useEffect } from "react";
 
-interface SEOProps {
+export type SEODomain = "main" | "events";
+
+export interface SEOProps {
   title: string;
   description: string;
   keywords?: string;
+  canonicalPath?: string;
+  domain?: SEODomain;
   ogType?: string;
   ogImage?: string;
+  schema?: Record<string, any> | Array<Record<string, any>>;
 }
 
-export const useSEO = ({ title, description, keywords, ogType = "website", ogImage }: SEOProps) => {
+const DOMAIN_MAP: Record<SEODomain, string> = {
+  main: "https://flockngo.com",
+  events: "https://events.flockngo.com",
+};
+
+export const useSEO = ({
+  title,
+  description,
+  keywords,
+  canonicalPath,
+  domain = "main",
+  ogType = "website",
+  ogImage,
+  schema,
+}: SEOProps) => {
   useEffect(() => {
     // 1. Title Tag
-    document.title = title;
+    if (title) {
+      document.title = title;
+    }
+
+    // Helper for Meta Tags
+    const setMetaTag = (selector: string, attrName: string, attrVal: string, content: string) => {
+      let tag = document.querySelector(selector);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute(attrName, attrVal);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
 
     // 2. Meta Description
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement("meta");
-      metaDescription.setAttribute("name", "description");
-      document.head.appendChild(metaDescription);
+    if (description) {
+      setMetaTag('meta[name="description"]', "name", "description", description);
     }
-    metaDescription.setAttribute("content", description);
 
     // 3. Meta Keywords
     if (keywords) {
-      let metaKeywords = document.querySelector('meta[name="keywords"]');
-      if (!metaKeywords) {
-        metaKeywords = document.createElement("meta");
-        metaKeywords.setAttribute("name", "keywords");
-        document.head.appendChild(metaKeywords);
-      }
-      metaKeywords.setAttribute("content", keywords);
+      setMetaTag('meta[name="keywords"]', "name", "keywords", keywords);
     }
 
     // 4. Robots Tag
-    let metaRobots = document.querySelector('meta[name="robots"]');
-    if (!metaRobots) {
-      metaRobots = document.createElement("meta");
-      metaRobots.setAttribute("name", "robots");
-      document.head.appendChild(metaRobots);
+    setMetaTag('meta[name="robots"]', "name", "robots", "index, follow, max-image-preview:large");
+
+    // 5. Canonical URL
+    const baseUrl = DOMAIN_MAP[domain] || DOMAIN_MAP.main;
+    const cleanPath = canonicalPath || window.location.pathname;
+    const fullCanonicalUrl = `${baseUrl}${cleanPath.startsWith("/") ? "" : "/"}${cleanPath}`;
+
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement("link");
+      canonicalLink.setAttribute("rel", "canonical");
+      document.head.appendChild(canonicalLink);
     }
-    metaRobots.setAttribute("content", "index, follow");
+    canonicalLink.setAttribute("href", fullCanonicalUrl);
 
-    // 5. Open Graph Meta Tags
-    const updateOGTag = (property: string, content: string) => {
-      let tag = document.querySelector(`meta[property="${property}"]`);
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("property", property);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
-
-    updateOGTag("og:title", title);
-    updateOGTag("og:description", description);
-    updateOGTag("og:type", ogType);
-    updateOGTag("og:url", window.location.href);
+    // 6. Open Graph Meta Tags
+    setMetaTag('meta[property="og:title"]', "property", "og:title", title);
+    setMetaTag('meta[property="og:description"]', "property", "og:description", description);
+    setMetaTag('meta[property="og:type"]', "property", "og:type", ogType);
+    setMetaTag('meta[property="og:url"]', "property", "og:url", fullCanonicalUrl);
+    setMetaTag('meta[property="og:site_name"]', "property", "og:site_name", "FlocknGo");
     if (ogImage) {
-      updateOGTag("og:image", ogImage);
+      setMetaTag('meta[property="og:image"]', "property", "og:image", ogImage);
     }
 
-    // 6. Twitter Meta Tags
-    const updateTwitterTag = (name: string, content: string) => {
-      let tag = document.querySelector(`meta[name="${name}"]`);
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("name", name);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
-
-    updateTwitterTag("twitter:card", "summary_large_image");
-    updateTwitterTag("twitter:title", title);
-    updateTwitterTag("twitter:description", description);
+    // 7. Twitter Card Tags
+    setMetaTag('meta[name="twitter:card"]', "name", "twitter:card", "summary_large_image");
+    setMetaTag('meta[name="twitter:title"]', "name", "twitter:title", title);
+    setMetaTag('meta[name="twitter:description"]', "name", "twitter:description", description);
     if (ogImage) {
-      updateTwitterTag("twitter:image", ogImage);
+      setMetaTag('meta[name="twitter:image"]', "name", "twitter:image", ogImage);
     }
-  }, [title, description, keywords, ogType, ogImage]);
+
+    // 8. Structured Data (JSON-LD Schema)
+    const scriptId = "flockngo-jsonld-schema";
+    let existingScript = document.getElementById(scriptId);
+
+    if (schema) {
+      if (!existingScript) {
+        existingScript = document.createElement("script");
+        existingScript.id = scriptId;
+        existingScript.setAttribute("type", "application/ld+json");
+        document.head.appendChild(existingScript);
+      }
+      existingScript.textContent = JSON.stringify(schema);
+    } else if (existingScript) {
+      existingScript.remove();
+    }
+
+    return () => {
+      // Optional cleanup on unmount if needed
+    };
+  }, [title, description, keywords, canonicalPath, domain, ogType, ogImage, JSON.stringify(schema)]);
 };

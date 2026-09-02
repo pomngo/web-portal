@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://flockngo.com/sitemap.xml
+Sitemap: https://events.flockngo.com/sitemap.xml
