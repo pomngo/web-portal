@@ -192,7 +192,7 @@ const FlocksDetails = () => {
       <DetailsTopNav />
 
       {/* MOBILE FULL WIDTH COVER BANNER WITH INSIDE OVERLAY ICONS (< lg) */}
-      <div className="relative w-full h-56 sm:h-72 overflow-hidden lg:hidden">
+      <div className="relative flex justify-center items-center w-full h-56 sm:h-72 overflow-hidden lg:hidden">
         <img
           src={
             flockData?.cover_image_s3key
@@ -200,7 +200,7 @@ const FlocksDetails = () => {
               : images.default_flock_banner
           }
           alt={flockName}
-          className="w-full h-full object-cover"
+          className="h-full object-cover object-center"
           onError={(e) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;
@@ -251,7 +251,7 @@ const FlocksDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Cover Image */}
             <div className="lg:col-span-6 xl:col-span-6">
-              <div className="relative rounded-[28px] overflow-hidden shadow-sm aspect-[1.4] sm:aspect-[1.5] w-full bg-orange-100">
+              <div className="relative rounded-[28px] overflow-hidden shadow-sm aspect-[16/9] w-full bg-slate-100 flex items-center justify-center">
                 <img
                   src={
                     flockData?.cover_image_s3key
@@ -259,7 +259,7 @@ const FlocksDetails = () => {
                       : images.default_flock_banner
                   }
                   alt={flockName}
-                  className="w-full h-full object-cover"
+                  className=" h-full object-cover object-center"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     (e.target as HTMLImageElement).src = images.default_flock_banner;

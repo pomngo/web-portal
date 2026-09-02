@@ -38,12 +38,12 @@ const DetailBanner = ({
         }}
         className={
           isDefaultFlockBanner
-            ? "h-full w-full object-contain"
-            : "h-full w-full object-cover lg:w-[90%] lg:rounded-b-xl"
+            ? "h-full w-full object-contain object-center"
+            : "h-full w-full object-cover object-center"
         }
       />
       {!isDefaultFlockBanner && (
-        <div className="from-primary-dark/90 via-primary-dark/60 absolute inset-0 bg-linear-to-r to-transparent lg:left-[5%] lg:w-[90%] lg:rounded-b-xl" />
+        <div className="from-primary-dark/90 via-primary-dark/60 absolute inset-0 bg-linear-to-r to-transparent" />
       )}
     </div>
   );

@@ -59,17 +59,21 @@ const InterestDropdown = ({ selectedFilter, setSelectedFilter }: InterestDropdow
         <button
           onClick={handleClick}
           className={`flex items-center gap-3.5 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 shadow-sm border outline-hidden cursor-pointer backdrop-blur-md hover:scale-[1.03] active:scale-[0.98] ${
-            selectedCategory
+            selectedFilter
               ? "bg-primary-dark text-white border-primary-dark/30 shadow-md"
               : "bg-white/80 text-secondary border-slate-200/60 hover:bg-slate-50/90"
           }`}
         >
-          {selectedCategory ? (
+          {selectedFilter ? (
             <>
               <span className={`flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs`}>
-                <selectedCategory.icon size={14} className="text-white" />
+                {selectedCategory ? (
+                  <selectedCategory.icon size={14} className="text-white" />
+                ) : (
+                  "✨"
+                )}
               </span>
-              <span className="tracking-wide">{selectedCategory.label}</span>
+              <span className="tracking-wide">{selectedCategory ? selectedCategory.label : selectedFilter}</span>
               <span
                 onClick={handleClear}
                 className="ml-1 rounded-full p-0.5 hover:bg-white/20 transition-colors cursor-pointer"

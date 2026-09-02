@@ -21,9 +21,9 @@ const DetailsTopNav = () => {
               setOpen(true);
               setHasBeenOpened(true);
             }}
-            className="from-btn02 to-btn01 text-primary cursor-pointer rounded-full bg-linear-to-tr to-75% px-5 py-2 text-[12px] text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px]"
+            className="from-btn02 to-btn01 text-white cursor-pointer rounded-full bg-linear-to-tr to-75% px-3.5 py-1.5 text-xs sm:px-5 sm:py-2 text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] font-semibold"
           >
-            Become Organizer
+            Start a Community
           </button>
           {hasBeenOpened && (
             <Suspense fallback={null}>

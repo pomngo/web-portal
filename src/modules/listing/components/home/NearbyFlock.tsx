@@ -28,7 +28,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
-          className="bg-primary-dark h-full w-full rounded-xl sm:rounded-2xl object-cover transition-all duration-500 hover:scale-110"
+          className="bg-primary-dark h-full w-full rounded-xl sm:rounded-2xl object-cover object-center transition-all duration-500 hover:scale-110"
         />
       </div>
 
