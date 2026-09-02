@@ -78,7 +78,7 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
           e.currentTarget.onerror = null;
           (e.target as HTMLImageElement).src = images.default_flock_banner;
         }}
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
       />
       {/* Dark Animated Overlay */}
       <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/40 to-black/10 transition-all duration-500" />
