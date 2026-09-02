@@ -8,7 +8,7 @@ import GradientLinkButton from "../../../../components/common/GradientLinkButton
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
 import { ResponsiveCardListSkeleton } from "../../../../components/common/HomeLoader";
-import { useSEO } from "../../../../hooks/useSEO";
+import SEOHead from "../../../../components/common/SEOHead";
 import { useActivities } from "../../../../hooks/useActivitiesQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
@@ -61,14 +61,6 @@ const Activities = () => {
     refetch: refetchExplore,
   } = useActivities("");
 
-  const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
-
-  useSEO({
-    title: "Activities | FlocknGo - Explore Events & Experiences",
-    description: "Discover nearby local activities, outdoor adventures, workshops, and fun experiences. Join exciting local events with FlocknGo.",
-    keywords: "local activities, events near me, local experiences, fun activities, community events",
-  });
-
   const handleRetry = () => {
     refetchNearby();
     refetchExplore();
@@ -92,8 +84,29 @@ const Activities = () => {
 
   const filteredExploreActivities = exploreActivitiesList;
 
+  const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
+  const activeInterest = selectedFilter || searchParams.get("interest") || "";
+  const activeLocation = searchParams.get("location") || "";
+  const dynamicActivityTitle = activeInterest || activeLocation
+    ? `${activeInterest ? activeInterest + " " : ""}Activities${activeLocation ? " in " + activeLocation : ""} | FlocknGo Events`
+    : "Explore Nearby Local Activities & Events | FlocknGo";
+
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <SEOHead
+        title={dynamicActivityTitle}
+        description="Discover nearby local activities, outdoor adventures, workshops, and fun experiences. Join exciting local events with FlocknGo."
+        keywords={`local activities, events near me, local experiences, fun activities, community events, ${activeInterest}, ${activeLocation}`}
+        canonicalPath="/activities"
+        domain="events"
+        schemaType="ItemList"
+        schemaData={{
+          items: filteredNearbyActivities.map((act: any) => ({
+            name: act.name || act.activity_name || act.title || "Activity",
+            url: `https://events.flockngo.com/flocks/${act.flock_id || 1}/activities/${act.id || act.activity_id}/detail`,
+          })),
+        }}
+      />
       <h1 className="sr-only">Discover Local Activities and Upcoming Events - FlocknGo</h1>
       <section className="">
         {/* Heading */}

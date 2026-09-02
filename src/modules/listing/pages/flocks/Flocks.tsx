@@ -8,7 +8,7 @@ import GradientLinkButton from "../../../../components/common/GradientLinkButton
 import NearbyFlock from "../../components/home/NearbyFlock";
 import ErrorState from "../../../../components/common/ErrorState";
 import EmptyState from "../../../../components/common/EmptyState";
-import { useSEO } from "../../../../hooks/useSEO";
+import SEOHead from "../../../../components/common/SEOHead";
 import { useFlocks } from "../../../../hooks/useFlocksQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
@@ -63,14 +63,6 @@ const Flocks = () => {
     refetch: refetchCommunity,
   } = useFlocks(communityFlockQueryString);
 
-  const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
-
-  useSEO({
-    title: "Flocks | FlocknGo - Find & Connect with Community Groups",
-    description: "Browse and discover local social groups, clubs, and interest-based flocks. Connect with like-minded people near you with FlocknGo.",
-    keywords: "local social groups, interest groups, find community, meetup groups, social club",
-  });
-
   const handleRetry = () => {
     refetchNearby();
     refetchCommunity();
@@ -96,8 +88,29 @@ const Flocks = () => {
   const isCommunityFlocksFallback = communityFlockList.some((flock: any) => flock.is_fallback);
   const filteredCommunityFlocks = communityFlockList;
 
+  const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
+  const activeInterest = selectedFilter || searchParams.get("interest") || "";
+  const activeLocation = searchParams.get("location") || "";
+  const dynamicFlockTitle = activeInterest || activeLocation
+    ? `${activeInterest ? activeInterest + " " : ""}Community Groups${activeLocation ? " in " + activeLocation : ""} | FlocknGo`
+    : "Discover Local Community Groups & Social Flocks | FlocknGo";
+
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <SEOHead
+        title={dynamicFlockTitle}
+        description="Browse and discover local social groups, interest-based clubs, and community flocks. Connect with like-minded people near you with FlocknGo."
+        keywords={`local social groups, interest groups, find community, meetup groups, social club, ${activeInterest}, ${activeLocation}`}
+        canonicalPath="/flocks"
+        domain="main"
+        schemaType="ItemList"
+        schemaData={{
+          items: filteredNearbyFlocks.map((f: any) => ({
+            name: f.name || f.flock_name || f.title || "Flock",
+            url: `https://flockngo.com/flocks/${f.id || f.flock_id}/detail`,
+          })),
+        }}
+      />
       <h1 className="sr-only">Browse Local Flocks and Social Groups - FlocknGo</h1>
       {/* Nearby Flocks */}
       <section className="">

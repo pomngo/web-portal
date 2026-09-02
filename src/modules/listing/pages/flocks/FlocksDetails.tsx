@@ -27,7 +27,7 @@ import ErrorState from "../../../../components/common/ErrorState";
 import { images } from "../../../../constants/images";
 import type { ActivityItem } from "../../../../types";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
-import { useSEO } from "../../../../hooks/useSEO";
+import SEOHead from "../../../../components/common/SEOHead";
 import { useFlockDetails } from "../../../../hooks/useFlocksQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { handleExternalRedirect } from "../../../../constants/urls";
@@ -74,14 +74,6 @@ const FlocksDetails = () => {
   const flockDescription = flockData?.description || "Welcome to our community flock! Connect with members and explore our activities.";
   const flockLocation = flockData?.location || "Pune";
   const memberCount = flockData?.participants_count || flockData?.members_count || 0;
-
-  // SEO metadata setup
-  useSEO({
-    title: flockName ? `${flockName} | Flock Details - FlocknGo` : "Flock Details | FlocknGo",
-    description: flockDescription ? flockDescription.slice(0, 160) : "Discover local community groups and activities with FlocknGo.",
-    keywords: `${flockName}, social group, community meetup, activities, FlocknGo`,
-    ogImage: flockData?.cover_image_s3key || undefined,
-  });
 
   // Derive Interests Hashtags from real backend data
   const flockInterests = useMemo(() => {
@@ -186,8 +178,26 @@ const FlocksDetails = () => {
     );
   }
 
+  const coverImageUrl = flockData?.cover_image_s3key
+    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flockData.cover_image_s3key)
+    : undefined;
+
   return (
     <div className="min-h-screen text-slate-800 flex flex-col font-sans pb-24 bg-[#F8FAFC]">
+      <SEOHead
+        title={`${flockName} - Join Local Community Flock in ${flockLocation} | FlocknGo`}
+        description={flockDescription.slice(0, 160)}
+        keywords={`${flockName}, ${flockInterests.join(", ")}, social group ${flockLocation}, community flock, FlocknGo`}
+        canonicalPath={`/flocks/${flockId}/detail`}
+        domain="main"
+        ogImage={coverImageUrl}
+        schemaType="SocialGroup"
+        schemaData={{
+          name: flockName,
+          url: `https://flockngo.com/flocks/${flockId}/detail`,
+          location: flockLocation,
+        }}
+      />
       {/* Top Header Navbar */}
       <DetailsTopNav />
 

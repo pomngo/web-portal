@@ -4,7 +4,7 @@ import HomeLoader, { CardSkeleton } from "../../../../components/common/HomeLoad
 import PageHeader from "../../../../components/common/PageHeader";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ErrorState from "../../../../components/common/ErrorState";
-import { useSEO } from "../../../../hooks/useSEO";
+import SEOHead from "../../../../components/common/SEOHead";
 import { useInfiniteActivities } from "../../../../hooks/useActivitiesQuery";
 import { useSyncFilters } from "../../../../utils/filter";
 
@@ -41,12 +41,6 @@ const AllActivities = () => {
     ? (filteredActivityList.length % 2 !== 0 ? 3 : 2)
     : (hasNextPage && filteredActivityList.length % 2 !== 0 ? 1 : 0);
 
-  useSEO({
-    title: `All Activities - ${search_by || "Nearby"} | FlocknGo`,
-    description: `Discover all our local activities, experiences, and events matching ${search_by || "your interest"}. Join now on FlocknGo!`,
-    keywords: "discover activities, find local events, local experiences, social meetup activities",
-  });
-
   const handleRetry = () => {
     refetch();
   };
@@ -63,6 +57,13 @@ const AllActivities = () => {
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <SEOHead
+        title={`All Activities - ${search_by || "Nearby"} | FlocknGo Events`}
+        description={`Discover all our local activities, experiences, and events matching ${search_by || "your interest"}. Join now on FlocknGo!`}
+        keywords={`discover activities, find local events, local experiences, social meetup activities, ${search_by || ""}`}
+        canonicalPath={`/activities/${search_by || "nearby"}`}
+        domain="events"
+      />
       <h1 className="sr-only">Explore All Activities - {search_by || "Nearby"}</h1>
       {/* Nearby Flocks */}
       <section className="">
