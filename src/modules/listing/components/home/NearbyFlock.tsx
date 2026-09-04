@@ -3,6 +3,7 @@ import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { handleExternalRedirect } from "../../../../constants/urls";
+import { getMemberCount, getLocation, getItemName } from "../../../../utils/dataHelper";
 
 type NearbyFlockProps = {
   flock: {
@@ -11,6 +12,7 @@ type NearbyFlockProps = {
     location: string;
     member_count?: number;
     cover_image_s3key?: string | null;
+    [key: string]: any;
   };
 };
 
@@ -21,7 +23,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
       <div className="h-28 xs:h-32 sm:h-52 w-full overflow-hidden rounded-xl sm:rounded-2xl">
         <img
           src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.default_flock_banner}`}
-          alt={flock.name}
+          alt={getItemName(flock)}
           loading="lazy"
           decoding="async"
           onError={(e) => {
@@ -34,16 +36,16 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
 
       {/* Content */}
       <div className="mt-0.5 sm:mt-1 flex flex-col gap-1">
-        <h2 className="line-clamp-1 text-xs sm:text-[16px] font-semibold">{flock.name || "Title not found"}</h2>
+        <h2 className="line-clamp-1 text-xs sm:text-[16px] font-semibold">{getItemName(flock, "Community Flock")}</h2>
 
         <p className="text-secondary flex items-center gap-1 text-[10px] sm:text-[12px] truncate">
           <Icons.map className="h-3 w-3 sm:h-[14px] sm:w-[14px] flex-shrink-0" />
-          <span className="truncate">{flock.location || "location not found"}</span>
+          <span className="truncate">{getLocation(flock, "Pune")}</span>
         </p>
 
         <p className="text-secondary flex items-center gap-1 text-[10px] sm:text-[12px]">
           <Icons.users className="h-3 w-3 sm:h-[14px] sm:w-[14px] flex-shrink-0" />
-          <span>{flock.member_count || 0} members</span>
+          <span>{getMemberCount(flock)} members</span>
         </p>
       </div>
 

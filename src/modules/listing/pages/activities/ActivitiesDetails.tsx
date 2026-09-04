@@ -21,10 +21,12 @@ import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { images } from "../../../../constants/images";
 import { handleExternalRedirect } from "../../../../constants/urls";
+import { encodeId, decodeId } from "../../../../utils/idEncoder";
+import { getMemberCount, getLocation, getItemName } from "../../../../utils/dataHelper";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
-  const activityId = Number(id);
+  const activityId = decodeId(id);
   const navigate = useNavigate();
 
   const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
@@ -50,13 +52,13 @@ const ActivitiesDetails = () => {
     refetch,
   } = useActivityDetails(activityId);
 
-  const actName = selected_activities?.name || "Community Activity";
+  const actData = selected_activities?.activity_details || selected_activities?.result || selected_activities?.data || selected_activities;
+  const actName = getItemName(actData, "Community Activity");
   const actDesc =
-    selected_activities?.description ||
+    actData?.description ||
     "Join us for an exciting local community activity. Connect with members and enjoy the experience!";
-  const actLocation = selected_activities?.campaign_location || "Location N/A";
-  const actJoinedCount =
-    selected_activities?.joined_member_count ?? selected_activities?.flock_members_count ?? 0;
+  const actLocation = getLocation(actData, "Location N/A");
+  const actJoinedCount = getMemberCount(actData);
 
   const coverImageUrl =
     selected_activities?.cover_image?.[0] ||
@@ -128,7 +130,7 @@ const ActivitiesDetails = () => {
         title={`${actName} - Local Event & Activity in ${actLocation} | FlocknGo Events`}
         description={actDesc.slice(0, 160)}
         keywords={`${actName}, ${actLocation} events, join local activity, community event, FlocknGo`}
-        canonicalPath={`/flocks/${selected_activities?.flock_id || 1}/activities/${activityId}/detail`}
+        canonicalPath={`/flocks/${encodeId(selected_activities?.flock_id || 1)}/activities/${encodeId(activityId)}/detail`}
         domain="events"
         ogImage={coverImageUrl}
         schemaType="Event"
