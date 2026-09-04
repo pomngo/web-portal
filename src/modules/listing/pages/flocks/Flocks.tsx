@@ -12,6 +12,7 @@ import SEOHead from "../../../../components/common/SEOHead";
 import { useFlocks } from "../../../../hooks/useFlocksQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
+import { encodeId } from "../../../../utils/idEncoder";
 
 const Flocks = () => {
   useSyncFilters();
@@ -107,7 +108,7 @@ const Flocks = () => {
         schemaData={{
           items: filteredNearbyFlocks.map((f: any) => ({
             name: f.name || f.flock_name || f.title || "Flock",
-            url: `https://flockngo.com/flocks/${f.id || f.flock_id}/detail`,
+            url: `https://flockngo.com/flocks/${encodeId(f.id || f.flock_id)}/detail`,
           })),
         }}
       />
@@ -141,7 +142,7 @@ const Flocks = () => {
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
                 <Link
                   key={flock.id}
-                  to={`/flocks/${flock.id}/detail`}
+                  to={`/flocks/${encodeId(flock.id)}/detail`}
                   className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]"
                 >
                   <NearbyFlock flock={flock} />
@@ -152,7 +153,7 @@ const Flocks = () => {
             {/* Activities List */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
-                <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
+                <Link key={flock.id} to={`/flocks/${encodeId(flock.id)}/detail`}>
                   <NearbyFlock flock={flock} />
                 </Link>
               ))}

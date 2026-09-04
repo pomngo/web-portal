@@ -12,6 +12,7 @@ import SEOHead from "../../../../components/common/SEOHead";
 import { useActivities } from "../../../../hooks/useActivitiesQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
+import { encodeId } from "../../../../utils/idEncoder";
 
 const Activities = () => {
   useSyncFilters();
@@ -103,7 +104,7 @@ const Activities = () => {
         schemaData={{
           items: filteredNearbyActivities.map((act: any) => ({
             name: act.name || act.activity_name || act.title || "Activity",
-            url: `https://events.flockngo.com/flocks/${act.flock_id || 1}/activities/${act.id || act.activity_id}/detail`,
+            url: `https://events.flockngo.com/flocks/${encodeId(act.flock_id || 1)}/activities/${encodeId(act.id || act.activity_id)}/detail`,
           })),
         }}
       />
@@ -135,7 +136,7 @@ const Activities = () => {
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyActivities.map((activity) => (
                 <div key={activity.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
+                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
                     <NearbyActivities activity={activity} />
                   </Link>
                 </div>
@@ -145,7 +146,7 @@ const Activities = () => {
             {/* Activities List */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredNearbyActivities.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
+                <Link key={activity.id} to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
@@ -183,7 +184,7 @@ const Activities = () => {
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
                 <div key={activity.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
+                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>
@@ -193,7 +194,7 @@ const Activities = () => {
             {/* Desktop Grid */}
             <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
-                <Link key={activity.id} to={`/flocks/${activity.flock_id || activity.id}/activities/${activity.id}/detail`}>
+                <Link key={activity.id} to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
                   <ExploreActivitiesCard activity={activity} />
                 </Link>
               ))}
