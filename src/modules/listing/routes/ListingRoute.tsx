@@ -12,6 +12,7 @@ const AllFlocks = lazy(() => import("../pages/flocks/AllFlocks"));
 const AllActivities = lazy(() => import("../pages/activities/AllActivities"));
 const FlocksDetails = lazy(() => import("../pages/flocks/FlocksDetails"));
 const ActivitiesDetails = lazy(() => import("../pages/activities/ActivitiesDetails"));
+const NotFound = lazy(() => import("../pages/NotFound"));
 
 const ListingRoute = () => {
   return (
@@ -57,6 +58,22 @@ const ListingRoute = () => {
             </Suspense>
           }
         />
+        <Route
+          path="not-found"
+          element={
+            <Suspense fallback={<HomeLoader type="home" />}>
+              <NotFound />
+            </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<HomeLoader type="home" />}>
+              <NotFound />
+            </Suspense>
+          }
+        />
       </Route>
       <Route
         path="/flocks/:id/detail"
@@ -71,6 +88,22 @@ const ListingRoute = () => {
         element={
           <Suspense fallback={<ActivityDetailsLoader />}>
             <ActivitiesDetails />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/not-found"
+        element={
+          <Suspense fallback={<HomeLoader type="home" />}>
+            <NotFound />
+          </Suspense>
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={<HomeLoader type="home" />}>
+            <NotFound />
           </Suspense>
         }
       />
