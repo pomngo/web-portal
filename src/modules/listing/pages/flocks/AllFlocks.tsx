@@ -7,6 +7,7 @@ import HomeLoader, { CardSkeleton } from "../../../../components/common/HomeLoad
 import SEOHead from "../../../../components/common/SEOHead";
 import { useInfiniteFlocks } from "../../../../hooks/useFlocksQuery";
 import { useSyncFilters } from "../../../../utils/filter";
+import { encodeId } from "../../../../utils/idEncoder";
 
 const AllFlocks = () => {
   useSyncFilters();
@@ -83,7 +84,7 @@ const AllFlocks = () => {
           >
             <div className="grid grid-cols-2 gap-2.5 gap-y-8 sm:gap-4 sm:gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {filteredFlockList.map((flock) => (
-                <Link key={flock.id} to={`/flocks/${flock.id}/detail`}>
+                <Link key={flock.id} to={`/flocks/${encodeId(flock.id)}/detail`}>
                   <NearbyFlock flock={flock} />
                 </Link>
               ))}

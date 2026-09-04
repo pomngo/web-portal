@@ -21,10 +21,11 @@ import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { images } from "../../../../constants/images";
 import { handleExternalRedirect } from "../../../../constants/urls";
+import { encodeId, decodeId } from "../../../../utils/idEncoder";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
-  const activityId = Number(id);
+  const activityId = decodeId(id);
   const navigate = useNavigate();
 
   const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
@@ -128,7 +129,7 @@ const ActivitiesDetails = () => {
         title={`${actName} - Local Event & Activity in ${actLocation} | FlocknGo Events`}
         description={actDesc.slice(0, 160)}
         keywords={`${actName}, ${actLocation} events, join local activity, community event, FlocknGo`}
-        canonicalPath={`/flocks/${selected_activities?.flock_id || 1}/activities/${activityId}/detail`}
+        canonicalPath={`/flocks/${encodeId(selected_activities?.flock_id || 1)}/activities/${encodeId(activityId)}/detail`}
         domain="events"
         ogImage={coverImageUrl}
         schemaType="Event"

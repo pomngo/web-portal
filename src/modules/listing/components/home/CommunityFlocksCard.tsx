@@ -4,6 +4,7 @@ import type { CardType } from "../../../../types";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { images } from "../../../../constants/images";
 import { handleExternalRedirect } from "../../../../constants/urls";
+import { encodeId } from "../../../../utils/idEncoder";
 
 type CommunityFlocksCardProps = {
   card: {
@@ -62,7 +63,7 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
   const description = card.description?.toString() ?? "";
   return (
     <Link
-      to={`/flocks/${card.id}/detail`}
+      to={`/flocks/${encodeId(card.id)}/detail`}
       className={`group relative block w-full cursor-pointer overflow-hidden rounded-2xl sm:rounded-3xl transition-all duration-300 hover:z-auto hover:scale-105 active:scale-95 ${classes} `}
     >
       <img

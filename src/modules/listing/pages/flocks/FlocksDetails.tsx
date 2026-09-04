@@ -31,10 +31,11 @@ import SEOHead from "../../../../components/common/SEOHead";
 import { useFlockDetails } from "../../../../hooks/useFlocksQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { handleExternalRedirect } from "../../../../constants/urls";
+import { encodeId, decodeId } from "../../../../utils/idEncoder";
 
 const FlocksDetails = () => {
   const { id } = useParams();
-  const flockId = Number(id);
+  const flockId = decodeId(id);
   const navigate = useNavigate();
 
   // State management
@@ -188,13 +189,13 @@ const FlocksDetails = () => {
         title={`${flockName} - Join Local Community Flock in ${flockLocation} | FlocknGo`}
         description={flockDescription.slice(0, 160)}
         keywords={`${flockName}, ${flockInterests.join(", ")}, social group ${flockLocation}, community flock, FlocknGo`}
-        canonicalPath={`/flocks/${flockId}/detail`}
+        canonicalPath={`/flocks/${encodeId(flockId)}/detail`}
         domain="main"
         ogImage={coverImageUrl}
         schemaType="SocialGroup"
         schemaData={{
           name: flockName,
-          url: `https://flockngo.com/flocks/${flockId}/detail`,
+          url: `https://flockngo.com/flocks/${encodeId(flockId)}/detail`,
           location: flockLocation,
         }}
       />
