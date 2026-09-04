@@ -7,8 +7,12 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     chunkSizeWarningLimit: 1600,
+    sourcemap: false,
+  },
+  esbuild: {
+    drop: ["console", "debugger"],
   },
   server: {
-    allowedHosts: ['series-crate-detail.ngrok-free.dev'],
+    allowedHosts: ["series-crate-detail.ngrok-free.dev"],
   },
 });
