@@ -3,6 +3,7 @@ import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { handleExternalRedirect } from "../../../../constants/urls";
+import { getMemberCount, getLocation, getItemName } from "../../../../utils/dataHelper";
 
 type NearbyActivitiesProps = {
   activity: {
@@ -15,6 +16,7 @@ type NearbyActivitiesProps = {
     image?: string;
     flock_members_count?: number;
     joined_member_count?: number;
+    [key: string]: any;
   };
 };
 
@@ -25,9 +27,9 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
       ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.cover_image_s3key)
       : activity?.image || images.default_flock_banner;
 
-  const activityName = activity?.name || activity?.title || "Title not found";
-  const location = activity?.campaign_location || "Location not found";
-  const members = activity?.joined_member_count ?? activity?.flock_members_count ?? 0;
+  const activityName = getItemName(activity, "Community Activity");
+  const location = getLocation(activity, "Location N/A");
+  const members = getMemberCount(activity);
 
   return (
     <div className="flex w-full cursor-pointer flex-col gap-2 sm:gap-2.5 rounded-2xl bg-white p-2 sm:p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 border border-slate-100/80">

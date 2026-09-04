@@ -22,6 +22,7 @@ import { ENDPOINTS } from "../../../../services/api/endpoints";
 import { images } from "../../../../constants/images";
 import { handleExternalRedirect } from "../../../../constants/urls";
 import { encodeId, decodeId } from "../../../../utils/idEncoder";
+import { getMemberCount, getLocation, getItemName } from "../../../../utils/dataHelper";
 
 const ActivitiesDetails = () => {
   const { id } = useParams();
@@ -51,13 +52,13 @@ const ActivitiesDetails = () => {
     refetch,
   } = useActivityDetails(activityId);
 
-  const actName = selected_activities?.name || "Community Activity";
+  const actData = selected_activities?.activity_details || selected_activities?.result || selected_activities?.data || selected_activities;
+  const actName = getItemName(actData, "Community Activity");
   const actDesc =
-    selected_activities?.description ||
+    actData?.description ||
     "Join us for an exciting local community activity. Connect with members and enjoy the experience!";
-  const actLocation = selected_activities?.campaign_location || "Location N/A";
-  const actJoinedCount =
-    selected_activities?.joined_member_count ?? selected_activities?.flock_members_count ?? 0;
+  const actLocation = getLocation(actData, "Location N/A");
+  const actJoinedCount = getMemberCount(actData);
 
   const coverImageUrl =
     selected_activities?.cover_image?.[0] ||

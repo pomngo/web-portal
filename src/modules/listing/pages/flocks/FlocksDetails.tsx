@@ -32,6 +32,7 @@ import { useFlockDetails } from "../../../../hooks/useFlocksQuery";
 import JoinPromptPopup from "../../components/common/JoinPromptPopup";
 import { handleExternalRedirect } from "../../../../constants/urls";
 import { encodeId, decodeId } from "../../../../utils/idEncoder";
+import { getMemberCount, getLocation, getItemName } from "../../../../utils/dataHelper";
 
 const FlocksDetails = () => {
   const { id } = useParams();
@@ -70,11 +71,11 @@ const FlocksDetails = () => {
   } = useFlockDetails(flockId);
 
   // Real flock data from backend API
-  const flockData = selected_flock?.flock_details || selected_flock;
-  const flockName = flockData?.flock_name || flockData?.name || flockData?.title || "Community Flock";
+  const flockData = selected_flock?.flock_details || selected_flock?.result || selected_flock?.data || selected_flock;
+  const flockName = getItemName(flockData, "Community Flock");
   const flockDescription = flockData?.description || "Welcome to our community flock! Connect with members and explore our activities.";
-  const flockLocation = flockData?.location || "Pune";
-  const memberCount = flockData?.participants_count || flockData?.members_count || 0;
+  const flockLocation = getLocation(flockData, "Pune");
+  const memberCount = getMemberCount(flockData);
 
   // Derive Interests Hashtags from real backend data
   const flockInterests = useMemo(() => {
@@ -545,7 +546,7 @@ const FlocksDetails = () => {
                       const formattedDate = actDateStr
                         ? dayjs(actDateStr).format("ddd, MMM D")
                         : "TBD";
-                      const joinedCount = act.joined_member_count ?? act.flock_members_count ?? 0;
+                      const joinedCount = getMemberCount(act);
 
                       return (
                         <div key={act.id} className="flex flex-col">
