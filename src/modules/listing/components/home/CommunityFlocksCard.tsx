@@ -15,6 +15,8 @@ type CommunityFlocksCardProps = {
     cover_image_s3key?: string | null;
     image?: string;
     type?: CardType;
+    invite_link?: string;
+    dynamic_url?: string;
   };
   index?: number;
   isUniform?: boolean;
@@ -98,7 +100,7 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleExternalRedirect();
+              handleExternalRedirect(card?.dynamic_url || card?.invite_link);
             }}
             className="from-btn02 to-btn01 text-white cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tl to-65% px-2.5 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-xs lg:text-sm font-bold shadow-lg transition-all duration-300 active:scale-95 w-fit"
           >
