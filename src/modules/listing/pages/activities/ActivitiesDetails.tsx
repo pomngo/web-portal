@@ -397,7 +397,7 @@ const ActivitiesDetails = () => {
         isOpen={isJoinPopupOpen}
         onClose={() => setIsJoinPopupOpen(false)}
         message={joinPopupMessage}
-        onJoin={handleExternalRedirect}
+        onJoin={() => handleExternalRedirect(actData?.dynamic_url || actData?.invite_link)}
       />
     </div>
   );

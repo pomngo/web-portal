@@ -9,6 +9,8 @@ export interface FlockItem {
   participants_count?: number;
   cover_image_s3key?: string | null;
   description?: string;
+  invite_link?: string;
+  dynamic_url?: string;
   [key: string]: any;
 }
 
@@ -22,6 +24,8 @@ export interface ActivityItem {
   cover_image_s3key?: string;
   last_cover_image?: string | null;
   image?: string;
+  invite_link?: string;
+  dynamic_url?: string;
   [key: string]: any;
 }
 
