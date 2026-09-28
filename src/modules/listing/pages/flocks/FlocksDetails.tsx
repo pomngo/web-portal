@@ -707,7 +707,7 @@ const FlocksDetails = () => {
         isOpen={isJoinPopupOpen}
         onClose={() => setIsJoinPopupOpen(false)}
         message={joinPopupMessage}
-        onJoin={handleExternalRedirect}
+        onJoin={() => handleExternalRedirect(flockData?.dynamic_url || flockData?.invite_link)}
       />
     </div>
   );

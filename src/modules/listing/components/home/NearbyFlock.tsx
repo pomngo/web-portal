@@ -54,7 +54,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          handleExternalRedirect();
+          handleExternalRedirect(flock?.dynamic_url || flock?.invite_link);
         }}
         className="from-btn02 to-btn01 text-primary font-semibold text-[11px] sm:text-sm mt-1.5 sm:mt-3 w-full cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2.5 py-1.5 sm:px-5 sm:py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95"
       >

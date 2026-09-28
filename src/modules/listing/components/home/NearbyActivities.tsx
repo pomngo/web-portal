@@ -70,7 +70,7 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          handleExternalRedirect();
+          handleExternalRedirect(activity?.dynamic_url || activity?.invite_link);
         }}
         className="from-btn02 to-btn01 text-white font-semibold text-[11px] sm:text-sm mt-1 sm:mt-2 w-full cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2.5 py-1.5 sm:px-4 sm:py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
       >
