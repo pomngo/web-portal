@@ -1,12 +1,8 @@
-import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { images } from "../../../constants/images";
-
-const LoginPopup = lazy(() => import("./common/LoginPopup"));
+import { handleExternalRedirect } from "../../../constants/urls";
 
 const DetailsTopNav = () => {
-  const [open, setOpen] = useState(false);
-  const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
   return (
     <div className="from-nav01  px-4 py-2 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -17,19 +13,11 @@ const DetailsTopNav = () => {
 
         <div>
           <button
-            onClick={() => {
-              setOpen(true);
-              setHasBeenOpened(true);
-            }}
+            onClick={() => handleExternalRedirect()}
             className="from-btn02 to-btn01 text-white cursor-pointer rounded-full bg-linear-to-tr to-75% px-3.5 py-1.5 text-xs sm:px-5 sm:py-2 text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] font-semibold"
           >
             Start a Community
           </button>
-          {hasBeenOpened && (
-            <Suspense fallback={null}>
-              <LoginPopup isOpen={open} onClose={() => setOpen(false)} />
-            </Suspense>
-          )}
         </div>
       </div>
     </div>
