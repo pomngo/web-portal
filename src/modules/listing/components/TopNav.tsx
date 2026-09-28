@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState, lazy, Suspense } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { images } from "../../../constants/images";
 import { navItems } from "../../../constants/data";
+import { handleExternalRedirect } from "../../../constants/urls";
 import SearchBar from "./common/SearchBar";
-
-const LoginPopup = lazy(() => import("./common/LoginPopup"));
 
 const TopNav = () => {
   const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
@@ -106,19 +103,11 @@ const TopNav = () => {
         {/* Button */}
         <div className="relative flex-shrink-0">
           <button
-            onClick={() => {
-              setOpen(true);
-              setHasBeenOpened(true);
-            }}
+            onClick={() => handleExternalRedirect()}
             className="from-btn02 to-btn01 text-white cursor-pointer rounded-full bg-linear-to-tr to-75% px-3.5 py-1.5 text-xs sm:px-5 sm:py-2 text-nowrap transition-all duration-300 hover:scale-105 active:scale-95 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[17px] font-semibold"
           >
             Start a Community
           </button>
-          {hasBeenOpened && (
-            <Suspense fallback={null}>
-              <LoginPopup isOpen={open} onClose={() => setOpen(false)} />
-            </Suspense>
-          )}
         </div>
       </div>
 
