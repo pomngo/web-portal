@@ -285,9 +285,6 @@ const SearchBar = () => {
         >
           <div className="bg-primary flex items-center justify-between rounded-full px-4 py-2.5 gap-3">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="h-9 w-9 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-                <SearchIcon className="text-btn01 h-4 w-4" />
-              </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-primary-dark text-xs font-bold truncate">
                   {locLoading ? (
@@ -330,9 +327,6 @@ const SearchBar = () => {
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-orange-50 flex items-center justify-center">
-                  <SearchIcon className="text-btn01 h-4 w-4" />
-                </div>
                 <div>
                   <Dialog.Title className="text-primary-dark text-base font-bold">
                     Search & Filter
