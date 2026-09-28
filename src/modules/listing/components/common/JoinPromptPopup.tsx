@@ -7,9 +7,10 @@ type JoinPromptPopupProps = {
   onClose: () => void;
   message: string;
   onJoin?: () => void;
+  redirectUrl?: string;
 };
 
-const JoinPromptPopup = ({ isOpen, onClose, message, onJoin }: JoinPromptPopupProps) => {
+const JoinPromptPopup = ({ isOpen, onClose, message, onJoin, redirectUrl }: JoinPromptPopupProps) => {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
@@ -37,8 +38,11 @@ const JoinPromptPopup = ({ isOpen, onClose, message, onJoin }: JoinPromptPopupPr
           <div className="flex flex-col gap-3">
             <button
               onClick={() => {
-                if (onJoin) onJoin();
-                handleExternalRedirect();
+                if (onJoin) {
+                  onJoin();
+                } else {
+                  handleExternalRedirect(redirectUrl);
+                }
                 onClose();
               }}
               className="from-btn01 to-btn02 w-full cursor-pointer rounded-xl bg-linear-to-tl to-75% py-3 sm:py-3.5 font-semibold text-white shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-[1.01] active:scale-95 text-xs sm:text-sm"
