@@ -1,0 +1,134 @@
+name: Deploy Discovery Portal (S3 + CloudFront)
+
+# `dev` auto-deploys on every push to `development`.
+# `prod` auto-deploys on every push to `release`. Merging to `main` does NOT
+# deploy anything. Either environment can also be run by hand via
+# workflow_dispatch.
+#
+# Bucket names, distribution IDs and the role ARN are not secrets, so they are
+# hardcoded below. AWS access uses OIDC (no long-lived keys); the role
+# `flockngo-discovery-portal-gha-deploy` only trusts `repo:pomngo/web-portal:*`.
+on:
+  push:
+    branches: [development, release]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        type: choice
+        default: 'dev'
+        options:
+          - dev
+          - prod
+
+concurrency:
+  group: deploy-discovery-portal-${{ github.event.inputs.environment || (github.ref_name == 'release' && 'prod' || 'dev') }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # required for OIDC -> AWS role assumption
+  contents: read
+
+jobs:
+  deploy:
+    name: Build & Deploy Discovery Portal
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ENV_NAME: ${{ github.event.inputs.environment || (github.ref_name == 'release' && 'prod' || 'dev') }}
+      AWS_REGION: us-east-1
+      AWS_DEPLOY_ROLE_ARN: arn:aws:iam::840797239270:role/flockngo-discovery-portal-gha-deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Vite inlines VITE_* values at build time, so the backend API and image
+      # CDN for each environment are fixed here.
+      - name: Resolve per-environment config
+        run: |
+          case "$ENV_NAME" in
+            dev)
+              {
+                echo "S3_BUCKET=flockngo-discovery-portal-dev"
+                echo "CLOUDFRONT_DISTRIBUTION_ID=E12TK624T0A90T"
+                echo "VITE_API_BASE_URL=https://api-dev.flockngo.com/campaign_api/v1"
+                echo "VITE_IMAGE_URL=https://du27z4qz38jyx.cloudfront.net"
+                echo "VITE_REDIRECT_URL=https://dev.flockngo.com"
+              } >> "$GITHUB_ENV"
+              ;;
+            prod)
+              {
+                echo "S3_BUCKET=flockngo-discovery-portal-prod"
+                echo "CLOUDFRONT_DISTRIBUTION_ID=E1MPYJF9K0JOJA"
+                echo "VITE_API_BASE_URL=https://api.flockngo.com/campaign_api/v1"
+                echo "VITE_IMAGE_URL=https://d1450gndgb2mk2.cloudfront.net"
+                echo "VITE_REDIRECT_URL=https://web.flockngo.com"
+              } >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "Unknown environment: $ENV_NAME" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Vite emits content-hashed files under dist/assets, so they are safe to
+      # cache for a year. Old hashed files are kept (no --delete) so tabs that
+      # still hold the previous index.html keep working.
+      - name: Upload hashed assets (immutable cache)
+        run: |
+          aws s3 sync dist/assets s3://${S3_BUCKET}/assets \
+            --cache-control "public, max-age=31536000, immutable"
+
+      # Un-hashed files from public/ (favicon, images, ...) get a short cache.
+      - name: Sync other static files (short cache)
+        run: |
+          aws s3 sync dist s3://${S3_BUCKET} \
+            --delete \
+            --cache-control "public, max-age=3600" \
+            --exclude "assets/*" \
+            --exclude "index.html"
+
+      # Uploaded last so it never points at assets that are not there yet.
+      - name: Upload index.html (never cache)
+        run: |
+          aws s3 cp dist/index.html s3://${S3_BUCKET}/index.html \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --content-type "text/html"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/*"
+
+      - name: Deployment summary
+        run: |
+          {
+            echo "### Deployed \`$ENV_NAME\` :rocket:"
+            echo "- Commit: \`${GITHUB_SHA:0:7}\`"
+            echo "- Bucket: \`${S3_BUCKET}\`"
+            echo "- Distribution: \`${CLOUDFRONT_DISTRIBUTION_ID}\`"
+            echo "- API: \`${VITE_API_BASE_URL}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
