@@ -53,7 +53,9 @@ const ActivitiesDetails = () => {
   } = useActivityDetails(activityId);
 
   const actData = selected_activities?.activity_details || selected_activities?.result || selected_activities?.data || selected_activities;
-  const actName = getItemName(actData, "Community Activity");
+  const actName = actData?.name || actData?.title || actData?.activity_name || getItemName(actData, "Community Activity");
+  const flockName = selected_activities?.flock_name || actData?.flock_name || actData?.flock?.name || "Community Flock";
+  const flockId = selected_activities?.flock_id || actData?.flock_id || actData?.flock?.id;
   const actDesc =
     actData?.description ||
     "Join us for an exciting local community activity. Connect with members and enjoy the experience!";
@@ -201,6 +203,21 @@ const ActivitiesDetails = () => {
 
             {/* Right Info Details */}
             <div className="lg:col-span-6 xl:col-span-6 space-y-4">
+              {/* Flock Name Context Badge Link */}
+              {flockName && (
+                <div className="flex items-center gap-2 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-3 py-1 rounded-full w-fit border border-[#FEEBD9]">
+                  <Users className="h-3.5 w-3.5 shrink-0 text-[#E75B28]" />
+                  {flockId ? (
+                    <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline flex items-center gap-1">
+                      <span className="text-slate-500 font-semibold"></span>
+                      <span className="font-extrabold text-[#E75B28]">{flockName}</span>
+                    </Link>
+                  ) : (
+                    <span> {flockName}</span>
+                  )}
+                </div>
+              )}
+
               {/* Title */}
               <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
                 {actName}
