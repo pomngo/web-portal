@@ -43,11 +43,14 @@ const FlocksDetails = () => {
   const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
   const [joinPopupMessage, setJoinPopupMessage] = useState("");
   const [activeMobileTab, setActiveMobileTab] = useState<"activities" | "calendar">("activities");
+  const [isInterestsModalOpen, setIsInterestsModalOpen] = useState(false);
 
   // Professional Filter Modal & Search Controls
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activitySearchQuery, setActivitySearchQuery] = useState("");
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<"ALL" | "ONGOING" | "COMPLETED" | "DRAFT">("ALL");
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<"ALL" | "ONGOING" | "COMPLETED">("ALL");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   // Show join prompt popup before any external redirect
   const handleActionClick = (label: string) => {
@@ -77,13 +80,33 @@ const FlocksDetails = () => {
   const flockLocation = getLocation(flockData, "Pune");
   const memberCount = getMemberCount(flockData);
 
-  // Derive Interests Hashtags from real backend data
+  // Derive Interests Hashtags from real backend data (standard + custom_interests)
   const flockInterests = useMemo(() => {
-    const raw = flockData?.interests;
-    if (Array.isArray(raw) && raw.length > 0) {
-      return raw.map((item: any) => (typeof item === "object" ? item.name || "" : String(item))).filter(Boolean);
+    const rawInterests = flockData?.interests;
+    const customInterests = flockData?.custom_interests?.child_interests;
+    const result: string[] = [];
+
+    if (Array.isArray(rawInterests)) {
+      rawInterests.forEach((item: any) => {
+        if (typeof item === "object" && item?.name) {
+          result.push(item.name);
+        } else if (typeof item === "string" && item.trim()) {
+          result.push(item.trim());
+        }
+      });
     }
-    return ["Community", "Meetup", "Events"];
+
+    if (Array.isArray(customInterests)) {
+      customInterests.forEach((c: any) => {
+        if (typeof c === "object" && c?.name && !result.includes(c.name)) {
+          result.push(c.name);
+        } else if (typeof c === "string" && c.trim() && !result.includes(c.trim())) {
+          result.push(c.trim());
+        }
+      });
+    }
+
+    return Array.from(new Set(result.filter(Boolean)));
   }, [flockData]);
 
   // Quick Action Links list (Updates, Polls, Gallery, Files)
@@ -114,11 +137,30 @@ const FlocksDetails = () => {
       const title = (act.name || act.title || "").toLowerCase();
       const matchesSearch = !activitySearchQuery.trim() || title.includes(activitySearchQuery.toLowerCase());
       const status = (act.status || act.current_tab || "ONGOING").toUpperCase();
+      const matchesStatus = selectedStatusFilter === "ALL" || status === selectedStatusFilter;
 
-      if (selectedStatusFilter === "ALL") return matchesSearch;
-      return matchesSearch && status === selectedStatusFilter;
+      let matchesDate = true;
+      const dateStr = act.start_date_time || act.start_date || act.end_date_time || act.created_at;
+
+      if (selectedDate) {
+        if (!dateStr) {
+          matchesDate = false;
+        } else {
+          matchesDate = dayjs(dateStr).format("YYYY-MM-DD") === dayjs(selectedDate).format("YYYY-MM-DD");
+        }
+      } else if (calendarMonth) {
+        if (!dateStr) {
+          matchesDate = true;
+        } else {
+          matchesDate =
+            dayjs(dateStr).month() === dayjs(calendarMonth).month() &&
+            dayjs(dateStr).year() === dayjs(calendarMonth).year();
+        }
+      }
+
+      return matchesSearch && matchesStatus && matchesDate;
     });
-  }, [realActivities, activitySearchQuery, selectedStatusFilter]);
+  }, [realActivities, activitySearchQuery, selectedStatusFilter, selectedDate, calendarMonth]);
 
   // Group real activities by Month & Year
   const groupedActivities = useMemo(() => {
@@ -282,18 +324,27 @@ const FlocksDetails = () => {
 
             {/* Right Info Details */}
             <div className="lg:col-span-6 xl:col-span-6 space-y-4">
-              {/* Hashtag List */}
-              <div className="flex flex-wrap items-center gap-1 text-sm font-semibold text-[#555555]">
-                <span># {flockInterests.slice(0, 3).join(", ")}</span>
-                {flockInterests.length > 3 && (
-                  <button
-                    onClick={() => handleActionClick("Interests")}
-                    className="text-[#E75B28] font-bold cursor-pointer hover:underline ml-1"
-                  >
-                    +{flockInterests.length - 3}
-                  </button>
-                )}
-              </div>
+              {/* Hashtag / Interest List */}
+              {flockInterests.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 text-sm font-semibold text-[#555555]">
+                  {flockInterests.slice(0, 4).map((interest, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-orange-50 text-[#E75B28] text-xs font-bold border border-[#FEEBD9]"
+                    >
+                      #{interest}
+                    </span>
+                  ))}
+                  {flockInterests.length > 4 && (
+                    <button
+                      onClick={() => setIsInterestsModalOpen(true)}
+                      className="text-[#E75B28] font-bold text-xs cursor-pointer hover:underline ml-1"
+                    >
+                      +{flockInterests.length - 4} more
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Title */}
               <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
@@ -357,14 +408,24 @@ const FlocksDetails = () => {
 
       {/* MOBILE INFO & METADATA SECTION (< lg) */}
       <div className="lg:hidden px-4 py-5 space-y-4 bg-white border-b border-slate-100">
-        <div className="flex flex-wrap items-center gap-1 text-xs font-bold text-[#E75B28]">
-          <span># {flockInterests.slice(0, 3).join(", ")}</span>
-          {flockInterests.length > 3 && (
-            <button onClick={() => handleActionClick("Interests")} className="ml-1 underline">
-              +{flockInterests.length - 3}
-            </button>
-          )}
-        </div>
+        {/* Mobile Interest Badges */}
+        {flockInterests.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-[#E75B28]">
+            {flockInterests.slice(0, 3).map((interest, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-50 text-[#E75B28] text-[11px] font-bold border border-[#FEEBD9]"
+              >
+                #{interest}
+              </span>
+            ))}
+            {flockInterests.length > 3 && (
+              <button onClick={() => setIsInterestsModalOpen(true)} className="ml-1 text-xs text-[#E75B28] font-extrabold underline cursor-pointer">
+                +{flockInterests.length - 3}
+              </button>
+            )}
+          </div>
+        )}
 
         <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{flockName}</h1>
 
@@ -478,7 +539,12 @@ const FlocksDetails = () => {
             <div className="bg-white rounded-[24px] border border-slate-100 p-6 shadow-2xs space-y-4">
               <SidebarCalendar
                 activities={selected_flock?.public_activities}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                monthDate={calendarMonth}
+                onMonthChange={setCalendarMonth}
                 onActionClick={handleActionClick}
+                onActivityClick={(actId) => navigate(`/flocks/${encodeId(flockId)}/activities/${encodeId(actId)}/detail`)}
               />
             </div>
           </div>
@@ -511,11 +577,26 @@ const FlocksDetails = () => {
                 )}
               </div>
 
+              {/* Selected Date Badge (If calendar date selected) */}
+              {selectedDate && (
+                <div className="flex items-center gap-1.5 bg-orange-50 border border-[#FEEBD9] text-[#E75B28] px-3 py-1 rounded-full text-xs font-bold shadow-2xs">
+                  <CalendarIcon className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>{dayjs(selectedDate).format("MMM D, YYYY")}</span>
+                  <button
+                    onClick={() => setSelectedDate(undefined)}
+                    className="ml-1 hover:text-orange-800 text-[#E75B28] cursor-pointer"
+                    title="Clear Date Filter"
+                  >
+                    <X className="h-3.5 w-3.5 stroke-[2.5]" />
+                  </button>
+                </div>
+              )}
+
               {/* Filter Button (Opens Professional Modal) */}
               <button
                 onClick={() => setIsFilterModalOpen(true)}
                 className={`relative h-9 px-3.5 rounded-full border transition cursor-pointer flex items-center gap-2 text-xs font-bold shadow-2xs ${
-                  selectedStatusFilter !== "ALL" || activitySearchQuery
+                  selectedStatusFilter !== "ALL" || activitySearchQuery || selectedDate
                     ? "bg-[#E75B28] border-[#E75B28] text-white"
                     : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
@@ -523,7 +604,7 @@ const FlocksDetails = () => {
               >
                 <SlidersHorizontal className="h-4 w-4 stroke-[2]" />
                 <span>Filter</span>
-                {(selectedStatusFilter !== "ALL" || activitySearchQuery) && (
+                {(selectedStatusFilter !== "ALL" || activitySearchQuery || selectedDate) && (
                   <span className="h-2 w-2 rounded-full bg-amber-300" />
                 )}
               </button>
@@ -558,7 +639,7 @@ const FlocksDetails = () => {
 
                           {/* Activity Card Container (Calls handleActionClick on click) */}
                           <div
-                            onClick={() => handleActionClick(act.name || "Activity Details")}
+                            onClick={() => navigate(`/flocks/${encodeId(flockId)}/activities/${encodeId(act.id)}/detail`)}
                             className="bg-white border border-slate-100 hover:border-[#E75B28]/40 rounded-2xl p-3 shadow-2xs hover:shadow-xs transition flex items-center gap-3 cursor-pointer select-none group"
                           >
                             <img
@@ -608,10 +689,20 @@ const FlocksDetails = () => {
                 <PartyPopper className="h-8 w-8 text-slate-300 mx-auto" />
                 <p className="text-sm font-semibold text-slate-600">No activities found</p>
                 <p className="text-xs text-slate-400">
-                  {activitySearchQuery || selectedStatusFilter !== "ALL"
+                  {selectedDate
+                    ? `No activities scheduled on ${dayjs(selectedDate).format("MMM D, YYYY")}.`
+                    : activitySearchQuery || selectedStatusFilter !== "ALL"
                     ? "No activities match your filter settings."
-                    : "This community flock has no public activities listed yet."}
+                    : `No public activities listed in ${dayjs(calendarMonth).format("MMMM YYYY")}.`}
                 </p>
+                {selectedDate && (
+                  <button
+                    onClick={() => setSelectedDate(undefined)}
+                    className="mt-2 text-xs font-bold text-[#E75B28] hover:underline cursor-pointer"
+                  >
+                    Clear Date Filter ({dayjs(calendarMonth).format("MMMM YYYY")})
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -664,7 +755,7 @@ const FlocksDetails = () => {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-600">Activity Status</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(["ALL", "ONGOING", "DRAFT", "COMPLETED"] as const).map((statusOpt) => (
+                  {(["ALL", "ONGOING", "COMPLETED"] as const).map((statusOpt) => (
                     <button
                       key={statusOpt}
                       onClick={() => setSelectedStatusFilter(statusOpt)}
@@ -686,6 +777,7 @@ const FlocksDetails = () => {
                 onClick={() => {
                   setSelectedStatusFilter("ALL");
                   setActivitySearchQuery("");
+                  setSelectedDate(undefined);
                 }}
                 className="flex-1 py-2.5 text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl cursor-pointer"
               >
@@ -696,6 +788,50 @@ const FlocksDetails = () => {
                 className="flex-1 py-2.5 text-xs font-bold bg-[#E75B28] text-white hover:bg-orange-700 rounded-xl cursor-pointer shadow-xs"
               >
                 Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* All Interests Modal */}
+      {isInterestsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            onClick={() => setIsInterestsModalOpen(false)}
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs cursor-pointer animate-fade-in"
+          />
+          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-5 z-10">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">✨</span>
+                <h3 className="text-base font-bold text-slate-900">Flock Interests</h3>
+              </div>
+              <button
+                onClick={() => setIsInterestsModalOpen(false)}
+                className="h-8 w-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 py-2 max-h-60 overflow-y-auto">
+              {flockInterests.map((interest, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-orange-50 text-[#E75B28] text-xs font-bold border border-[#FEEBD9] shadow-2xs"
+                >
+                  #{interest}
+                </span>
+              ))}
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => setIsInterestsModalOpen(false)}
+                className="w-full py-2.5 text-xs font-bold bg-[#E75B28] text-white hover:bg-orange-700 rounded-xl cursor-pointer shadow-xs transition"
+              >
+                Close
               </button>
             </div>
           </div>
