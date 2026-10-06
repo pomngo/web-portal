@@ -63,10 +63,10 @@ export const getLocation = (item: any, fallback = "Location N/A"): string => {
 export const getItemName = (item: any, fallback = "Community Item"): string => {
   if (!item || typeof item !== "object") return fallback;
   return (
-    item.flock_name ||
     item.name ||
     item.title ||
     item.activity_name ||
+    item.flock_name ||
     fallback
   );
 };
