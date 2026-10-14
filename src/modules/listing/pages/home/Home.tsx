@@ -183,7 +183,7 @@ const Home = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
+            <TitleText title={isFlockFiltered ? "Filtered Communities" : "Communities"} />
           </div>
 
           <div>

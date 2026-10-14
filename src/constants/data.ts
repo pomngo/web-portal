@@ -71,7 +71,7 @@ export const navItems = [
     icon: HomeIcon,
   },
   {
-    name: "Flocks",
+    name: "Communities",
     path: "/flocks",
     matchPaths: ["/flock"],
     icon: CompassIcon,
