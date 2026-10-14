@@ -9,9 +9,36 @@ import { useInfiniteFlocks } from "../../../../hooks/useFlocksQuery";
 import { useSyncFilters } from "../../../../utils/filter";
 import { encodeId } from "../../../../utils/idEncoder";
 
+const getFlockSlugMeta = (slug?: string) => {
+  const s = (slug || "").toLowerCase();
+  if (s === "community-flocks" || s === "community") {
+    return {
+      title: "Local Community Activities & Social Groups Near Me | FlocknGo",
+      description: "Join local community activities, meetup groups, and social flocks near you. Connect with like-minded local communities on FlocknGo.",
+      h1: "Local Community Activities & Social Groups Near Me",
+    };
+  }
+  if (s === "nearby-flocks" || s === "nearby") {
+    return {
+      title: "Group Activities Near Me | Community Groups & Flocks | FlocknGo",
+      description: "Discover group activities near me and connect with nearby community flocks. Find social activities and interest groups in your city.",
+      h1: "Group Activities & Community Flocks Near Me",
+    };
+  }
+  const formatted = slug
+    ? slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+    : "Community Flocks";
+  return {
+    title: `${formatted} - Community Flocks & Group Activities | FlocknGo`,
+    description: `Discover ${formatted} community flocks and group activities near you. Join interest clubs and social groups on FlocknGo.`,
+    h1: `${formatted} - Community Flocks & Group Activities`,
+  };
+};
+
 const AllFlocks = () => {
   useSyncFilters();
   const { search_by } = useParams();
+  const slugMeta = getFlockSlugMeta(search_by);
   const [searchParams] = useSearchParams();
   const flockQueryString = (() => {
     const params = new URLSearchParams();
@@ -59,13 +86,12 @@ const AllFlocks = () => {
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
-        title={`All Flocks - ${search_by || "Nearby"} | FlocknGo`}
-        description={`Discover and browse through all our local community flocks and groups matching ${search_by || "your interest"}. Join now on FlocknGo!`}
-        keywords={`discover flocks, find community, local social groups, join social group, ${search_by || ""}`}
-        canonicalPath={`/flocks/${search_by || "nearby"}`}
-        domain="main"
+        title={slugMeta.title}
+        description={slugMeta.description}
+        canonicalPath={`/flocks/${search_by || "community-flocks"}`}
+        domain="events"
       />
-      <h1 className="sr-only">Explore All Community Flocks - {search_by || "Nearby"}</h1>
+      <h1 className="sr-only">{slugMeta.h1}</h1>
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />

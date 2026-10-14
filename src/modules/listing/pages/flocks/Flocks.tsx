@@ -92,27 +92,42 @@ const Flocks = () => {
   const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
   const activeInterest = selectedFilter || searchParams.get("interest") || "";
   const activeLocation = searchParams.get("location") || "";
-  const dynamicFlockTitle = activeInterest || activeLocation
-    ? `${activeInterest ? activeInterest + " " : ""}Community Groups${activeLocation ? " in " + activeLocation : ""} | FlocknGo`
-    : "Discover Local Community Groups & Social Flocks | FlocknGo";
+  let pageTitle = "Community Events & Group Activities Near Me | FlocknGo";
+  let pageDescription = "Discover community events near me, local community activities, and social groups. Connect with like-minded people for group activities with FlocknGo.";
+  let pageH1 = "Community Groups & Group Activities Near Me";
+
+  if (activeLocation && activeInterest) {
+    const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
+    pageTitle = `${formattedInterest} Community Groups & Activities in ${activeLocation} | FlocknGo`;
+    pageDescription = `Connect with ${activeInterest} community groups and social activities in ${activeLocation}. Join local clubs on FlocknGo.`;
+    pageH1 = `${formattedInterest} Community Groups in ${activeLocation}`;
+  } else if (activeLocation) {
+    pageTitle = `Community Events & Groups in ${activeLocation} | FlocknGo`;
+    pageDescription = `Discover local community groups and social activities in ${activeLocation}. Connect with people near you on FlocknGo.`;
+    pageH1 = `Community Groups & Activities in ${activeLocation}`;
+  } else if (activeInterest) {
+    const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
+    pageTitle = `${formattedInterest} Community Groups & Social Activities Near Me | FlocknGo`;
+    pageDescription = `Find ${activeInterest} groups and local community activities near you. Join clubs and connect on FlocknGo.`;
+    pageH1 = `${formattedInterest} Community Groups & Activities Near Me`;
+  }
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
-        title={dynamicFlockTitle}
-        description="Browse and discover local social groups, interest-based clubs, and community flocks. Connect with like-minded people near you with FlocknGo."
-        keywords={`local social groups, interest groups, find community, meetup groups, social club, ${activeInterest}, ${activeLocation}`}
+        title={pageTitle}
+        description={pageDescription}
         canonicalPath="/flocks"
-        domain="main"
+        domain="events"
         schemaType="ItemList"
         schemaData={{
           items: filteredNearbyFlocks.map((f: any) => ({
             name: f.name || f.flock_name || f.title || "Flock",
-            url: `https://flockngo.com/flocks/${encodeId(f.id || f.flock_id)}/detail`,
+            url: `https://events.flockngo.com/flocks/${encodeId(f.id || f.flock_id)}/detail`,
           })),
         }}
       />
-      <h1 className="sr-only">Browse Local Flocks and Social Groups - FlocknGo</h1>
+      <h1 className="sr-only">{pageH1}</h1>
       {/* Nearby Flocks */}
       <section className="">
         {/* Heading */}

@@ -9,9 +9,64 @@ import { useInfiniteActivities } from "../../../../hooks/useActivitiesQuery";
 import { useSyncFilters } from "../../../../utils/filter";
 import { encodeId } from "../../../../utils/idEncoder";
 
+const getSlugMeta = (slug?: string) => {
+  const s = (slug || "").toLowerCase();
+  if (s === "weekend-activities" || s === "this-weekend" || s === "things-to-do-this-weekend") {
+    return {
+      title: "Things to Do This Weekend | Weekend Activities Near Me | FlocknGo",
+      description: "Looking for things to do this weekend? Discover top weekend activities near me, fun local events, and book event tickets online with FlocknGo.",
+      h1: "Things to Do This Weekend & Weekend Activities Near Me",
+    };
+  }
+  if (s === "workshops" || s === "workshops-near-me" || s === "hobby-classes") {
+    return {
+      title: "Workshops Near Me | Creative & Hobby Classes | FlocknGo Events",
+      description: "Find exciting workshops near me, hobby classes, and creative skill sessions. Book workshop and event tickets online on FlocknGo.",
+      h1: "Workshops & Learning Activities Near Me",
+    };
+  }
+  if (s === "community-events" || s === "community-activities" || s === "group-activities") {
+    return {
+      title: "Community Events Near Me | Local Community Activities | FlocknGo",
+      description: "Join vibrant community events near me, group activities, and local social gatherings. Connect with people in your city on FlocknGo.",
+      h1: "Community Events & Local Group Activities Near Me",
+    };
+  }
+  if (s === "upcoming-events-india" || s === "events-in-india" || s === "cultural-events") {
+    return {
+      title: "Upcoming Events in India | Cultural, Live & Networking Events | FlocknGo",
+      description: "Browse top upcoming events in India, cultural events, live entertainment, and networking meetups. Book event tickets online.",
+      h1: "Upcoming Events in India",
+    };
+  }
+  if (s === "explore-activities" || s === "explore") {
+    return {
+      title: "Upcoming Events Near Me | Events This Weekend & City Activities | FlocknGo",
+      description: "Explore upcoming events near me and activities in your city. Find things to do this weekend, workshops, and book event tickets online.",
+      h1: "Explore Upcoming Events & Activities Near Me",
+    };
+  }
+  if (s === "nearby-activities" || s === "nearby" || s === "events-near-me") {
+    return {
+      title: "Activities Near Me | Events Happening Today & Fun Things to Do | FlocknGo",
+      description: "Discover fun activities near me and events happening today. Browse local events near you and book event tickets online with FlocknGo.",
+      h1: "Activities Near Me & Local Events",
+    };
+  }
+  const formatted = slug
+    ? slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+    : "Activities";
+  return {
+    title: `${formatted} - Upcoming Events & Activities Near Me | FlocknGo`,
+    description: `Discover ${formatted} and upcoming events in India. Find activities near me, workshops, and book event tickets online on FlocknGo.`,
+    h1: `${formatted} - Upcoming Events & Activities`,
+  };
+};
+
 const AllActivities = () => {
   useSyncFilters();
   const { search_by } = useParams();
+  const slugMeta = getSlugMeta(search_by);
   const [searchParams] = useSearchParams();
   const activityQueryString = (() => {
     const params = new URLSearchParams();
@@ -59,13 +114,12 @@ const AllActivities = () => {
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
-        title={`All Activities - ${search_by || "Nearby"} | FlocknGo Events`}
-        description={`Discover all our local activities, experiences, and events matching ${search_by || "your interest"}. Join now on FlocknGo!`}
-        keywords={`discover activities, find local events, local experiences, social meetup activities, ${search_by || ""}`}
-        canonicalPath={`/activities/${search_by || "nearby"}`}
+        title={slugMeta.title}
+        description={slugMeta.description}
+        canonicalPath={`/activities/${search_by || "nearby-activities"}`}
         domain="events"
       />
-      <h1 className="sr-only">Explore All Activities - {search_by || "Nearby"}</h1>
+      <h1 className="sr-only">{slugMeta.h1}</h1>
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />
