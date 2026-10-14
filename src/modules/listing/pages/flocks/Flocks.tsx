@@ -133,7 +133,7 @@ const Flocks = () => {
         {/* Heading */}
         <div className="mb-4 flex justify-between">
           <div className="">
-            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Nearby Flocks"} />
+            <TitleText title={isFlockFiltered ? "Filtered Communities" : "Communities"} />
             <p className="text-secondary text-base">Enable your location to get personalized results.</p>
           </div>
           <div className="">
@@ -187,7 +187,7 @@ const Flocks = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <TitleText title={isFlockFiltered ? "Filtered Flocks" : "Community Flocks"} />
+            <TitleText title={isFlockFiltered ? "Filtered Communities" : "Communities"} />
           </div>
 
           <div>
