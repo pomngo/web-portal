@@ -126,20 +126,37 @@ const ActivitiesDetails = () => {
     }
   ];
 
+  const isDraftOrPrivate =
+    (actData?.status || "").toLowerCase() === "draft" ||
+    actData?.is_private === true ||
+    actData?.visibility === "private" ||
+    (selected_activities?.status || "").toLowerCase() === "draft" ||
+    selected_activities?.is_private === true;
+
+  const eventCanonicalPath = `/flocks/${encodeId(selected_activities?.flock_id || flockId || 1)}/activities/${encodeId(activityId)}/detail`;
+  const eventSeoTitle = `${actName} in ${actLocation} - Book Event Tickets Online | FlocknGo`;
+  const eventSeoDesc = `${actName} in ${actLocation}. ${actDesc.slice(0, 120).trim()}... Discover upcoming events in India and book event tickets online on FlocknGo.`;
+
   return (
     <div className="min-h-screen text-slate-800 flex flex-col font-sans pb-24 bg-[#F8FAFC]">
       <SEOHead
-        title={`${actName} - Local Event & Activity in ${actLocation} | FlocknGo Events`}
-        description={actDesc.slice(0, 160)}
-        keywords={`${actName}, ${actLocation} events, join local activity, community event, FlocknGo`}
-        canonicalPath={`/flocks/${encodeId(selected_activities?.flock_id || 1)}/activities/${encodeId(activityId)}/detail`}
+        title={eventSeoTitle}
+        description={eventSeoDesc}
+        canonicalPath={eventCanonicalPath}
         domain="events"
         ogImage={coverImageUrl}
+        robots={isDraftOrPrivate ? "noindex, nofollow" : undefined}
         schemaType="Event"
         schemaData={{
           name: actName,
+          description: actDesc,
           location: actLocation,
-          startDate: selected_activities?.created_at || selected_activities?.start_date,
+          city: actLocation,
+          startDate: selected_activities?.start_date || selected_activities?.created_at || actData?.start_date || actData?.created_at,
+          endDate: selected_activities?.end_date || actData?.end_date,
+          price: actData?.price || actData?.entry_fee || "0",
+          organizerName: flockName || "FlocknGo Events",
+          eventUrl: `https://events.flockngo.com${eventCanonicalPath}`,
         }}
       />
       {/* Top Header Navbar */}

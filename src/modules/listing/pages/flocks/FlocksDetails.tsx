@@ -226,19 +226,24 @@ const FlocksDetails = () => {
     ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flockData.cover_image_s3key)
     : undefined;
 
+  const isFlockPrivate = flockData?.is_private === true || flockData?.visibility === "private";
+  const flockCanonicalPath = `/flocks/${encodeId(flockId)}/detail`;
+  const flockSeoTitle = `${flockName} - Community Group in ${flockLocation} | FlocknGo`;
+  const flockSeoDesc = `${flockDescription.slice(0, 140).trim()}... Connect with like-minded people and join local community activities in ${flockLocation} on FlocknGo.`;
+
   return (
     <div className="min-h-screen text-slate-800 flex flex-col font-sans pb-24 bg-[#F8FAFC]">
       <SEOHead
-        title={`${flockName} - Join Local Community Flock in ${flockLocation} | FlocknGo`}
-        description={flockDescription.slice(0, 160)}
-        keywords={`${flockName}, ${flockInterests.join(", ")}, social group ${flockLocation}, community flock, FlocknGo`}
-        canonicalPath={`/flocks/${encodeId(flockId)}/detail`}
-        domain="main"
+        title={flockSeoTitle}
+        description={flockSeoDesc}
+        canonicalPath={flockCanonicalPath}
+        domain="events"
         ogImage={coverImageUrl}
+        robots={isFlockPrivate ? "noindex, nofollow" : undefined}
         schemaType="SocialGroup"
         schemaData={{
           name: flockName,
-          url: `https://flockngo.com/flocks/${encodeId(flockId)}/detail`,
+          url: `https://events.flockngo.com${flockCanonicalPath}`,
           location: flockLocation,
         }}
       />

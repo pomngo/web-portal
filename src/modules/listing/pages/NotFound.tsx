@@ -15,10 +15,11 @@ const NotFound = () => {
   return (
     <div className="min-h-[75vh] flex flex-col items-center justify-center bg-white px-6 py-16 font-sans">
       <SEOHead
-        title="Page Not Found | FlocknGo"
-        description="The page you are looking for does not exist."
+        title="Page Not Found | FlocknGo Events"
+        description="The page you requested could not be found. Explore upcoming events in India and activities near me on FlocknGo Events."
         canonicalPath="/not-found"
-        domain="main"
+        domain="events"
+        robots="noindex, nofollow"
       />
 
       <div className="max-w-md text-center space-y-6">
