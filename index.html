@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Primary Meta Tags -->
-    <title>FlocknGo Events | Events, Activities & Workshops Near You</title>
-    <meta name="title" content="FlocknGo Events | Events, Activities & Workshops Near You" />
+    <title>FlocknGo Events | Discover Events & Activities Near You</title>
+    <meta name="title" content="FlocknGo Events | Discover Events & Activities Near You" />
     <meta name="description" content="Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo." />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="language" content="English" />
@@ -19,16 +19,46 @@
     <meta property="og:url" content="https://events.flockngo.com/" />
     <meta property="og:site_name" content="FlocknGo Events" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:title" content="FlocknGo Events | Events, Activities & Workshops Near You" />
+    <meta property="og:title" content="FlocknGo Events | Discover Events & Activities Near You" />
     <meta property="og:description" content="Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo." />
     <meta property="og:image" content="/flockgo_logo.png" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://events.flockngo.com/" />
-    <meta name="twitter:title" content="FlocknGo Events | Events, Activities & Workshops Near You" />
+    <meta name="twitter:title" content="FlocknGo Events | Discover Events & Activities Near You" />
     <meta name="twitter:description" content="Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo." />
     <meta name="twitter:image" content="/flockgo_logo.png" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json" id="flockngo-jsonld-schema">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://events.flockngo.com/#website",
+          "name": "FlocknGo Events",
+          "alternateName": "FlocknGo",
+          "url": "https://events.flockngo.com/",
+          "description": "Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://events.flockngo.com/activities?interest={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://events.flockngo.com/#organization",
+          "name": "FlocknGo Events",
+          "url": "https://events.flockngo.com/",
+          "logo": "https://events.flockngo.com/flockgo_logo.png",
+          "description": "FlocknGo Events is an event discovery and community platform helping people explore upcoming events, local activities, workshops, and gatherings across India."
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
