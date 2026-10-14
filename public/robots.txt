@@ -1,6 +1,33 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /not-found
 
-Sitemap: https://flockngo.com/sitemap.xml
+# Search & AI Crawlers
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /not-found
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /not-found
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /not-found
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+Disallow: /not-found
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /not-found
+
 Sitemap: https://events.flockngo.com/sitemap.xml
+
