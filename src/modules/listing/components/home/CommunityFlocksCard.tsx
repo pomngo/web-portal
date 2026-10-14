@@ -74,7 +74,7 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
             ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(card.cover_image_s3key)
             : images.default_flock_banner
         }
-        alt={card.name || "Cover Image"}
+        alt={card.name || "FlocknGo Community Flock"}
         loading="lazy"
         decoding="async"
         onError={(e) => {

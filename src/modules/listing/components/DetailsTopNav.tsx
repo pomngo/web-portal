@@ -8,7 +8,7 @@ const DetailsTopNav = () => {
     <div className="from-nav01  px-4 py-2 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <div className="flex items-center justify-between">
         <Link to={"/"}>
-          <img src={images.logo} alt="Logo" className="h-16" />
+          <img src={images.logo} alt="FlocknGo Events - Discover Local Activities & Events" className="h-16" />
         </Link>
 
         <div>

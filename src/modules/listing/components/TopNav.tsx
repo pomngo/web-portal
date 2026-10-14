@@ -41,7 +41,7 @@ const TopNav = () => {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <Link to={"/"} className="flex-shrink-0">
-          <img src={images.logo} alt="Logo" className="h-12 sm:h-16 transition-all" />
+          <img src={images.logo} alt="FlocknGo Events - Discover Local Activities & Events" className="h-12 sm:h-16 transition-all" />
         </Link>
 
         {/* Navigation */}
