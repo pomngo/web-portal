@@ -119,7 +119,7 @@ const Home = () => {
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
-        title="FlocknGo Events | Events, Activities & Workshops Near You"
+        title="FlocknGo Events | Discover Events & Activities Near You"
         description="Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo."
         canonicalPath="/"
         domain="events"

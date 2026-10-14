@@ -45,7 +45,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         "@id": "https://events.flockngo.com/#website",
         "name": "FlocknGo Events",
         "alternateName": "FlocknGo",
-        "url": "https://events.flockngo.com",
+        "url": "https://events.flockngo.com/",
         "description": description,
         "potentialAction": {
           "@type": "SearchAction",
@@ -57,7 +57,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         "@type": "Organization",
         "@id": "https://events.flockngo.com/#organization",
         "name": "FlocknGo Events",
-        "url": "https://events.flockngo.com",
+        "url": "https://events.flockngo.com/",
         "logo": "https://events.flockngo.com/flockgo_logo.png",
         "description": "FlocknGo Events is an event discovery and community platform helping people explore upcoming events, local activities, workshops, and gatherings across India.",
       },
