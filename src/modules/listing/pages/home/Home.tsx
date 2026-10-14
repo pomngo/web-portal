@@ -119,14 +119,13 @@ const Home = () => {
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
-        title="FlocknGo | Discover Nearby Local Groups, Activities & Community Events"
-        description="Discover nearby local flocks, join exciting community activities, outdoor adventures, and make new connections. Find your interest and go with FlocknGo!"
-        keywords="flockngo, activities near me, local events, meet new people, social groups, interest clubs, outdoor adventures, join community club"
+        title="FlocknGo Events | Events, Activities & Workshops Near You"
+        description="Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo."
         canonicalPath="/"
-        domain="main"
+        domain="events"
         schemaType="WebSite"
       />
-      <h1 className="sr-only">FlocknGo - Discover Nearby Activities and Community Flocks</h1>
+      <h1 className="sr-only">FlocknGo Events</h1>
       {/* Nearby Activities */}
       <section className="">
         {/* Heading */}

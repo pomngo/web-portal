@@ -88,16 +88,53 @@ const Activities = () => {
   const isActivityFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
   const activeInterest = selectedFilter || searchParams.get("interest") || "";
   const activeLocation = searchParams.get("location") || "";
-  const dynamicActivityTitle = activeInterest || activeLocation
-    ? `${activeInterest ? activeInterest + " " : ""}Activities${activeLocation ? " in " + activeLocation : ""} | FlocknGo Events`
-    : "Explore Nearby Local Activities & Events | FlocknGo";
+  const activeDate = searchParams.get("created_date") || "";
+
+  // Dynamic targeting aligned with FlocknGo primary, secondary, and location-specific keyword strategy
+  let pageTitle = "Upcoming Events in India | Activities Near Me & Things to Do | FlocknGo";
+  let pageDescription = "Explore upcoming events in India and activities near me. Find weekend activities, community events, workshops, and book event tickets online on FlocknGo.";
+  let pageH1 = "Upcoming Events in India & Activities Near Me";
+
+  if (activeLocation && activeInterest) {
+    const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
+    pageTitle = `${formattedInterest} Activities & Events in ${activeLocation} | FlocknGo`;
+    pageDescription = `Discover ${activeInterest} events and activities in ${activeLocation}. Find things to do this weekend, workshops, and book event tickets online.`;
+    pageH1 = `${formattedInterest} Events & Activities in ${activeLocation}`;
+  } else if (activeLocation) {
+    pageTitle = `Upcoming Events in ${activeLocation} | Weekend Activities & Things to Do | FlocknGo`;
+    pageDescription = `Discover upcoming events in ${activeLocation}. Explore weekend activities, workshops, cultural events, and things to do in ${activeLocation}. Book event tickets online.`;
+    pageH1 = `Upcoming Events & Activities in ${activeLocation}`;
+  } else if (activeInterest) {
+    const lowerInterest = activeInterest.toLowerCase();
+    if (lowerInterest === "creative" || lowerInterest.includes("workshop") || lowerInterest.includes("art")) {
+      pageTitle = "Workshops Near Me | Creative & Hobby Classes | FlocknGo Events";
+      pageDescription = "Find creative workshops near me, hobby classes, and learning activities in India. Book event tickets online with FlocknGo.";
+      pageH1 = "Workshops & Creative Activities Near Me";
+    } else if (lowerInterest === "fitness") {
+      pageTitle = "Fitness Activities Near Me | Group Workouts & Sports Events | FlocknGo";
+      pageDescription = "Discover fitness activities near me, group runs, yoga sessions, and sports meetups. Stay active with FlocknGo.";
+      pageH1 = "Fitness Activities & Sports Events Near Me";
+    } else if (lowerInterest === "social") {
+      pageTitle = "Social Activities & Community Events Near Me | FlocknGo";
+      pageDescription = "Join social activities near me, local community events, and group meetups. Make new connections and attend events.";
+      pageH1 = "Social Activities & Community Gatherings Near Me";
+    } else {
+      const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
+      pageTitle = `${formattedInterest} Events & Activities Near Me | FlocknGo`;
+      pageDescription = `Explore ${activeInterest} events and activities near you. Connect with local communities and book event tickets online.`;
+      pageH1 = `${formattedInterest} Events & Activities Near Me`;
+    }
+  } else if (activeDate) {
+    pageTitle = "Events Happening Today & This Weekend Near Me | FlocknGo Events";
+    pageDescription = "Find events happening today, weekend activities near me, and things to do this weekend. Book event tickets online on FlocknGo.";
+    pageH1 = "Events Happening Today & This Weekend Near Me";
+  }
 
   return (
     <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
-        title={dynamicActivityTitle}
-        description="Discover nearby local activities, outdoor adventures, workshops, and fun experiences. Join exciting local events with FlocknGo."
-        keywords={`local activities, events near me, local experiences, fun activities, community events, ${activeInterest}, ${activeLocation}`}
+        title={pageTitle}
+        description={pageDescription}
         canonicalPath="/activities"
         domain="events"
         schemaType="ItemList"
@@ -108,7 +145,7 @@ const Activities = () => {
           })),
         }}
       />
-      <h1 className="sr-only">Discover Local Activities and Upcoming Events - FlocknGo</h1>
+      <h1 className="sr-only">{pageH1}</h1>
       <section className="">
         {/* Heading */}
         <div className="mb-4 flex justify-between">
