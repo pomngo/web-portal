@@ -34,6 +34,106 @@ import { handleExternalRedirect } from "../../../../constants/urls";
 import { encodeId, decodeId } from "../../../../utils/idEncoder";
 import { getMemberCount, getLocation, getItemName } from "../../../../utils/dataHelper";
 
+// Helper to extract the primary date string of an activity
+const getActivityDateStr = (act: ActivityItem): string | undefined => {
+  return (
+    act.start_date_time ||
+    act.start_date ||
+    act.end_date_time ||
+    act.end_date ||
+    act.activity_date ||
+    act.event_date ||
+    act.date ||
+    act.created_at
+  );
+};
+
+// Helper for scheduled event date (strictly event time, avoiding created_at timestamp)
+const getScheduledEventDateStr = (act: ActivityItem): string | undefined => {
+  return (
+    act.start_date_time ||
+    act.start_date ||
+    act.end_date_time ||
+    act.end_date ||
+    act.activity_date ||
+    act.event_date ||
+    act.date
+  );
+};
+
+// Intelligent default date picker:
+// 1. If today has an activity -> today
+// 2. Else latest activity before today (most recent past activity)
+// 3. Else nearest upcoming activity
+// 4. If no activity at all in flock -> fallback to today so calendar keeps current date selected & highlighted
+const getSmartDefaultActivityDate = (activities: ActivityItem[]): Date => {
+  const today = dayjs().startOf("day");
+  const todayFormat = today.format("YYYY-MM-DD");
+
+  if (!activities || activities.length === 0) {
+    return new Date(); // If flock has NO activities, fallback to current date
+  }
+
+  // Filter items with valid date (include all statuses)
+  const validItems = activities.filter((act) => {
+    const dateStr = getActivityDateStr(act);
+    return dateStr && dayjs(dateStr).isValid();
+  });
+
+  if (validItems.length === 0) {
+    return new Date(); // If no valid dates found, fallback to current date
+  }
+
+  // 1. Check if today has any scheduled activity (using real event time, not created_at)
+  const hasTodayActivity = validItems.some((act) => {
+    const eventDate = getScheduledEventDateStr(act);
+    if (!eventDate) return false;
+    return dayjs(eventDate).format("YYYY-MM-DD") === todayFormat;
+  });
+  if (hasTodayActivity) {
+    return new Date();
+  }
+
+  // 2. Look for activities before today (sorted descending: latest past activity first)
+  const pastItems = validItems
+    .map((act) => {
+      const dateStr = getActivityDateStr(act);
+      return { act, date: dayjs(dateStr) };
+    })
+    .filter(({ date }) => date.isBefore(today, "day"))
+    .sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+  if (pastItems.length > 0) {
+    return pastItems[0].date.toDate();
+  }
+
+  // 3. If no past activity exists, look for upcoming activities (sorted ascending: nearest future activity first)
+  const futureItems = validItems
+    .map((act) => {
+      const dateStr = getActivityDateStr(act);
+      return { act, date: dayjs(dateStr) };
+    })
+    .filter(({ date }) => date.isAfter(today, "day"))
+    .sort((a, b) => a.date.valueOf() - b.date.valueOf());
+
+  if (futureItems.length > 0) {
+    return futureItems[0].date.toDate();
+  }
+
+  return dayjs(getActivityDateStr(validItems[0])).toDate();
+};
+
+// Helper to check if flock has any activities
+const getTrueLatestActivityDate = (activities: ActivityItem[]): Date | undefined => {
+  if (!activities || activities.length === 0) return undefined;
+  const validItems = activities.filter((act) => {
+    const dateStr = getActivityDateStr(act);
+    return dateStr && dayjs(dateStr).isValid();
+  });
+  if (validItems.length === 0) return undefined;
+  return getSmartDefaultActivityDate(activities);
+};
+
 const FlocksDetails = () => {
   const { id } = useParams();
   const flockId = decodeId(id);
@@ -49,8 +149,21 @@ const FlocksDetails = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activitySearchQuery, setActivitySearchQuery] = useState("");
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<"ALL" | "ONGOING" | "COMPLETED">("ALL");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
+
+  // User manual selection state:
+  // null = auto-use smart default (activity date or today if no activity)
+  // undefined = explicitly cleared date filter (show all activities)
+  // Date = user clicked a specific date
+  const [manualSelectedDate, setManualSelectedDate] = useState<Date | null | undefined>(null);
+  const [manualMonth, setManualMonth] = useState<Date | null>(null);
+  const [prevFlockId, setPrevFlockId] = useState(flockId);
+
+  // Reset manual selection when switching to a different flock
+  if (flockId !== prevFlockId) {
+    setPrevFlockId(flockId);
+    setManualSelectedDate(null);
+    setManualMonth(null);
+  }
 
   // Show join prompt popup before any external redirect
   const handleActionClick = (label: string) => {
@@ -129,8 +242,43 @@ const FlocksDetails = () => {
     },
   ];
 
-  // Real backend public activities filtered dynamically in state
-  const realActivities: ActivityItem[] = selected_flock?.public_activities || [];
+  // Real backend public activities from any possible API response path
+  const realActivities: ActivityItem[] = useMemo(() => {
+    const list =
+      selected_flock?.public_activities ||
+      selected_flock?.activities ||
+      selected_flock?.data?.public_activities ||
+      selected_flock?.result?.public_activities ||
+      flockData?.public_activities ||
+      flockData?.activities ||
+      [];
+    return Array.isArray(list) ? list : [];
+  }, [selected_flock, flockData]);
+
+  const smartDefaultDate = useMemo(() => {
+    return getSmartDefaultActivityDate(realActivities);
+  }, [realActivities]);
+
+  const latestAvailableActivityDate = useMemo(() => {
+    return getTrueLatestActivityDate(realActivities);
+  }, [realActivities]);
+
+  // The active selected date (auto-falls back to smart default until user manual interaction)
+  const selectedDate: Date | undefined = manualSelectedDate !== null ? manualSelectedDate : smartDefaultDate;
+
+  // Calendar month follows the selected date unless manually paged
+  const calendarMonth: Date = manualMonth || selectedDate || new Date();
+
+  const handleSelectDate = (date: Date | undefined) => {
+    setManualSelectedDate(date);
+    if (date) {
+      setManualMonth(date);
+    }
+  };
+
+  const handleMonthChange = (month: Date) => {
+    setManualMonth(month);
+  };
 
   const filteredRealActivities = useMemo(() => {
     return realActivities.filter((act: ActivityItem) => {
@@ -140,7 +288,7 @@ const FlocksDetails = () => {
       const matchesStatus = selectedStatusFilter === "ALL" || status === selectedStatusFilter;
 
       let matchesDate = true;
-      const dateStr = act.start_date_time || act.start_date || act.end_date_time || act.created_at;
+      const dateStr = getActivityDateStr(act);
 
       if (selectedDate) {
         if (!dateStr) {
@@ -148,26 +296,26 @@ const FlocksDetails = () => {
         } else {
           matchesDate = dayjs(dateStr).format("YYYY-MM-DD") === dayjs(selectedDate).format("YYYY-MM-DD");
         }
-      } else if (calendarMonth) {
-        if (!dateStr) {
-          matchesDate = true;
-        } else {
-          matchesDate =
-            dayjs(dateStr).month() === dayjs(calendarMonth).month() &&
-            dayjs(dateStr).year() === dayjs(calendarMonth).year();
-        }
       }
 
       return matchesSearch && matchesStatus && matchesDate;
     });
-  }, [realActivities, activitySearchQuery, selectedStatusFilter, selectedDate, calendarMonth]);
+  }, [realActivities, activitySearchQuery, selectedStatusFilter, selectedDate]);
 
-  // Group real activities by Month & Year
+  // Group and sort real activities by Month & Year (latest first)
   const groupedActivities = useMemo(() => {
+    const sorted = [...filteredRealActivities].sort((a, b) => {
+      const dateA = getActivityDateStr(a);
+      const dateB = getActivityDateStr(b);
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      return dayjs(dateB).valueOf() - dayjs(dateA).valueOf();
+    });
+
     const groups: Record<string, ActivityItem[]> = {};
-    filteredRealActivities.forEach((act: ActivityItem) => {
-      const dateStr = act.start_date_time || act.created_at;
-      const monthYear = dateStr ? dayjs(dateStr).format("MMMM YYYY").toUpperCase() : "UPCOMING ACTIVITIES";
+    sorted.forEach((act: ActivityItem) => {
+      const dateStr = getActivityDateStr(act);
+      const monthYear = dateStr ? dayjs(dateStr).format("MMMM YYYY").toUpperCase() : "ACTIVITIES";
       if (!groups[monthYear]) {
         groups[monthYear] = [];
       }
@@ -543,11 +691,11 @@ const FlocksDetails = () => {
           >
             <div className="bg-white rounded-[24px] border border-slate-100 p-6 shadow-2xs space-y-4">
               <SidebarCalendar
-                activities={selected_flock?.public_activities}
+                activities={realActivities}
                 selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
+                onSelectDate={handleSelectDate}
                 monthDate={calendarMonth}
-                onMonthChange={setCalendarMonth}
+                onMonthChange={handleMonthChange}
                 onActionClick={handleActionClick}
                 onActivityClick={(actId) => navigate(`/flocks/${encodeId(flockId)}/activities/${encodeId(actId)}/detail`)}
               />
@@ -582,20 +730,35 @@ const FlocksDetails = () => {
                 )}
               </div>
 
-              {/* Selected Date Badge (If calendar date selected) */}
-              {selectedDate && (
+              {/* Selected Date Badge (If calendar date selected) or Jump to Latest */}
+              {selectedDate ? (
                 <div className="flex items-center gap-1.5 bg-orange-50 border border-[#FEEBD9] text-[#E75B28] px-3 py-1 rounded-full text-xs font-bold shadow-2xs">
                   <CalendarIcon className="h-3.5 w-3.5 stroke-[2.5]" />
-                  <span>{dayjs(selectedDate).format("MMM D, YYYY")}</span>
-                  <button
-                    onClick={() => setSelectedDate(undefined)}
-                    className="ml-1 hover:text-orange-800 text-[#E75B28] cursor-pointer"
-                    title="Clear Date Filter"
-                  >
-                    <X className="h-3.5 w-3.5 stroke-[2.5]" />
-                  </button>
+                  <span>
+                    {dayjs(selectedDate).format("MMM D, YYYY")}
+                    {dayjs(selectedDate).isSame(dayjs(), "day") ? " (Today)" : ""}
+                  </span>
+                  {realActivities.length > 0 && (
+                    <button
+                      onClick={() => handleSelectDate(undefined)}
+                      className="ml-1 hover:text-orange-800 text-[#E75B28] cursor-pointer"
+                      title="View All Activities (Clear Date Filter)"
+                    >
+                      <X className="h-3.5 w-3.5 stroke-[2.5]" />
+                    </button>
+                  )}
                 </div>
-              )}
+              ) : latestAvailableActivityDate ? (
+                <button
+                  onClick={() => handleSelectDate(latestAvailableActivityDate)}
+                  className="flex items-center gap-1.5 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-[#FEEBD9] text-slate-600 hover:text-[#E75B28] px-3 py-1 rounded-full text-xs font-bold transition shadow-2xs cursor-pointer"
+                  title="Filter to Latest Activity"
+                >
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Latest:</span>
+                  <span>{dayjs(latestAvailableActivityDate).format("MMM D")}</span>
+                </button>
+              ) : null}
 
               {/* Filter Button (Opens Professional Modal) */}
               <button
@@ -628,9 +791,9 @@ const FlocksDetails = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {activities.map((act: ActivityItem) => {
                       const status = (act.status || act.current_tab || "ONGOING").toUpperCase();
-                      const actDateStr = act.start_date_time || act.created_at;
+                      const actDateStr = getActivityDateStr(act);
                       const formattedDate = actDateStr
-                        ? dayjs(actDateStr).format("ddd, MMM D")
+                        ? dayjs(actDateStr).format("ddd, MMM D, YYYY")
                         : "TBD";
                       const joinedCount = getMemberCount(act);
 
@@ -690,24 +853,53 @@ const FlocksDetails = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center py-16 text-slate-400 space-y-2 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+              <div className="text-center py-16 text-slate-400 space-y-3 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-6">
                 <PartyPopper className="h-8 w-8 text-slate-300 mx-auto" />
-                <p className="text-sm font-semibold text-slate-600">No activities found</p>
-                <p className="text-xs text-slate-400">
-                  {selectedDate
-                    ? `No activities scheduled on ${dayjs(selectedDate).format("MMM D, YYYY")}.`
+                <p className="text-sm font-semibold text-slate-700">No activities found</p>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  {realActivities.length === 0
+                    ? "This flock has no activities scheduled yet. Today's date is selected on the calendar so you can stay updated when new activities are posted!"
+                    : selectedDate
+                    ? `No activities scheduled on ${dayjs(selectedDate).format("MMM D, YYYY")}${
+                        dayjs(selectedDate).isSame(dayjs(), "day") ? " (Today)" : ""
+                      }.`
                     : activitySearchQuery || selectedStatusFilter !== "ALL"
-                    ? "No activities match your filter settings."
-                    : `No public activities listed in ${dayjs(calendarMonth).format("MMMM YYYY")}.`}
+                    ? "No activities match your current filter settings."
+                    : "No public activities available in this flock yet."}
                 </p>
-                {selectedDate && (
-                  <button
-                    onClick={() => setSelectedDate(undefined)}
-                    className="mt-2 text-xs font-bold text-[#E75B28] hover:underline cursor-pointer"
-                  >
-                    Clear Date Filter ({dayjs(calendarMonth).format("MMMM YYYY")})
-                  </button>
-                )}
+
+                {/* Helpful Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                  {selectedDate && latestAvailableActivityDate && !dayjs(selectedDate).isSame(latestAvailableActivityDate, "day") && (
+                    <button
+                      onClick={() => handleSelectDate(latestAvailableActivityDate)}
+                      className="px-4 py-2 text-xs font-bold bg-[#E75B28] text-white rounded-xl hover:bg-orange-600 transition shadow-xs cursor-pointer"
+                    >
+                      View Latest Activity ({dayjs(latestAvailableActivityDate).format("MMM D")})
+                    </button>
+                  )}
+
+                  {selectedDate && realActivities.length > 0 && (
+                    <button
+                      onClick={() => handleSelectDate(undefined)}
+                      className="px-4 py-2 text-xs font-bold border border-slate-200 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition shadow-2xs cursor-pointer"
+                    >
+                      View All Activities ({realActivities.length})
+                    </button>
+                  )}
+
+                  {(activitySearchQuery || selectedStatusFilter !== "ALL") && (
+                    <button
+                      onClick={() => {
+                        setActivitySearchQuery("");
+                        setSelectedStatusFilter("ALL");
+                      }}
+                      className="px-4 py-2 text-xs font-bold text-[#E75B28] hover:underline cursor-pointer"
+                    >
+                      Clear Search & Status Filters
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -782,7 +974,7 @@ const FlocksDetails = () => {
                 onClick={() => {
                   setSelectedStatusFilter("ALL");
                   setActivitySearchQuery("");
-                  setSelectedDate(undefined);
+                  handleSelectDate(undefined);
                 }}
                 className="flex-1 py-2.5 text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl cursor-pointer"
               >
