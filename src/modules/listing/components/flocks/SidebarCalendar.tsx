@@ -9,9 +9,19 @@ const CustomDayButton = (props: any) => {
   const { day, modifiers, className, ...buttonProps } = props;
 
   const modifierClasses: string[] = [];
-  if (modifiers.activity) modifierClasses.push("!bg-[#E8E5FF] !text-[#5B4EFF] font-bold rounded-full");
-  if (modifiers.selected) modifierClasses.push("!bg-[#E75B28] !text-white !font-extrabold rounded-full shadow-xs");
-  if (modifiers.today) modifierClasses.push("border border-[#E75B28]");
+  if (modifiers.selected) {
+    modifierClasses.push("!bg-[#E75B28] !text-white !font-extrabold rounded-full shadow-xs");
+    if (modifiers.today) {
+      modifierClasses.push("ring-2 ring-orange-300 ring-offset-1");
+    }
+  } else if (modifiers.activity) {
+    modifierClasses.push("!bg-[#E8E5FF] !text-[#5B4EFF] font-bold rounded-full");
+    if (modifiers.today) {
+      modifierClasses.push("ring-1 ring-[#E75B28]");
+    }
+  } else if (modifiers.today) {
+    modifierClasses.push("border border-slate-400 text-slate-800 font-bold rounded-full");
+  }
 
   const combinedClassName = [
     modifierClasses.join(" "),
@@ -55,9 +65,10 @@ const SidebarCalendar = ({
   onActionClick,
   onActivityClick,
 }: SidebarCalendarProps) => {
-  // Internal state if selectedDate is not controlled
+  // If onSelectDate is provided, component is controlled
+  const isControlled = onSelectDate !== undefined;
   const [internalSelected, setInternalSelected] = useState<Date | undefined>(new Date());
-  const selected = selectedDate !== undefined ? selectedDate : internalSelected;
+  const selected = isControlled ? selectedDate : internalSelected;
 
   const handleSelect = (date: Date | undefined) => {
     // Toggle: if clicking the already selected date, clear date filter
@@ -75,8 +86,9 @@ const SidebarCalendar = ({
   };
 
   // Month state (controlled by parent or internal)
+  const isMonthControlled = onMonthChange !== undefined;
   const [internalMonth, setInternalMonth] = useState<Date>(selected || monthDate || new Date());
-  const month = monthDate !== undefined ? monthDate : internalMonth;
+  const month = isMonthControlled && monthDate !== undefined ? monthDate : (monthDate || internalMonth);
 
   const handleMonthChange = (newMonth: Date) => {
     if (onMonthChange) {
@@ -133,15 +145,23 @@ const SidebarCalendar = ({
     const currentMonthNum = dayjs(month).month();
     const currentYearNum = dayjs(month).year();
 
-    return activities.filter((act) => {
-      const status = (act.status || act.current_tab || "").toLowerCase();
-      if (status === "draft") return false;
+    return activities
+      .filter((act) => {
+        const status = (act.status || act.current_tab || "").toLowerCase();
+        if (status === "draft") return false;
 
-      const dateStr = act.start_date_time || act.start_date || act.end_date_time || act.created_at;
-      if (!dateStr) return true;
-      const d = dayjs(dateStr);
-      return d.month() === currentMonthNum && d.year() === currentYearNum;
-    });
+        const dateStr = act.start_date_time || act.start_date || act.end_date_time || act.created_at;
+        if (!dateStr) return true;
+        const d = dayjs(dateStr);
+        return d.month() === currentMonthNum && d.year() === currentYearNum;
+      })
+      .sort((a, b) => {
+        const dateA = a.start_date_time || a.start_date || a.end_date_time || a.created_at;
+        const dateB = b.start_date_time || b.start_date || b.end_date_time || b.created_at;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dayjs(dateB).valueOf() - dayjs(dateA).valueOf();
+      });
   }, [selected, month, activities]);
 
   return (
@@ -206,6 +226,10 @@ const SidebarCalendar = ({
           <span className="h-3 w-3 rounded-full bg-[#E8E5FF] border border-[#5B4EFF]/30" />
           <span>Activity</span>
         </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-[#E75B28]" />
+          <span>Selected</span>
+        </div>
       </div>
 
       {/* EVENTS LIST */}
@@ -213,7 +237,9 @@ const SidebarCalendar = ({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-900 tracking-tight">
             {selected
-              ? `Events on ${dayjs(selected).format("MMM D, YYYY")}`
+              ? `Events on ${dayjs(selected).format("MMM D, YYYY")}${
+                  dayjs(selected).isSame(dayjs(), "day") ? " (Today)" : ""
+                }`
               : `Events in ${dayjs(month).format("MMMM YYYY")}`}
           </h3>
           {selected && (
@@ -260,11 +286,23 @@ const SidebarCalendar = ({
               );
             })
           ) : (
-            <p className="text-xs text-slate-400 font-medium py-2">
-              {selected
-                ? `No activities scheduled on ${dayjs(selected).format("MMM D, YYYY")}.`
-                : `No activities scheduled in ${dayjs(month).format("MMMM YYYY")}.`}
-            </p>
+            <div className="py-2 space-y-1.5">
+              <p className="text-xs text-slate-400 font-medium">
+                {selected
+                  ? dayjs(selected).isSame(dayjs(), "day")
+                    ? "No activities scheduled for today."
+                    : `No activities scheduled on ${dayjs(selected).format("MMM D, YYYY")}.`
+                  : `No activities scheduled in ${dayjs(month).format("MMMM YYYY")}.`}
+              </p>
+              {selected && (
+                <button
+                  onClick={() => handleSelect(undefined)}
+                  className="text-xs font-bold text-[#E75B28] hover:underline cursor-pointer block"
+                >
+                  Show all events in {dayjs(month).format("MMMM")}
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
