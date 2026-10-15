@@ -134,8 +134,9 @@ const ActivitiesDetails = () => {
     selected_activities?.is_private === true;
 
   const eventCanonicalPath = `/flocks/${encodeId(selected_activities?.flock_id || flockId || 1)}/activities/${encodeId(activityId)}/detail`;
-  const eventSeoTitle = `${actName} in ${actLocation} - Book Event Tickets Online | FlocknGo`;
-  const eventSeoDesc = `${actName} in ${actLocation}. ${actDesc.slice(0, 120).trim()}... Discover upcoming events in India and book event tickets online on FlocknGo.`;
+  const eventSeoTitle = `${actName} in ${actLocation} | FlocknGo`;
+  const eventSeoDesc = `${actName} in ${actLocation} by ${flockName}. ${actDesc.slice(0, 130).trim()}... Explore schedule, venue details, and participation info on FlocknGo.`;
+
 
   return (
     <div className="min-h-screen text-slate-800 flex flex-col font-sans pb-24 bg-[#F8FAFC]">
