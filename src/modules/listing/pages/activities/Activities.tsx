@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import NearbyActivities from "../../components/home/NearbyActivities";
 import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
+import { Icons } from "../../../../constants/icons";
 import ExploreActivitiesCard from "../../components/home/ExploreActivitiesCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
@@ -90,44 +91,44 @@ const Activities = () => {
   const activeLocation = searchParams.get("location") || "";
   const activeDate = searchParams.get("created_date") || "";
 
-  // Dynamic targeting aligned with FlocknGo primary, secondary, and location-specific keyword strategy
-  let pageTitle = "Upcoming Events in India | Activities Near Me & Things to Do | FlocknGo";
-  let pageDescription = "Explore upcoming events in India and activities near me. Find weekend activities, community events, workshops, and book event tickets online on FlocknGo.";
-  let pageH1 = "Upcoming Events in India & Activities Near Me";
+  // Descriptive metadata aligned with search intent and brand clarity
+  let pageTitle = "Upcoming Events & Activities in India | FlocknGo";
+  let pageDescription = "Discover upcoming events, weekend activities, creative workshops, and local gatherings across India. Browse schedules, explore venues, and join experiences on FlocknGo.";
+  let pageH1 = "Upcoming Events & Activities in India";
 
   if (activeLocation && activeInterest) {
     const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
     pageTitle = `${formattedInterest} Activities & Events in ${activeLocation} | FlocknGo`;
-    pageDescription = `Discover ${activeInterest} events and activities in ${activeLocation}. Find things to do this weekend, workshops, and book event tickets online.`;
+    pageDescription = `Discover ${activeInterest} events and activities in ${activeLocation}. Browse upcoming schedules, venues, and join local experiences on FlocknGo.`;
     pageH1 = `${formattedInterest} Events & Activities in ${activeLocation}`;
   } else if (activeLocation) {
-    pageTitle = `Upcoming Events in ${activeLocation} | Weekend Activities & Things to Do | FlocknGo`;
-    pageDescription = `Discover upcoming events in ${activeLocation}. Explore weekend activities, workshops, cultural events, and things to do in ${activeLocation}. Book event tickets online.`;
+    pageTitle = `Upcoming Events & Activities in ${activeLocation} | FlocknGo`;
+    pageDescription = `Discover upcoming events, weekend activities, and workshops in ${activeLocation}. Explore event schedules, venues, and connect with organizers on FlocknGo.`;
     pageH1 = `Upcoming Events & Activities in ${activeLocation}`;
   } else if (activeInterest) {
     const lowerInterest = activeInterest.toLowerCase();
     if (lowerInterest === "creative" || lowerInterest.includes("workshop") || lowerInterest.includes("art")) {
-      pageTitle = "Workshops Near Me | Creative & Hobby Classes | FlocknGo Events";
-      pageDescription = "Find creative workshops near me, hobby classes, and learning activities in India. Book event tickets online with FlocknGo.";
-      pageH1 = "Workshops & Creative Activities Near Me";
+      pageTitle = "Creative Workshops & Hobby Classes in India | FlocknGo";
+      pageDescription = "Discover creative workshops, pottery classes, art sessions, and learning activities across India. Connect with hosts and book your spot on FlocknGo.";
+      pageH1 = "Creative Workshops & Hobby Classes";
     } else if (lowerInterest === "fitness") {
-      pageTitle = "Fitness Activities Near Me | Group Workouts & Sports Events | FlocknGo";
-      pageDescription = "Discover fitness activities near me, group runs, yoga sessions, and sports meetups. Stay active with FlocknGo.";
-      pageH1 = "Fitness Activities & Sports Events Near Me";
+      pageTitle = "Fitness Activities & Sports Meetups in India | FlocknGo";
+      pageDescription = "Discover local fitness activities, morning yoga sessions, group runs, and sports meetups across India. Stay active with FlocknGo.";
+      pageH1 = "Fitness Activities & Sports Meetups";
     } else if (lowerInterest === "social") {
-      pageTitle = "Social Activities & Community Events Near Me | FlocknGo";
-      pageDescription = "Join social activities near me, local community events, and group meetups. Make new connections and attend events.";
-      pageH1 = "Social Activities & Community Gatherings Near Me";
+      pageTitle = "Social Activities & Community Gatherings in India | FlocknGo";
+      pageDescription = "Explore social gatherings, club meetups, and community hangouts across India. Meet like-minded people and attend events with FlocknGo.";
+      pageH1 = "Social Activities & Community Gatherings";
     } else {
       const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
-      pageTitle = `${formattedInterest} Events & Activities Near Me | FlocknGo`;
-      pageDescription = `Explore ${activeInterest} events and activities near you. Connect with local communities and book event tickets online.`;
-      pageH1 = `${formattedInterest} Events & Activities Near Me`;
+      pageTitle = `${formattedInterest} Events & Activities in India | FlocknGo`;
+      pageDescription = `Explore ${activeInterest} events, workshops, and gatherings across India. Connect with local communities on FlocknGo.`;
+      pageH1 = `${formattedInterest} Events & Activities`;
     }
   } else if (activeDate) {
-    pageTitle = "Events Happening Today & This Weekend Near Me | FlocknGo Events";
-    pageDescription = "Find events happening today, weekend activities near me, and things to do this weekend. Book event tickets online on FlocknGo.";
-    pageH1 = "Events Happening Today & This Weekend Near Me";
+    pageTitle = "Events Happening Today & This Weekend | FlocknGo";
+    pageDescription = "Find upcoming events and activities happening today or this weekend across India. Explore schedules and participate on FlocknGo.";
+    pageH1 = "Events Happening Today & This Weekend";
   }
 
   return (
@@ -238,6 +239,27 @@ const Activities = () => {
             </div>
           </>
         )}
+      </section>
+
+      {/* Featured Location Activities */}
+      <section className="mb-20 lg:mb-0 border-t border-slate-200/60 pt-8 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-primary-dark text-base sm:text-lg font-bold">
+              Looking for events in major cities?
+            </h2>
+            <p className="text-secondary/70 text-xs sm:text-sm">
+              Discover upcoming activities and weekend events by city.
+            </p>
+          </div>
+          <Link
+            to="/activities/location/mumbai"
+            className="from-btn02 to-btn01 inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-tr px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all duration-300 hover:scale-105 active:scale-95 w-fit"
+          >
+            <span>Explore Activities in Mumbai</span>
+            <Icons.rightArrow className="h-4 w-4 text-white" />
+          </Link>
+        </div>
       </section>
     </main>
   );

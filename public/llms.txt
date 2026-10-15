@@ -1,0 +1,33 @@
+# FlocknGo Events
+
+> Discover local community flocks, social groups, workshops, and upcoming activities in India.
+
+FlocknGo (https://events.flockngo.com) is an event and community discovery platform helping people explore interest-based social groups ("flocks"), attend scheduled activities, and connect with local organizers across India.
+
+## Key Sections
+
+- [Home](https://events.flockngo.com/): Discover nearby activities and featured communities.
+- [Communities & Flocks](https://events.flockngo.com/flocks): Explore interest-based social groups, clubs, and meetup communities.
+- [Activities & Events](https://events.flockngo.com/activities): Browse upcoming weekend events, workshops, treks, and social gatherings.
+
+## Featured City Hubs
+
+- [Communities in Pune](https://events.flockngo.com/flocks/location/pune): Active trekking, culture, crafts, and outdoor community flocks in Pune.
+- [Activities in Mumbai](https://events.flockngo.com/activities/location/mumbai): Upcoming activities, music sessions, and social events in Mumbai.
+
+## Supported Categories
+
+FlocknGo hosts activities and communities across diverse interests:
+- Adventure: Trekking, camping, cycling, outdoor trails, mountain escapes
+- Social: Meetups, community gatherings, club hangouts, campfire nights
+- Creative & Workshops: Art, pottery, crafts, design, hobby classes
+- Fitness & Sports: Group workouts, runs, cycling, yoga sessions
+- Music & Cultural: Acoustic jams, live performances, heritage tours
+- Tech & Learning: Developer meetups, hackathons, skill-building sessions
+- Culinary: Street food walks, dining experiences, cooking meetups
+
+## Participation & Information Access
+
+- Browsing public communities and activities is free.
+- Users can view event venues, dates, member counts, and organizers directly on detail pages.
+- RSVP or community membership can be initiated via the "Join Community" or "Join Activity" options.

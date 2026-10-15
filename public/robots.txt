@@ -29,5 +29,14 @@ Allow: /
 Disallow: /api/
 Disallow: /not-found
 
-Sitemap: https://events.flockngo.com/sitemap.xml
+User-agent: Applebot
+Allow: /
+Disallow: /api/
+Disallow: /not-found
 
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /not-found
+
+Sitemap: https://events.flockngo.com/sitemap.xml
