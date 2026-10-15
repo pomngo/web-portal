@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import InterestChips from "../../components/common/InterestChips";
 import { useState } from "react";
 import { ResponsiveCardListSkeleton, ResponsiveBentoFlockListSkeleton } from "../../../../components/common/HomeLoader";
+import { Icons } from "../../../../constants/icons";
 import CommunityFlocksCard from "../../components/home/CommunityFlocksCard";
 import TitleText from "../../../../components/common/TitleText";
 import GradientLinkButton from "../../../../components/common/GradientLinkButton";
@@ -92,24 +93,24 @@ const Flocks = () => {
   const isFlockFiltered = !!selectedFilter || !!searchParams.get("interest") || !!searchParams.get("location") || !!searchParams.get("created_date");
   const activeInterest = selectedFilter || searchParams.get("interest") || "";
   const activeLocation = searchParams.get("location") || "";
-  let pageTitle = "Community Events & Group Activities Near Me | FlocknGo";
-  let pageDescription = "Discover community events near me, local community activities, and social groups. Connect with like-minded people for group activities with FlocknGo.";
-  let pageH1 = "Community Groups & Group Activities Near Me";
+  let pageTitle = "Community Flocks & Social Groups in India | FlocknGo";
+  let pageDescription = "Discover active community flocks, interest-based clubs, and social groups across India. Connect with like-minded people and attend gatherings on FlocknGo.";
+  let pageH1 = "Community Flocks & Social Groups";
 
   if (activeLocation && activeInterest) {
     const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
-    pageTitle = `${formattedInterest} Community Groups & Activities in ${activeLocation} | FlocknGo`;
-    pageDescription = `Connect with ${activeInterest} community groups and social activities in ${activeLocation}. Join local clubs on FlocknGo.`;
-    pageH1 = `${formattedInterest} Community Groups in ${activeLocation}`;
+    pageTitle = `${formattedInterest} Communities & Groups in ${activeLocation} | FlocknGo`;
+    pageDescription = `Connect with ${activeInterest} community flocks and social clubs in ${activeLocation}. Join local groups and attend gatherings on FlocknGo.`;
+    pageH1 = `${formattedInterest} Communities & Groups in ${activeLocation}`;
   } else if (activeLocation) {
-    pageTitle = `Community Events & Groups in ${activeLocation} | FlocknGo`;
-    pageDescription = `Discover local community groups and social activities in ${activeLocation}. Connect with people near you on FlocknGo.`;
-    pageH1 = `Community Groups & Activities in ${activeLocation}`;
+    pageTitle = `Community Groups & Flocks in ${activeLocation} | FlocknGo`;
+    pageDescription = `Discover local community flocks, social clubs, and hobby groups in ${activeLocation}. Connect with organizers and members on FlocknGo.`;
+    pageH1 = `Community Groups & Flocks in ${activeLocation}`;
   } else if (activeInterest) {
     const formattedInterest = activeInterest.charAt(0).toUpperCase() + activeInterest.slice(1);
-    pageTitle = `${formattedInterest} Community Groups & Social Activities Near Me | FlocknGo`;
-    pageDescription = `Find ${activeInterest} groups and local community activities near you. Join clubs and connect on FlocknGo.`;
-    pageH1 = `${formattedInterest} Community Groups & Activities Near Me`;
+    pageTitle = `${formattedInterest} Communities & Social Groups | FlocknGo`;
+    pageDescription = `Find ${activeInterest} community flocks and interest groups across India. Connect with clubs and participate in activities on FlocknGo.`;
+    pageH1 = `${formattedInterest} Communities & Social Groups`;
   }
 
   return (
@@ -224,6 +225,27 @@ const Flocks = () => {
             </div>
           </>
         )}
+      </section>
+
+      {/* Featured Location Communities */}
+      <section className="border-t border-slate-200/60 pt-8 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-primary-dark text-base sm:text-lg font-bold">
+              Looking for local communities?
+            </h2>
+            <p className="text-secondary/70 text-xs sm:text-sm">
+              Discover active community groups and flocks by city.
+            </p>
+          </div>
+          <Link
+            to="/flocks/location/pune"
+            className="from-btn02 to-btn01 inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-tr px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all duration-300 hover:scale-105 active:scale-95 w-fit"
+          >
+            <span>Explore Communities in Pune</span>
+            <Icons.rightArrow className="h-4 w-4 text-white" />
+          </Link>
+        </div>
       </section>
     </main>
   );
