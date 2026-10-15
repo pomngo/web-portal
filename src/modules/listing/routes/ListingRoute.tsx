@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ListingScreen from "../components/ListingScreen";
 import HomeLoader from "../../../components/common/HomeLoader";
 import FlockDetailsLoader from "../../../components/common/FlockDetailsLoader";
@@ -13,6 +13,8 @@ const AllActivities = lazy(() => import("../pages/activities/AllActivities"));
 const FlocksDetails = lazy(() => import("../pages/flocks/FlocksDetails"));
 const ActivitiesDetails = lazy(() => import("../pages/activities/ActivitiesDetails"));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const FlocksLocationPage = lazy(() => import("../../../features/location-search/pages/FlocksLocationPage"));
+const ActivitiesLocationPage = lazy(() => import("../../../features/location-search/pages/ActivitiesLocationPage"));
 
 const ListingRoute = () => {
   return (
@@ -42,6 +44,24 @@ const ListingRoute = () => {
             </Suspense>
           }
         />
+        <Route
+          path="flocks/location/:location"
+          element={
+            <Suspense fallback={<HomeLoader type="all-flocks" />}>
+              <FlocksLocationPage />
+            </Suspense>
+          }
+        />
+        <Route path="flocks/location" element={<Navigate to="/flocks" replace />} />
+        <Route
+          path="activities/location/:location"
+          element={
+            <Suspense fallback={<HomeLoader type="all-activities" />}>
+              <ActivitiesLocationPage />
+            </Suspense>
+          }
+        />
+        <Route path="activities/location" element={<Navigate to="/activities" replace />} />
         <Route
           path="flocks/:search_by"
           element={
