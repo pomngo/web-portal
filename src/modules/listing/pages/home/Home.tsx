@@ -16,6 +16,34 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSyncFilters, evictFilterFromCache } from "../../../../utils/filter";
 import { encodeId } from "../../../../utils/idEncoder";
 
+const HOME_FAQS = [
+  {
+    question: "What is FlocknGo and how does it work?",
+    answer:
+      "FlocknGo is a community and event discovery platform in India. It connects people with local community flocks (interest-based clubs and social groups) and scheduled activities ranging from weekend treks and creative workshops to fitness runs and cultural gatherings.",
+  },
+  {
+    question: "How do I discover communities and events near me?",
+    answer:
+      "You can explore activities and communities directly on FlocknGo by selecting your city or using location-based search (such as Pune or Mumbai). You can also filter by interests like Adventure, Fitness, Social, Tech, Wellness, and Culinary to find experiences that match your passions.",
+  },
+  {
+    question: "Which cities in India are supported on FlocknGo?",
+    answer:
+      "FlocknGo features discoverable communities and activities across India, with active groups in major hubs including Pune, Mumbai, Bangalore, and Delhi NCR, as well as emerging outdoor and cultural destinations.",
+  },
+  {
+    question: "How can I join a community or attend an activity?",
+    answer:
+      "Browse any public community or activity listing on FlocknGo to review schedules, venue locations, and member details. Click 'Join Activity' or 'Join Community' to participate and connect directly with organizers and members.",
+  },
+  {
+    question: "Is FlocknGo free for visitors to discover events?",
+    answer:
+      "Yes, discovering local community flocks, browsing upcoming public activities, and exploring event schedules on FlocknGo is completely free.",
+  },
+];
+
 const Home = () => {
   useSyncFilters();
   const queryClient = useQueryClient();
@@ -124,6 +152,7 @@ const Home = () => {
         canonicalPath="/"
         domain="events"
         schemaType="WebSite"
+        schemaData={{ faqs: HOME_FAQS }}
       />
       <h1 className="sr-only">FlocknGo Events</h1>
       {/* Nearby Activities */}
@@ -262,6 +291,55 @@ const Home = () => {
             </div>
           </>
         )}
+      </section>
+
+      {/* Platform Overview & Frequently Asked Questions */}
+      <section className="hidden mb-20 lg:mb-8 border-t border-slate-200/60 pt-10">
+        <div className="mb-6">
+          <h2 className="text-primary-dark text-xl sm:text-2xl font-bold tracking-tight">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-secondary/70 text-xs sm:text-sm mt-1">
+            Everything you need to know about discovering communities and activities on FlocknGo.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 max-w-4xl">
+          {HOME_FAQS.map((faq, idx) => (
+            <details
+              key={idx}
+              className="group border border-slate-200/80 rounded-2xl p-4 sm:p-5 bg-white shadow-xs open:bg-orange-50/20 transition-all"
+            >
+              <summary className="flex cursor-pointer items-center justify-between font-semibold text-primary-dark text-sm sm:text-base list-none">
+                <span>{faq.question}</span>
+                <span className="text-btn01 transition-transform duration-200 group-open:rotate-180 text-xs ml-3">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-3 text-secondary/80 text-xs sm:text-sm leading-relaxed border-t border-slate-100 pt-3">
+                {faq.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+
+        {/* Popular Destination Links */}
+        <div className="mt-8 flex flex-wrap items-center gap-3 text-xs sm:text-sm text-secondary/70">
+          <span className="font-semibold text-primary-dark">Popular City Hubs:</span>
+          <Link
+            to="/flocks/location/pune"
+            className="text-btn01 hover:underline font-medium"
+          >
+            Communities in Pune
+          </Link>
+          <span>•</span>
+          <Link
+            to="/activities/location/mumbai"
+            className="text-btn01 hover:underline font-medium"
+          >
+            Activities in Mumbai
+          </Link>
+        </div>
       </section>
     </main>
   );
