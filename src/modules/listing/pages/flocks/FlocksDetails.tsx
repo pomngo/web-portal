@@ -21,7 +21,6 @@ import {
   PartyPopper,
 } from "lucide-react";
 import DetailsTopNav from "../../components/DetailsTopNav";
-import Footer from "../../components/Footer";
 import SidebarCalendar from "../../components/flocks/SidebarCalendar";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
