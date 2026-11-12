@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ListingScreen from "../components/ListingScreen";
 import HomeLoader from "../../../components/common/HomeLoader";
@@ -15,6 +15,13 @@ const ActivitiesDetails = lazy(() => import("../pages/activities/ActivitiesDetai
 const NotFound = lazy(() => import("../pages/NotFound"));
 const FlocksLocationPage = lazy(() => import("../../../features/location-search/pages/FlocksLocationPage"));
 const ActivitiesLocationPage = lazy(() => import("../../../features/location-search/pages/ActivitiesLocationPage"));
+
+const ExternalRedirect = ({ url }: { url: string }) => {
+  useEffect(() => {
+    window.location.replace(url);
+  }, [url]);
+  return null;
+};
 
 const ListingRoute = () => {
   return (
@@ -76,6 +83,12 @@ const ListingRoute = () => {
             <Suspense fallback={<HomeLoader type="all-activities" />}>
               <AllActivities />
             </Suspense>
+          }
+        />
+        <Route
+          path="about"
+          element={
+            <ExternalRedirect url="https://flockngo-story.vercel.app/" />
           }
         />
         <Route
