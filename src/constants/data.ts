@@ -1,6 +1,7 @@
 import CompassIcon from "../components/icons/CompassIcon";
 import HomeIcon from "../components/icons/HomeIcon";
 import UsersIcon from "../components/icons/UsersIcon";
+import AboutIcon from "../components/icons/AboutIcon";
 import { Icons } from "./icons";
 import type { CardType } from "../types";
 
@@ -81,6 +82,13 @@ export const navItems = [
     path: "/activities",
     matchPaths: ["/activities"],
     icon: UsersIcon,
+  },
+  {
+    name: "About",
+    path: "https://new.flockngo.com/",
+    matchPaths: ["/about"],
+    icon: AboutIcon,
+    isExternal: true,
   },
 ];
 
