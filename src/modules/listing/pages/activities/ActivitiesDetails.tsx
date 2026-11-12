@@ -13,6 +13,7 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import DetailsTopNav from "../../components/DetailsTopNav";
+import Footer from "../../components/Footer";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
 import SEOHead from "../../../../components/common/SEOHead";
@@ -137,6 +138,9 @@ const ActivitiesDetails = () => {
   const eventSeoTitle = `${actName} in ${actLocation} | FlocknGo`;
   const eventSeoDesc = `${actName} in ${actLocation} by ${flockName}. ${actDesc.slice(0, 130).trim()}... Explore schedule, venue details, and participation info on FlocknGo.`;
 
+  const rawMaxParticipants = selected_activities?.max_participants ?? actData?.max_participants ?? selected_activities?.max_size ?? actData?.max_size;
+  const isUnlimitedParticipants = !rawMaxParticipants || Number(rawMaxParticipants) >= 99999 || String(rawMaxParticipants).trim() === "999999" || String(rawMaxParticipants).toLowerCase() === "open to all";
+  const maxParticipantsDisplay = isUnlimitedParticipants ? "Unlimited" : rawMaxParticipants;
 
   return (
     <div className="min-h-screen text-slate-800 flex flex-col font-sans pb-24 bg-[#F8FAFC]">
@@ -161,7 +165,7 @@ const ActivitiesDetails = () => {
         }}
       />
       {/* Top Header Navbar */}
-      <DetailsTopNav />
+      {/* <DetailsTopNav /> */}
 
       {/* MOBILE FULL WIDTH COVER BANNER WITH INSIDE OVERLAY BACK BUTTON (< lg) */}
       <div className="relative w-full h-56 sm:h-72 overflow-hidden lg:hidden">
@@ -261,8 +265,8 @@ const ActivitiesDetails = () => {
                     {selected_activities?.end_date_time
                       ? dayjs(selected_activities.end_date_time).format("D ddd, MMM YYYY • h:mm A")
                       : selected_activities?.end_date
-                      ? dayjs(selected_activities.end_date).format("D ddd, MMM YYYY")
-                      : dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}
+                        ? dayjs(selected_activities.end_date).format("D ddd, MMM YYYY")
+                        : dayjs(selected_activities?.created_at).format("D ddd, MMM YYYY")}
                   </span>
                 </div>
 
@@ -375,7 +379,7 @@ const ActivitiesDetails = () => {
             <div>
               <span className="text-slate-400 text-xs font-semibold block">Max Participants</span>
               <p className="font-bold text-slate-800 text-sm sm:text-base mt-0.5">
-                {selected_activities?.max_participants || selected_activities?.max_size || "Open to all"}
+                {maxParticipantsDisplay}
               </p>
             </div>
           </div>
@@ -404,8 +408,8 @@ const ActivitiesDetails = () => {
                 {selected_activities?.end_date_time
                   ? dayjs(selected_activities.end_date_time).format("D MMM, h:mm A")
                   : selected_activities?.end_date
-                  ? dayjs(selected_activities.end_date).format("D MMM YYYY")
-                  : "TBD"}
+                    ? dayjs(selected_activities.end_date).format("D MMM YYYY")
+                    : "TBD"}
               </p>
             </div>
           </div>
