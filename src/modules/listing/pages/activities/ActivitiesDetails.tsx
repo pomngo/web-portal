@@ -13,7 +13,6 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import DetailsTopNav from "../../components/DetailsTopNav";
-import Footer from "../../components/Footer";
 import ActivityDetailsLoader from "../../../../components/common/ActivityDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
 import SEOHead from "../../../../components/common/SEOHead";
