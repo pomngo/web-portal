@@ -21,6 +21,7 @@ import {
   PartyPopper,
 } from "lucide-react";
 import DetailsTopNav from "../../components/DetailsTopNav";
+import Footer from "../../components/Footer";
 import SidebarCalendar from "../../components/flocks/SidebarCalendar";
 import FlockDetailsLoader from "../../../../components/common/FlockDetailsLoader";
 import ErrorState from "../../../../components/common/ErrorState";
@@ -167,7 +168,11 @@ const FlocksDetails = () => {
 
   // Show join prompt popup before any external redirect
   const handleActionClick = (label: string) => {
-    setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
+    if (label.toLowerCase().includes("join")) {
+      setJoinPopupMessage(`Join ${flockName} to connect with members and participate in exclusive activities.`);
+    } else {
+      setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
+    }
     setIsJoinPopupOpen(true);
   };
 
@@ -396,7 +401,7 @@ const FlocksDetails = () => {
         }}
       />
       {/* Top Header Navbar */}
-      <DetailsTopNav />
+      {/* <DetailsTopNav /> */}
 
       {/* MOBILE FULL WIDTH COVER BANNER WITH INSIDE OVERLAY ICONS (< lg) */}
       <div className="relative flex justify-center items-center w-full h-56 sm:h-72 overflow-hidden lg:hidden">
@@ -554,6 +559,17 @@ const FlocksDetails = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Action Buttons Row */}
+              <div className="flex items-center gap-4 pt-4 border-t border-slate-100/60">
+                <button
+                  onClick={() => handleActionClick("Join Flock")}
+                  className="from-btn01 to-btn02 bg-gradient-to-r text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4 stroke-[3]" />
+                  <span>Join Flock</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -610,6 +626,17 @@ const FlocksDetails = () => {
           </div>
         </div>
 
+        {/* Action Button for Mobile (< lg) */}
+        <div className="pt-2 border-t border-slate-100">
+          <button
+            onClick={() => handleActionClick("Join Flock")}
+            className="from-btn01 to-btn02 bg-gradient-to-r text-white font-bold text-xs w-full py-3 rounded-2xl shadow-md cursor-pointer text-center flex items-center justify-center gap-2 active:scale-95 transition-all"
+          >
+            <Plus className="h-4 w-4 stroke-[3]" />
+            <span>Join Flock</span>
+          </button>
+        </div>
+
         {/* 4 Quick Action Buttons for Mobile (< lg) directly below Social Links */}
         <div className="grid grid-cols-4 gap-2.5 pt-3 border-t border-slate-100">
           {quickLinks.map((item) => (
@@ -655,17 +682,15 @@ const FlocksDetails = () => {
           <div className="relative flex">
             <button
               onClick={() => setActiveMobileTab("activities")}
-              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold transition-colors duration-300 cursor-pointer ${
-                activeMobileTab === "activities" ? "text-[#E75B28]" : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold transition-colors duration-300 cursor-pointer ${activeMobileTab === "activities" ? "text-[#E75B28]" : "text-slate-500 hover:text-slate-800"
+                }`}
             >
               Activities ({filteredRealActivities.length})
             </button>
             <button
               onClick={() => setActiveMobileTab("calendar")}
-              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold transition-colors duration-300 cursor-pointer ${
-                activeMobileTab === "calendar" ? "text-[#E75B28]" : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex-1 py-3 text-center text-xs sm:text-sm font-bold transition-colors duration-300 cursor-pointer ${activeMobileTab === "calendar" ? "text-[#E75B28]" : "text-slate-500 hover:text-slate-800"
+                }`}
             >
               Calendar
             </button>
@@ -685,9 +710,8 @@ const FlocksDetails = () => {
         <div className="grid grid-cols-12 gap-8">
           {/* Left Column on Desktop (> lg): Calendar Sidebar (4 cols on lg) */}
           <div
-            className={`col-span-12 lg:col-span-4 ${
-              activeMobileTab === "calendar" ? "block" : "hidden lg:block"
-            } flex flex-col gap-6`}
+            className={`col-span-12 lg:col-span-4 ${activeMobileTab === "calendar" ? "block" : "hidden lg:block"
+              } flex flex-col gap-6`}
           >
             <div className="bg-white rounded-[24px] border border-slate-100 p-6 shadow-2xs space-y-4">
               <SidebarCalendar
@@ -704,9 +728,8 @@ const FlocksDetails = () => {
 
           {/* Right Column on Desktop (> lg): Activities Grid (8 cols on lg) */}
           <div
-            className={`col-span-12 lg:col-span-8 ${
-              activeMobileTab === "activities" ? "block" : "hidden lg:block"
-            } bg-white rounded-[24px] border border-slate-100 p-6 sm:p-8 shadow-2xs flex flex-col gap-6`}
+            className={`col-span-12 lg:col-span-8 ${activeMobileTab === "activities" ? "block" : "hidden lg:block"
+              } bg-white rounded-[24px] border border-slate-100 p-6 sm:p-8 shadow-2xs flex flex-col gap-6`}
           >
             {/* Top Bar: Search Input Box + Filter Button */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 gap-3">
@@ -763,11 +786,10 @@ const FlocksDetails = () => {
               {/* Filter Button (Opens Professional Modal) */}
               <button
                 onClick={() => setIsFilterModalOpen(true)}
-                className={`relative h-9 px-3.5 rounded-full border transition cursor-pointer flex items-center gap-2 text-xs font-bold shadow-2xs ${
-                  selectedStatusFilter !== "ALL" || activitySearchQuery || selectedDate
-                    ? "bg-[#E75B28] border-[#E75B28] text-white"
-                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-                }`}
+                className={`relative h-9 px-3.5 rounded-full border transition cursor-pointer flex items-center gap-2 text-xs font-bold shadow-2xs ${selectedStatusFilter !== "ALL" || activitySearchQuery || selectedDate
+                  ? "bg-[#E75B28] border-[#E75B28] text-white"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  }`}
                 title="Filter Activities"
               >
                 <SlidersHorizontal className="h-4 w-4 stroke-[2]" />
@@ -836,11 +858,10 @@ const FlocksDetails = () => {
 
                               {/* Status Badge */}
                               <span
-                                className={`inline-block font-extrabold text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                                  status === "DRAFT"
-                                    ? "bg-[#FFF0E6] text-[#E75B28]"
-                                    : "bg-[#E8E5FF] text-[#5B4EFF]"
-                                }`}
+                                className={`inline-block font-extrabold text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full ${status === "DRAFT"
+                                  ? "bg-[#FFF0E6] text-[#E75B28]"
+                                  : "bg-[#E8E5FF] text-[#5B4EFF]"
+                                  }`}
                               >
                                 {status}
                               </span>
@@ -860,12 +881,11 @@ const FlocksDetails = () => {
                   {realActivities.length === 0
                     ? "This flock has no activities scheduled yet. Today's date is selected on the calendar so you can stay updated when new activities are posted!"
                     : selectedDate
-                    ? `No activities scheduled on ${dayjs(selectedDate).format("MMM D, YYYY")}${
-                        dayjs(selectedDate).isSame(dayjs(), "day") ? " (Today)" : ""
+                      ? `No activities scheduled on ${dayjs(selectedDate).format("MMM D, YYYY")}${dayjs(selectedDate).isSame(dayjs(), "day") ? " (Today)" : ""
                       }.`
-                    : activitySearchQuery || selectedStatusFilter !== "ALL"
-                    ? "No activities match your current filter settings."
-                    : "No public activities available in this flock yet."}
+                      : activitySearchQuery || selectedStatusFilter !== "ALL"
+                        ? "No activities match your current filter settings."
+                        : "No public activities available in this flock yet."}
                 </p>
 
                 {/* Helpful Action Buttons */}
@@ -956,11 +976,10 @@ const FlocksDetails = () => {
                     <button
                       key={statusOpt}
                       onClick={() => setSelectedStatusFilter(statusOpt)}
-                      className={`py-2 px-3 rounded-xl text-xs font-bold transition border cursor-pointer ${
-                        selectedStatusFilter === statusOpt
-                          ? "bg-[#E75B28] border-[#E75B28] text-white shadow-2xs"
-                          : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                      }`}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold transition border cursor-pointer ${selectedStatusFilter === statusOpt
+                        ? "bg-[#E75B28] border-[#E75B28] text-white shadow-2xs"
+                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                        }`}
                     >
                       {statusOpt}
                     </button>
