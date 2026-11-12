@@ -18,6 +18,9 @@ const TopNav = () => {
 
   useEffect(() => {
     const activeIndex = navItems.findIndex((item) => {
+      if ((item as any).isExternal) {
+        return false;
+      }
       if (item.path === "/") {
         return location.pathname === "/";
       }
@@ -59,6 +62,30 @@ const TopNav = () => {
           <div className="relative hidden items-center gap-2 sm:flex">
             {navItems.map((item, index) => {
               const Icon = item.icon;
+              const isExternal = (item as any).isExternal;
+
+              if (isExternal) {
+                return (
+                  <a
+                    key={item.path}
+                    href={item.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ref={(el) => {
+                      navRefs.current[index] = el;
+                    }}
+                    className="group relative z-10 flex h-14 items-center justify-center rounded-full px-6 text-sm font-medium transition-all duration-300 text-secondary/70 hover:text-black cursor-pointer"
+                  >
+                    {Icon && (
+                      <Icon className="mr-2 h-5 w-5 transition-all duration-300 text-secondary/70 group-hover:text-btn01" />
+                    )}
+
+                    <span className="text-[12px] transition-all duration-300 sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] text-secondary/70 text-[15px] font-medium group-hover:text-black">
+                      {item.name}
+                    </span>
+                  </a>
+                );
+              }
 
               return (
                 <NavLink
