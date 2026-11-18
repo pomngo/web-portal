@@ -59,21 +59,15 @@ const AllFlocks = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useInfiniteFlocks(flockQueryString, 5);
+  } = useInfiniteFlocks(flockQueryString, 10);
 
   const flockList = data?.pages.flatMap((page) => page.items) || [];
 
   const filteredFlockList = flockList;
 
-  const skeletonCount = isFetchingNextPage
-    ? (filteredFlockList.length % 2 !== 0 ? 3 : 2)
-    : (hasNextPage && filteredFlockList.length % 2 !== 0 ? 1 : 0);
-
   const handleRetry = () => {
     refetch();
   };
-
-
 
   if (error && flockList.length === 0) {
     return (
@@ -102,8 +96,13 @@ const AllFlocks = () => {
           <InfiniteScroll
             dataLength={filteredFlockList.length}
             next={fetchNextPage}
-            hasMore={!!hasNextPage}
-            loader={null}
+            hasMore={Boolean(hasNextPage)}
+            scrollThreshold={0.8}
+            loader={
+              <div className="my-8 flex justify-center items-center py-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-200 border-t-[#E75B28]" />
+              </div>
+            }
             endMessage={
               <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more flocks are there.</p>
             }
@@ -114,9 +113,10 @@ const AllFlocks = () => {
                   <NearbyFlock flock={flock} />
                 </Link>
               ))}
-              {Array.from({ length: skeletonCount }).map((_, i) => (
-                <CardSkeleton key={`skeleton-${i}`} />
-              ))}
+              {isFetchingNextPage &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <CardSkeleton key={`skeleton-loading-${i}`} />
+                ))}
             </div>
           </InfiniteScroll>
         )}

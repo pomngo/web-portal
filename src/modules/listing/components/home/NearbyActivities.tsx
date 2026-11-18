@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 import { Icons } from "../../../../constants/icons";
 import { images } from "../../../../constants/images";
 import { ENDPOINTS } from "../../../../services/api/endpoints";
@@ -23,8 +23,6 @@ type NearbyActivitiesProps = {
 };
 
 const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
-  const [imageAspect, setImageAspect] = useState<"vertical" | "horizontal" | null>(null);
-
   const imageUrl = activity?.last_cover_image
     ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(activity.last_cover_image)
     : activity?.cover_image_s3key
@@ -38,41 +36,18 @@ const NearbyActivities = ({ activity }: NearbyActivitiesProps) => {
 
   return (
     <div className="group flex h-full w-full cursor-pointer flex-col justify-between gap-2 sm:gap-2.5 rounded-2xl bg-white p-2.5 sm:p-3 shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-98 border border-slate-100/90">
-      {/* Image Container with Ambient Backdrop */}
-      <div className="relative flex items-center justify-center h-36 xs:h-40 sm:h-48 w-full overflow-hidden rounded-xl sm:rounded-2xl bg-slate-900/5 backdrop-blur-xs">
-        {/* Soft Ambient Blur (eliminates blank empty bands around irregular images) */}
-        <img
-          src={imageUrl}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-125 select-none"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-black/5" />
-
-        {/* Main Image:
-            - If vertical: h-full w-auto (never w-full, preventing top/bottom cropping)
-            - If horizontal: w-full h-auto (never h-full, preventing side cropping)
-        */}
+      {/* Full Size Image on Card - Strictly Uniform Fixed Height & Width */}
+      <div className="relative h-28 xs:h-32 sm:h-48 w-full overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100">
         <img
           src={imageUrl}
           alt={activityName}
           loading="lazy"
           decoding="async"
-          onLoad={(e) => {
-            const { naturalWidth, naturalHeight } = e.currentTarget;
-            setImageAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
-          }}
           onError={(e) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
-          className={`relative z-10 transition-transform duration-300 group-hover:scale-105 ${
-            imageAspect === "vertical"
-              ? "h-full w-auto max-w-full object-contain mx-auto"
-              : imageAspect === "horizontal"
-              ? "w-full h-auto max-h-full object-contain my-auto"
-              : "max-h-full max-w-full object-contain"
-          }`}
+          className="h-full w-full object-cover rounded-xl sm:rounded-2xl transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 

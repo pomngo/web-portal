@@ -23,14 +23,10 @@ const ActivitiesLocationPage: React.FC = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useLocationActivities(norm.query, 6);
+  } = useLocationActivities(norm.query, 10);
 
   const activityList = data?.pages.flatMap((page) => page.items) || [];
   const isFallback = data?.pages.some((page) => page.isFallback) ?? false;
-
-  const skeletonCount = isFetchingNextPage
-    ? activityList.length % 2 !== 0 ? 3 : 2
-    : hasNextPage && activityList.length % 2 !== 0 ? 1 : 0;
 
   // SEO metadata calculation
   const seoTitle = isFallback
@@ -127,7 +123,12 @@ const ActivitiesLocationPage: React.FC = () => {
             dataLength={activityList.length}
             next={fetchNextPage}
             hasMore={Boolean(hasNextPage)}
-            loader={null}
+            scrollThreshold={0.8}
+            loader={
+              <div className="my-8 flex justify-center items-center py-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-200 border-t-[#E75B28]" />
+              </div>
+            }
             endMessage={
               <p className="text-secondary/70 my-8 py-4 text-center text-xs sm:text-sm font-medium">
                 {isFallback
@@ -145,9 +146,10 @@ const ActivitiesLocationPage: React.FC = () => {
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
-              {Array.from({ length: skeletonCount }).map((_, i) => (
-                <CardSkeleton key={`skeleton-${i}`} />
-              ))}
+              {isFetchingNextPage &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <CardSkeleton key={`skeleton-loading-${i}`} />
+                ))}
             </div>
           </InfiniteScroll>
         )}

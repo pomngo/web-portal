@@ -87,21 +87,15 @@ const AllActivities = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useInfiniteActivities(activityQueryString, 5);
+  } = useInfiniteActivities(activityQueryString, 10);
 
   const activityList = data?.pages.flatMap((page) => page.items) || [];
 
   const filteredActivityList = activityList;
 
-  const skeletonCount = isFetchingNextPage
-    ? (filteredActivityList.length % 2 !== 0 ? 3 : 2)
-    : (hasNextPage && filteredActivityList.length % 2 !== 0 ? 1 : 0);
-
   const handleRetry = () => {
     refetch();
   };
-
-
 
   if (error && activityList.length === 0) {
     return (
@@ -126,12 +120,17 @@ const AllActivities = () => {
 
         {loading && activityList.length === 0 ? (
           <HomeLoader type="all-activities" />
-         ) : (
+        ) : (
           <InfiniteScroll
             dataLength={filteredActivityList.length}
             next={fetchNextPage}
-            hasMore={!!hasNextPage}
-            loader={null}
+            hasMore={Boolean(hasNextPage)}
+            scrollThreshold={0.8}
+            loader={
+              <div className="my-8 flex justify-center items-center py-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-200 border-t-[#E75B28]" />
+              </div>
+            }
             endMessage={
               <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more activities to load.</p>
             }
@@ -142,9 +141,10 @@ const AllActivities = () => {
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
-              {Array.from({ length: skeletonCount }).map((_, i) => (
-                <CardSkeleton key={`skeleton-${i}`} />
-              ))}
+              {isFetchingNextPage &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <CardSkeleton key={`skeleton-loading-${i}`} />
+                ))}
             </div>
           </InfiniteScroll>
         )}
