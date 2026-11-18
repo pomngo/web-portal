@@ -31,6 +31,8 @@ const ActivitiesDetails = () => {
 
   const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
   const [joinPopupMessage, setJoinPopupMessage] = useState("");
+  const [coverAspect, setCoverAspect] = useState<"vertical" | "horizontal" | null>(null);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
 
   const handleActionClick = (label: string) => {
     setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
@@ -59,6 +61,9 @@ const ActivitiesDetails = () => {
   const actDesc =
     actData?.description ||
     "Join us for an exciting local community activity. Connect with members and enjoy the experience!";
+  const MAX_DESC_CHARS = 240;
+  const isLongDesc = actDesc.length > MAX_DESC_CHARS;
+  const displayDesc = isDescExpanded || !isLongDesc ? actDesc : `${actDesc.slice(0, MAX_DESC_CHARS).trim()}...`;
   const actLocation = getLocation(actData, "Location N/A");
   const actJoinedCount = getMemberCount(actData);
 
@@ -167,20 +172,18 @@ const ActivitiesDetails = () => {
       {/* <DetailsTopNav /> */}
 
       {/* MOBILE FULL WIDTH COVER BANNER WITH INSIDE OVERLAY BACK BUTTON (< lg) */}
-      <div className="relative w-full h-56 sm:h-72 overflow-hidden lg:hidden">
+      <div className="relative flex items-center justify-center w-full h-64 sm:h-80 overflow-hidden bg-slate-900/10 lg:hidden">
+        {/* Ambient Blur Backdrop */}
         <img
           src={coverImageUrl || images.default_flock_banner}
-          alt={actName}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            (e.target as HTMLImageElement).src = images.default_flock_banner;
-          }}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 select-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/20" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/30" />
 
         {/* Back Arrow Overlay inside banner */}
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-4 left-4 z-20">
           <button
             onClick={handleBack}
             className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition cursor-pointer text-white shadow-md"
@@ -189,6 +192,27 @@ const ActivitiesDetails = () => {
             <ChevronLeft className="h-5 w-5 stroke-[2.5]" />
           </button>
         </div>
+
+        {/* Main Cover Image */}
+        <img
+          src={coverImageUrl || images.default_flock_banner}
+          alt={actName}
+          onLoad={(e) => {
+            const { naturalWidth, naturalHeight } = e.currentTarget;
+            setCoverAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
+          }}
+          className={`relative z-10 transition-all duration-300 ${
+            coverAspect === "vertical"
+              ? "h-full w-auto max-w-full object-contain mx-auto"
+              : coverAspect === "horizontal"
+              ? "w-full h-auto max-h-full object-contain my-auto"
+              : "max-h-full max-w-full object-contain"
+          }`}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            (e.target as HTMLImageElement).src = images.default_flock_banner;
+          }}
+        />
       </div>
 
       {/* Hero Section Container for DESKTOP (Soft warm peach background #FFF6EE) */}
@@ -209,11 +233,30 @@ const ActivitiesDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Cover Image */}
             <div className="lg:col-span-6 xl:col-span-6">
-              <div className="relative rounded-[28px] overflow-hidden shadow-sm aspect-[1.4] sm:aspect-[1.5] w-full bg-orange-100">
+              <div className="relative flex items-center justify-center rounded-[28px] overflow-hidden shadow-sm aspect-[1.4] sm:aspect-[1.5] w-full bg-slate-900/5">
+                {/* Ambient Blur Backdrop */}
+                <img
+                  src={coverImageUrl || images.default_flock_banner}
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 select-none"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-black/5" />
+
                 <img
                   src={coverImageUrl || images.default_flock_banner}
                   alt={actName}
-                  className="w-full h-full object-cover"
+                  onLoad={(e) => {
+                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                    setCoverAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
+                  }}
+                  className={`relative z-10 transition-all duration-300 drop-shadow-sm ${
+                    coverAspect === "vertical"
+                      ? "h-full w-auto max-w-full object-contain mx-auto"
+                      : coverAspect === "horizontal"
+                      ? "w-full h-auto max-h-full object-contain my-auto"
+                      : "max-h-full max-w-full object-contain"
+                  }`}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     (e.target as HTMLImageElement).src = images.default_flock_banner;
@@ -244,10 +287,20 @@ const ActivitiesDetails = () => {
                 {actName}
               </h1>
 
-              {/* Description */}
-              <p className="text-[#555555] text-sm sm:text-base font-medium leading-relaxed max-w-xl">
-                {actDesc}
-              </p>
+              {/* Description with Expand/Collapse Text Protection */}
+              <div className="space-y-1.5 max-w-xl">
+                <p className="text-[#555555] text-sm sm:text-base font-medium leading-relaxed break-words">
+                  {displayDesc}
+                </p>
+                {isLongDesc && (
+                  <button
+                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                    className="text-[#E75B28] text-xs sm:text-sm font-bold hover:underline cursor-pointer transition inline-block pt-0.5"
+                  >
+                    {isDescExpanded ? "Show less" : "Read more"}
+                  </button>
+                )}
+              </div>
 
               {/* Activity Metadata Rows */}
               <div className="space-y-3 pt-3 text-sm font-semibold text-[#444444] border-t border-slate-100/60">
@@ -318,7 +371,17 @@ const ActivitiesDetails = () => {
       <div className="lg:hidden px-4 py-5 space-y-4 bg-white border-b border-slate-100">
         <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{actName}</h1>
 
-        <p className="text-slate-600 text-xs leading-relaxed">{actDesc}</p>
+        <div className="space-y-1">
+          <p className="text-slate-600 text-xs leading-relaxed break-words">{displayDesc}</p>
+          {isLongDesc && (
+            <button
+              onClick={() => setIsDescExpanded(!isDescExpanded)}
+              className="text-[#E75B28] text-xs font-bold hover:underline cursor-pointer transition inline-block pt-0.5"
+            >
+              {isDescExpanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </div>
 
         <div className="space-y-2 pt-2 text-xs font-semibold text-slate-700 border-t border-slate-100">
           <div className="flex items-center gap-2">

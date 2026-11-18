@@ -143,6 +143,8 @@ const FlocksDetails = () => {
   const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
   const [joinPopupMessage, setJoinPopupMessage] = useState("");
   const [activeMobileTab, setActiveMobileTab] = useState<"activities" | "calendar">("activities");
+  const [coverAspect, setCoverAspect] = useState<"vertical" | "horizontal" | null>(null);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [isInterestsModalOpen, setIsInterestsModalOpen] = useState(false);
 
   // Professional Filter Modal & Search Controls
@@ -194,6 +196,11 @@ const FlocksDetails = () => {
   const flockData = selected_flock?.flock_details || selected_flock?.result || selected_flock?.data || selected_flock;
   const flockName = getItemName(flockData, "Community Flock");
   const flockDescription = flockData?.description || "Welcome to our community flock! Connect with members and explore our activities.";
+  const MAX_FLOCK_DESC_CHARS = 240;
+  const isLongFlockDesc = flockDescription.length > MAX_FLOCK_DESC_CHARS;
+  const displayFlockDesc = isDescExpanded || !isLongFlockDesc
+    ? flockDescription
+    : `${flockDescription.slice(0, MAX_FLOCK_DESC_CHARS).trim()}...`;
   const flockLocation = getLocation(flockData, "Pune");
   const memberCount = getMemberCount(flockData);
 
@@ -403,7 +410,20 @@ const FlocksDetails = () => {
       {/* <DetailsTopNav /> */}
 
       {/* MOBILE FULL WIDTH COVER BANNER WITH INSIDE OVERLAY ICONS (< lg) */}
-      <div className="relative flex justify-center items-center w-full h-56 sm:h-72 overflow-hidden lg:hidden">
+      <div className="relative flex justify-center items-center w-full h-64 sm:h-80 overflow-hidden bg-slate-900/10 lg:hidden">
+        {/* Ambient Blur Backdrop */}
+        <img
+          src={
+            flockData?.cover_image_s3key
+              ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flockData.cover_image_s3key)
+              : images.default_flock_banner
+          }
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 select-none"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/30" />
+
         <img
           src={
             flockData?.cover_image_s3key
@@ -411,16 +431,25 @@ const FlocksDetails = () => {
               : images.default_flock_banner
           }
           alt={flockName}
-          className="h-full object-cover object-center"
+          onLoad={(e) => {
+            const { naturalWidth, naturalHeight } = e.currentTarget;
+            setCoverAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
+          }}
+          className={`relative z-10 transition-all duration-300 ${
+            coverAspect === "vertical"
+              ? "h-full w-auto max-w-full object-contain mx-auto"
+              : coverAspect === "horizontal"
+              ? "w-full h-auto max-h-full object-contain my-auto"
+              : "max-h-full max-w-full object-contain"
+          }`}
           onError={(e) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/20" />
 
         {/* Back and 3-Dot Options Overlay inside banner (Chat icon removed) */}
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
           <button
             onClick={handleBack}
             className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition cursor-pointer text-white shadow-md"
@@ -462,7 +491,20 @@ const FlocksDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Cover Image */}
             <div className="lg:col-span-6 xl:col-span-6">
-              <div className="relative rounded-[28px] overflow-hidden shadow-sm aspect-[16/9] w-full bg-slate-100 flex items-center justify-center">
+              <div className="relative flex items-center justify-center rounded-[28px] overflow-hidden shadow-sm aspect-[16/9] w-full bg-slate-900/5">
+                {/* Ambient Blur Backdrop */}
+                <img
+                  src={
+                    flockData?.cover_image_s3key
+                      ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flockData.cover_image_s3key)
+                      : images.default_flock_banner
+                  }
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 select-none"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-black/5" />
+
                 <img
                   src={
                     flockData?.cover_image_s3key
@@ -470,7 +512,17 @@ const FlocksDetails = () => {
                       : images.default_flock_banner
                   }
                   alt={flockName}
-                  className=" h-full object-cover object-center"
+                  onLoad={(e) => {
+                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                    setCoverAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
+                  }}
+                  className={`relative z-10 transition-all duration-300 drop-shadow-sm ${
+                    coverAspect === "vertical"
+                      ? "h-full w-auto max-w-full object-contain mx-auto"
+                      : coverAspect === "horizontal"
+                      ? "w-full h-auto max-h-full object-contain my-auto"
+                      : "max-h-full max-w-full object-contain"
+                  }`}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     (e.target as HTMLImageElement).src = images.default_flock_banner;
@@ -508,10 +560,20 @@ const FlocksDetails = () => {
                 {flockName}
               </h1>
 
-              {/* Description */}
-              <p className="text-[#555555] text-sm sm:text-base font-medium leading-relaxed max-w-xl">
-                {flockDescription}
-              </p>
+              {/* Description with Expand/Collapse Text Protection */}
+              <div className="space-y-1.5 max-w-xl">
+                <p className="text-[#555555] text-sm sm:text-base font-medium leading-relaxed break-words">
+                  {displayFlockDesc}
+                </p>
+                {isLongFlockDesc && (
+                  <button
+                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                    className="text-[#E75B28] text-xs sm:text-sm font-bold hover:underline cursor-pointer transition inline-block pt-0.5"
+                  >
+                    {isDescExpanded ? "Show less" : "Read more"}
+                  </button>
+                )}
+              </div>
 
               {/* Metadata List */}
               <div className="space-y-3 pt-3 text-sm font-semibold text-[#444444]">
@@ -597,7 +659,17 @@ const FlocksDetails = () => {
 
         <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{flockName}</h1>
 
-        <p className="text-slate-600 text-xs leading-relaxed">{flockDescription}</p>
+        <div className="space-y-1">
+          <p className="text-slate-600 text-xs leading-relaxed break-words">{displayFlockDesc}</p>
+          {isLongFlockDesc && (
+            <button
+              onClick={() => setIsDescExpanded(!isDescExpanded)}
+              className="text-[#E75B28] text-xs font-bold hover:underline cursor-pointer transition inline-block pt-0.5"
+            >
+              {isDescExpanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </div>
 
         <div className="space-y-2 pt-2 text-xs font-semibold text-slate-700 border-t border-slate-100">
           <div className="flex items-center justify-between">

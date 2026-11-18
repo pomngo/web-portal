@@ -154,20 +154,18 @@ const Flocks = () => {
           <EmptyState message="No nearby flocks found" />
         ) : (
           <>
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
-                <Link
-                  key={flock.id}
-                  to={`/flocks/${encodeId(flock.id)}/detail`}
-                  className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]"
-                >
-                  <NearbyFlock flock={flock} />
-                </Link>
+                <div key={flock.id} className="w-[210px] xs:w-[230px] sm:w-[250px] md:w-[260px] flex-shrink-0 snap-start">
+                  <Link to={`/flocks/${encodeId(flock.id)}/detail`}>
+                    <NearbyFlock flock={flock} />
+                  </Link>
+                </div>
               ))}
             </div>
 
             {/* Activities List */}
-            <div className="hidden gap-8 md:gap-4 lg:grid lg:grid-cols-5">
+            <div className="hidden gap-4 lg:grid lg:grid-cols-4 xl:grid-cols-5">
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
                 <Link key={flock.id} to={`/flocks/${encodeId(flock.id)}/detail`}>
                   <NearbyFlock flock={flock} />
@@ -209,9 +207,9 @@ const Flocks = () => {
         ) : (
           <>
             {/* Mobile Carousel */}
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:hidden">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto pb-2 md:hidden">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <div key={flock.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%]">
+                <div key={flock.id} className="w-[260px] xs:w-[280px] sm:w-[320px] flex-shrink-0 snap-start">
                   <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
                 </div>
               ))}
