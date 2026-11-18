@@ -92,10 +92,43 @@ const FlocksLocationPage: React.FC = () => {
         {isFallback ? `Community Flocks and Groups` : `Community Flocks in ${norm.displayName}`}
       </h1>
 
-      <section>
+      <section className="space-y-6">
         <PageHeader
           title={isFallback ? "Recommended Communities" : `Communities in ${norm.displayName}`}
         />
+
+        {/* City Location Hero Showcase */}
+        {!isFallback && (
+          <div className="rounded-3xl bg-gradient-to-r from-orange-50 via-white to-amber-50/50 p-6 sm:p-8 border border-orange-100 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-btn01 uppercase tracking-wider bg-orange-100/70 px-2.5 py-0.5 rounded-full">
+                  City Hub
+                </span>
+                <span className="text-xs font-semibold text-slate-500">📍 {norm.displayName}</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
+                Community Flocks in {norm.displayName}
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm max-w-xl">
+                Join active passion circles, hobby groups, and sports clubs meeting regularly across {norm.displayName}.
+              </p>
+            </div>
+
+            {/* Dual Mode Switcher Pill */}
+            <div className="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl w-fit shrink-0">
+              <Link
+                to={`/activities/location/${norm.canonicalSlug}`}
+                className="text-slate-500 hover:text-slate-800 font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl transition"
+              >
+                ⚡ Activities
+              </Link>
+              <span className="bg-white text-slate-800 shadow-xs font-bold text-xs sm:text-sm px-4 py-2 rounded-xl">
+                👥 Flocks ({flockList.length})
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Fallback Notice: Shown when backend returns fallback recommendations */}
         {isFallback && !isLoading && (

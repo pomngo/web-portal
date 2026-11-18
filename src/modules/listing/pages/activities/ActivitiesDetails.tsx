@@ -67,6 +67,13 @@ const ActivitiesDetails = () => {
   const actLocation = getLocation(actData, "Location N/A");
   const actJoinedCount = getMemberCount(actData);
 
+  const isFree = !actData?.price && !actData?.entry_fee;
+  const priceDisplay = isFree
+    ? "Free RSVP"
+    : (actData?.price && !isNaN(Number(actData?.price)))
+      ? `₹${actData.price}`
+      : actData?.price || actData?.entry_fee;
+
   const coverImageUrl =
     selected_activities?.cover_image?.[0] ||
     (selected_activities?.last_cover_image
@@ -218,14 +225,35 @@ const ActivitiesDetails = () => {
       {/* Hero Section Container for DESKTOP (Soft warm peach background #FFF6EE) */}
       <div className="hidden lg:block bg-[#FFF6EE] border-b border-[#FEEBD9] py-6 sm:py-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <div className="max-w-[1440px] mx-auto space-y-6">
-          {/* Desktop Back Action Row */}
+          {/* Desktop Breadcrumbs & Back Row */}
           <div className="flex items-center justify-between">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium">
+              <Link to="/" className="hover:text-btn01 transition">Home</Link>
+              <span>/</span>
+              <Link to="/activities" className="hover:text-btn01 transition">Activities</Link>
+              {flockName && (
+                <>
+                  <span>/</span>
+                  {flockId ? (
+                    <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:text-btn01 transition truncate max-w-[180px]">
+                      {flockName}
+                    </Link>
+                  ) : (
+                    <span className="truncate max-w-[180px]">{flockName}</span>
+                  )}
+                </>
+              )}
+              <span>/</span>
+              <span className="text-slate-800 font-semibold truncate max-w-[240px]">{actName}</span>
+            </nav>
+
             <button
               onClick={handleBack}
-              className="h-10 w-10 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center justify-center text-slate-700 transition cursor-pointer"
+              className="h-9 px-3.5 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center gap-1 text-xs font-semibold text-slate-700 transition cursor-pointer"
               title="Back"
             >
-              <ChevronLeft className="h-5 w-5 stroke-[2.5]" />
+              <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
+              <span>Back</span>
             </button>
           </div>
 
@@ -267,20 +295,26 @@ const ActivitiesDetails = () => {
 
             {/* Right Info Details */}
             <div className="lg:col-span-6 xl:col-span-6 space-y-4">
-              {/* Flock Name Context Badge Link */}
-              {flockName && (
-                <div className="flex items-center gap-2 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-3 py-1 rounded-full w-fit border border-[#FEEBD9]">
-                  <Users className="h-3.5 w-3.5 shrink-0 text-[#E75B28]" />
-                  {flockId ? (
-                    <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline flex items-center gap-1">
-                      <span className="text-slate-500 font-semibold"></span>
-                      <span className="font-extrabold text-[#E75B28]">{flockName}</span>
-                    </Link>
-                  ) : (
-                    <span> {flockName}</span>
-                  )}
-                </div>
-              )}
+              {/* Flock Name Context Badge Link & Price Tag */}
+              <div className="flex flex-wrap items-center gap-2">
+                {flockName && (
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-3 py-1 rounded-full w-fit border border-[#FEEBD9]">
+                    <Users className="h-3.5 w-3.5 shrink-0 text-[#E75B28]" />
+                    {flockId ? (
+                      <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline flex items-center gap-1">
+                        <span className="font-extrabold text-[#E75B28]">{flockName}</span>
+                      </Link>
+                    ) : (
+                      <span>{flockName}</span>
+                    )}
+                  </div>
+                )}
+                {priceDisplay && (
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    {priceDisplay}
+                  </span>
+                )}
+              </div>
 
               {/* Title */}
               <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
@@ -304,10 +338,22 @@ const ActivitiesDetails = () => {
 
               {/* Activity Metadata Rows */}
               <div className="space-y-3 pt-3 text-sm font-semibold text-[#444444] border-t border-slate-100/60">
-                {/* Location */}
-                <div className="flex items-center gap-2 text-slate-700">
-                  <MapPin className="h-4.5 w-4.5 text-[#E75B28] shrink-0" />
-                  <span>{actLocation}</span>
+                {/* Location with Directions link */}
+                <div className="flex items-center justify-between text-slate-700">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4.5 w-4.5 text-[#E75B28] shrink-0" />
+                    <span>{actLocation}</span>
+                  </div>
+                  {actLocation && actLocation !== "Location N/A" && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(actLocation)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold text-[#E75B28] hover:underline"
+                    >
+                      Directions ↗
+                    </a>
+                  )}
                 </div>
 
                 {/* Timing */}
@@ -369,6 +415,26 @@ const ActivitiesDetails = () => {
 
       {/* MOBILE INFO & METADATA SECTION (< lg) */}
       <div className="lg:hidden px-4 py-5 space-y-4 bg-white border-b border-slate-100">
+        <div className="flex flex-wrap items-center gap-2">
+          {flockName && (
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-2.5 py-0.5 rounded-full border border-[#FEEBD9]">
+              <Users className="h-3 w-3 shrink-0 text-[#E75B28]" />
+              {flockId ? (
+                <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline">
+                  <span className="font-bold text-[#E75B28]">{flockName}</span>
+                </Link>
+              ) : (
+                <span>{flockName}</span>
+              )}
+            </div>
+          )}
+          {priceDisplay && (
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {priceDisplay}
+            </span>
+          )}
+        </div>
+
         <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{actName}</h1>
 
         <div className="space-y-1">

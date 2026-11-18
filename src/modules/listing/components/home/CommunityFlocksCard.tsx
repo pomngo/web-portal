@@ -86,10 +86,20 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
       {/* Dark Animated Overlay */}
       <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/40 to-black/10 transition-all duration-500" />
 
+      {/* Floating Category Pill */}
+      <div className="absolute top-3 left-3 z-10 rounded-full bg-black/45 backdrop-blur-md px-2.5 py-0.5 text-[9px] sm:text-[10px] font-semibold text-white/95 shadow-xs border border-white/10">
+        Community Hub
+      </div>
+
       {/* Content */}
       <div className="relative z-10 flex h-full items-end p-3 sm:p-6 text-white w-full">
         <div className="flex flex-col w-full">
-          <h3 className="mb-1 sm:mb-2 text-sm sm:text-xl lg:text-2xl leading-tight font-bold line-clamp-1">{card?.name || card?.title}</h3>
+          <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+            <h3 className="text-sm sm:text-xl lg:text-2xl leading-tight font-bold line-clamp-1">{card?.name || card?.title}</h3>
+            <span className="inline-flex items-center justify-center h-4 w-4 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold shrink-0" title="Verified Community">
+              ✓
+            </span>
+          </div>
 
           {description && (
             <p className="text-shadow-primary text-white/90 mb-2 sm:mb-4 max-w-64 text-[11px] sm:text-xs lg:text-sm line-clamp-2 break-words">
@@ -104,9 +114,9 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
               e.stopPropagation();
               handleExternalRedirect(card?.dynamic_url || card?.invite_link);
             }}
-            className="from-btn02 to-btn01 text-white cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tl to-65% px-2.5 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-xs lg:text-sm font-bold shadow-lg transition-all duration-300 active:scale-95 w-fit"
+            className="from-btn02 to-btn01 text-white cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tl to-65% px-3 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-xs lg:text-sm font-bold shadow-md transition-all duration-300 hover:scale-105 active:scale-95 w-fit"
           >
-            Join Now
+            Join Community
           </button>
         </div>
       </div>

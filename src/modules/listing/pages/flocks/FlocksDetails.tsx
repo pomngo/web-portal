@@ -468,23 +468,34 @@ const FlocksDetails = () => {
       {/* Hero Section Container for DESKTOP (Soft warm peach background #FFF6EE) */}
       <div className="hidden lg:block bg-[#FFF6EE] border-b border-[#FEEBD9] py-6 sm:py-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <div className="max-w-[1440px] mx-auto space-y-6">
-          {/* Desktop Action Row (Chat icon removed) */}
+          {/* Desktop Breadcrumbs & Action Row */}
           <div className="flex items-center justify-between">
-            <button
-              onClick={handleBack}
-              className="h-10 w-10 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center justify-center text-slate-700 transition cursor-pointer"
-              title="Back to Flocks"
-            >
-              <ChevronLeft className="h-5 w-5 stroke-[2.5]" />
-            </button>
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium">
+              <Link to="/" className="hover:text-btn01 transition">Home</Link>
+              <span>/</span>
+              <Link to="/flocks" className="hover:text-btn01 transition">Flocks</Link>
+              <span>/</span>
+              <span className="text-slate-800 font-semibold truncate max-w-[260px]">{flockName}</span>
+            </nav>
 
-            <button
-              onClick={() => handleActionClick("Options")}
-              className="h-10 w-10 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center justify-center text-slate-700 transition cursor-pointer"
-              title="Options"
-            >
-              <MoreVertical className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleBack}
+                className="h-9 px-3.5 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center gap-1 text-xs font-semibold text-slate-700 transition cursor-pointer"
+                title="Back to Flocks"
+              >
+                <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
+                <span>Back</span>
+              </button>
+
+              <button
+                onClick={() => handleActionClick("Options")}
+                className="h-9 w-9 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center justify-center text-slate-700 transition cursor-pointer"
+                title="Options"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* Desktop Hero Grid (Left Cover Image, Right Info Details) */}
@@ -556,9 +567,14 @@ const FlocksDetails = () => {
               )}
 
               {/* Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
-                {flockName}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
+                  {flockName}
+                </h1>
+                <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-orange-100 text-[#EF7F23] text-xs font-bold shrink-0" title="Verified Community">
+                  ✓
+                </span>
+              </div>
 
               {/* Description with Expand/Collapse Text Protection */}
               <div className="space-y-1.5 max-w-xl">
@@ -657,7 +673,12 @@ const FlocksDetails = () => {
           </div>
         )}
 
-        <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{flockName}</h1>
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{flockName}</h1>
+          <span className="inline-flex items-center justify-center h-4 w-4 rounded-full bg-orange-100 text-[#EF7F23] text-[10px] font-bold shrink-0" title="Verified Community">
+            ✓
+          </span>
+        </div>
 
         <div className="space-y-1">
           <p className="text-slate-600 text-xs leading-relaxed break-words">{displayFlockDesc}</p>

@@ -159,7 +159,11 @@ const Home = () => {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
+            <span className="text-[10px] sm:text-xs font-bold tracking-wider text-btn01 uppercase">Local Hubs</span>
             <TitleText title={isFlockFiltered ? "Filtered Communities" : "Communities"} />
+            <p className="text-secondary text-xs sm:text-sm md:text-base mt-0.5">
+              Discover and join interest-based micro-communities meeting regularly.
+            </p>
           </div>
 
           <div>
@@ -203,8 +207,9 @@ const Home = () => {
         {/* Heading */}
         <div className="mb-4 flex justify-between">
           <div className="">
+            <span className="text-[10px] sm:text-xs font-bold tracking-wider text-btn01 uppercase">Happening Soon</span>
             <TitleText title={isActivityFiltered ? "Filtered Activities" : "Nearby Activities"} />
-            <p className="text-secondary text-base">Enable your location to get personalized results.</p>
+            <p className="text-secondary text-xs sm:text-sm md:text-base mt-0.5">Instant RSVP gatherings and activities happening near you.</p>
           </div>
           <div className="">
             <GradientLinkButton to="/activities/nearby-activities" />
@@ -252,12 +257,13 @@ const Home = () => {
       </section>
 
       {/* Explore Activities */}
-      <section className="mb-0">
+      <section className="mb-8 lg:mb-0">
         <div className="mb-4 flex justify-between">
           <div className="">
+            <span className="text-[10px] sm:text-xs font-bold tracking-wider text-btn01 uppercase">Discover</span>
             <TitleText title="Explore Activities" />
-            <p className="text-secondary text-xs sm:text-sm md:text-base">
-              Explore these amazing flocks and fetch your interest
+            <p className="text-secondary text-xs sm:text-sm md:text-base mt-0.5">
+              Explore diverse experiences and find activities matching your passions.
             </p>
           </div>
           <div className="">

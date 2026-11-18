@@ -8,6 +8,7 @@ import SEOHead from "../../../../components/common/SEOHead";
 import { useInfiniteFlocks } from "../../../../hooks/useFlocksQuery";
 import { useSyncFilters } from "../../../../utils/filter";
 import { encodeId } from "../../../../utils/idEncoder";
+import { handleExternalRedirect } from "../../../../constants/urls";
 
 const getFlockSlugMeta = (slug?: string) => {
   const s = (slug || "").toLowerCase();
@@ -89,6 +90,29 @@ const AllFlocks = () => {
       {/* Nearby Flocks */}
       <section className="">
         <PageHeader slug={search_by} />
+
+        {/* Creator Callout Promo Banner */}
+        <div className="mb-6 rounded-2xl bg-gradient-to-r from-orange-50 via-white to-amber-50/40 p-4 sm:p-5 border border-orange-100/90 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-1.5 text-[11px] font-bold text-btn01 uppercase tracking-wide">
+              <span>✨ Build Your Community</span>
+              <span className="text-slate-300">•</span>
+              <span className="text-slate-500 font-semibold normal-case">Zero platform fees for community gatherings</span>
+            </div>
+            <h2 className="text-slate-800 text-sm sm:text-base font-bold mt-0.5">
+              Love running, board games, or tech? Start your own Flock
+            </h2>
+            <p className="text-slate-500 text-xs sm:text-sm mt-0.5 max-w-xl">
+              Host recurring meetups, manage member RSVPs, and cultivate your local passion circle.
+            </p>
+          </div>
+          <button
+            onClick={() => handleExternalRedirect()}
+            className="from-btn02 to-btn01 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl bg-linear-to-tr shadow-xs hover:scale-105 active:scale-95 transition-all duration-300 shrink-0 cursor-pointer"
+          >
+            Start a Flock →
+          </button>
+        </div>
 
         {loading && flockList.length === 0 ? (
           <HomeLoader type="all-flocks" />

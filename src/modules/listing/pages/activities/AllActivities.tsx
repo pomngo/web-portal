@@ -118,6 +118,16 @@ const AllActivities = () => {
       <section className="">
         <PageHeader slug={search_by} />
 
+        {/* Discovery Subtitle & Counter */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 text-xs sm:text-sm text-slate-500">
+          <p>Discover spontaneous meetups, workshops, fitness runs, and gatherings hosted by trusted local flocks.</p>
+          {filteredActivityList.length > 0 && (
+            <span className="font-semibold text-btn01 bg-orange-50 px-2.5 py-1 rounded-full text-xs">
+              {filteredActivityList.length}+ gatherings
+            </span>
+          )}
+        </div>
+
         {loading && activityList.length === 0 ? (
           <HomeLoader type="all-activities" />
         ) : (
