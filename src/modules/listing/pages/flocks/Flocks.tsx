@@ -156,13 +156,11 @@ const Flocks = () => {
           <>
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
-                <Link
-                  key={flock.id}
-                  to={`/flocks/${encodeId(flock.id)}/detail`}
-                  className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]"
-                >
-                  <NearbyFlock flock={flock} />
-                </Link>
+                <div key={flock.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
+                  <Link to={`/flocks/${encodeId(flock.id)}/detail`}>
+                    <NearbyFlock flock={flock} />
+                  </Link>
+                </div>
               ))}
             </div>
 

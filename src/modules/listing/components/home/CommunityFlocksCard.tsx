@@ -91,10 +91,12 @@ const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFl
         <div className="flex flex-col w-full">
           <h3 className="mb-1 sm:mb-2 text-sm sm:text-xl lg:text-2xl leading-tight font-bold line-clamp-1">{card?.name || card?.title}</h3>
 
-          <p className="text-shadow-primary text-primary/80 mb-2 sm:mb-4 max-w-64 text-[11px] sm:text-xs lg:text-sm line-clamp-2">
-            {description.slice(0, 25).trim()}
-            {description.length > 0 && "..."}
-          </p>
+          {description && (
+            <p className="text-shadow-primary text-white/90 mb-2 sm:mb-4 max-w-64 text-[11px] sm:text-xs lg:text-sm line-clamp-2 break-words">
+              {description.slice(0, 80).trim()}
+              {description.length > 80 && "..."}
+            </p>
+          )}
 
           <button
             onClick={(e) => {
