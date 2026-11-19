@@ -138,7 +138,7 @@ const Home = () => {
   // Fallback Logic
   const isNearbyActivitiesFallback = nearbyActivities.some((act: any) => act.is_fallback);
   const filteredNearbyActivities = nearbyActivities;
-  
+
   const isCommunityFlocksFallback = flockList.some((flock: any) => flock.is_fallback);
   const filteredCommunityFlocks = flockList;
 
