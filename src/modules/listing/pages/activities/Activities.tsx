@@ -173,8 +173,8 @@ const Activities = () => {
           <>
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyActivities.map((activity) => (
-                <div key={activity.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
+                <div key={activity.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
+                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`} className="block h-full">
                     <NearbyActivities activity={activity} />
                   </Link>
                 </div>
@@ -221,8 +221,8 @@ const Activities = () => {
             {/* Mobile Carousel */}
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
-                <div key={activity.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
+                <div key={activity.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
+                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`} className="block h-full">
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>

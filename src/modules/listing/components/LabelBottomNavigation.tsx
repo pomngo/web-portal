@@ -130,7 +130,7 @@ export default function LabelBottomNavigation() {
                           : "text-secondary/70 font-medium"
                       }`}
                     >
-                      {item.name}
+                      {/* {item.name} */}
                     </span>
                   </div>
                 </NavLink>

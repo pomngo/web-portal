@@ -10,6 +10,8 @@ type NearbyFlockProps = {
     id: number;
     name?: string;
     location: string;
+    description?: string;
+    about?: string;
     member_count?: number;
     cover_image_s3key?: string | null;
     [key: string]: any;
@@ -17,36 +19,72 @@ type NearbyFlockProps = {
 };
 
 const NearbyFlock = ({ flock }: NearbyFlockProps) => {
+  const imageUrl = flock.cover_image_s3key
+    ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key)
+    : images.default_flock_banner;
+
+  const flockName = getItemName(flock, "Community Flock");
+  const location = getLocation(flock, "Pune");
+  const members = getMemberCount(flock);
+  const description = (flock?.description || flock?.about || "").trim();
+
   return (
-    <div className="flex w-full cursor-pointer flex-col gap-2 sm:gap-3 rounded-2xl bg-white p-2.5 sm:p-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 border border-slate-100/80">
-      {/* Image */}
-      <div className="h-28 xs:h-32 sm:h-52 w-full overflow-hidden rounded-xl sm:rounded-2xl">
+    <div className="group flex h-[270px] sm:h-[355px] w-full cursor-pointer flex-col justify-between rounded-2xl bg-white p-2.5 sm:p-3 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 active:scale-98 border border-slate-100/90">
+      {/* Full Size Image on Card - Strictly Uniform */}
+      <div className="relative h-28 sm:h-44 w-full shrink-0 overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100">
         <img
-          src={`${flock.cover_image_s3key ? ENDPOINTS.BASE_URL.BASE_IMAGE_URL(flock?.cover_image_s3key) : images.default_flock_banner}`}
-          alt={getItemName(flock)}
+          src={imageUrl}
+          alt={flockName}
           loading="lazy"
           decoding="async"
           onError={(e) => {
             e.currentTarget.onerror = null;
             (e.target as HTMLImageElement).src = images.default_flock_banner;
           }}
-          className="bg-primary-dark h-full w-full rounded-xl sm:rounded-2xl object-cover object-center transition-all duration-500 hover:scale-110"
+          className="h-full w-full object-cover rounded-xl sm:rounded-2xl transition-transform duration-500 group-hover:scale-105"
         />
+
+        {/* Floating Community Pill */}
+        <div className="absolute top-2 left-2 z-10 rounded-md bg-black/55 backdrop-blur-md px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-white shadow-xs">
+          Community
+        </div>
       </div>
 
       {/* Content */}
-      <div className="mt-0.5 sm:mt-1 flex flex-col gap-1">
-        <h2 className="line-clamp-1 text-xs sm:text-[16px] font-semibold">{getItemName(flock, "Community Flock")}</h2>
+      <div className="flex flex-1 flex-col justify-between overflow-hidden pt-1.5">
+        <div>
+          <span className="text-[10px] font-semibold text-[#EF7F23] truncate block max-w-full leading-none h-3 uppercase tracking-wider">
+            Community Hub
+          </span>
 
-        <p className="text-secondary flex items-center gap-1 text-[10px] sm:text-[12px] truncate">
-          <Icons.map className="h-3 w-3 sm:h-[14px] sm:w-[14px] flex-shrink-0" />
-          <span className="truncate">{getLocation(flock, "Pune")}</span>
-        </p>
+          <div className="flex items-center gap-1.5 h-4.5 sm:h-5 mt-0.5">
+            <h2
+              className="line-clamp-1 text-xs sm:text-[14px] font-bold text-slate-800 transition-colors group-hover:text-btn01 leading-snug"
+              title={flockName}
+            >
+              {flockName}
+            </h2>
+            <span className="inline-flex items-center justify-center h-3.5 w-3.5 rounded-full bg-orange-100 text-[#EF7F23] text-[9px] font-bold shrink-0" title="Verified Flock">
+              ✓
+            </span>
+          </div>
 
-        <p className="text-secondary flex items-center gap-1 text-[10px] sm:text-[12px]">
-          <Icons.users className="h-3 w-3 sm:h-[14px] sm:w-[14px] flex-shrink-0" />
-          <span>{getMemberCount(flock)} members</span>
-        </p>
+          <p className="mt-0.5 line-clamp-2 text-[10px] sm:text-[11px] text-slate-500 leading-snug break-words h-7 sm:h-8">
+            {description ? (description.length > 70 ? `${description.slice(0, 70)}...` : description) : "\u00A0"}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-100/70 text-[10px] sm:text-[11px] text-slate-500 h-5 shrink-0">
+          <p className="flex items-center gap-1 truncate max-w-[55%]">
+            <Icons.map className="h-3 w-3 sm:h-[13px] sm:w-[13px] text-[#EF7F23] shrink-0" />
+            <span className="truncate">{location}</span>
+          </p>
+
+          <p className="flex items-center gap-1 shrink-0">
+            <Icons.users className="h-3 w-3 sm:h-[13px] sm:w-[13px] text-[#EF7F23] shrink-0" />
+            <span>{members}</span>
+          </p>
+        </div>
       </div>
 
       {/* Button */}
@@ -56,7 +94,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
           e.stopPropagation();
           handleExternalRedirect(flock?.dynamic_url || flock?.invite_link);
         }}
-        className="from-btn02 to-btn01 text-primary font-semibold text-[11px] sm:text-sm mt-1.5 sm:mt-3 w-full cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2.5 py-1.5 sm:px-5 sm:py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95"
+        className="from-btn02 to-btn01 text-white font-semibold text-[11px] sm:text-xs h-7 sm:h-8 shrink-0 mt-1 w-full flex items-center justify-center cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
       >
         Join Now
       </button>
