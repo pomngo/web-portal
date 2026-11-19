@@ -5,32 +5,32 @@ type HomeLoaderProps = {
 };
 
 export const CardSkeleton = () => (
-  <div className="flex w-full flex-col gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-white p-2.5 sm:p-3 shadow-xs">
-    <Skeleton variant="rounded" width="100%" className="h-28 xs:h-32 sm:h-52" sx={{ borderRadius: "16px" }} />
+  <div className="flex w-full h-[270px] sm:h-[355px] flex-col justify-between gap-2 sm:gap-2.5 rounded-2xl border border-slate-100 bg-white p-2.5 sm:p-3 shadow-xs">
+    <Skeleton variant="rounded" width="100%" className="h-28 sm:h-44 shrink-0" sx={{ borderRadius: "16px" }} />
 
-    <div className="mt-0.5 sm:mt-1 flex flex-col gap-1 sm:gap-2">
-      <Skeleton variant="text" width="80%" height={20} />
-      <div className="flex items-center gap-1.5">
-        <Skeleton variant="circular" width={12} height={12} />
-        <Skeleton variant="text" width="50%" height={14} />
+    <div className="flex flex-1 flex-col justify-between overflow-hidden pt-1.5">
+      <div>
+        <Skeleton variant="text" width="40%" height={12} />
+        <Skeleton variant="text" width="85%" height={18} />
+        <Skeleton variant="text" width="95%" height={14} />
       </div>
-      <div className="flex items-center gap-1.5">
-        <Skeleton variant="circular" width={12} height={12} />
-        <Skeleton variant="text" width="40%" height={14} />
+      <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-100/70">
+        <Skeleton variant="text" width="45%" height={14} />
+        <Skeleton variant="text" width="35%" height={14} />
       </div>
     </div>
 
-    <Skeleton variant="rounded" width="100%" height={32} sx={{ borderRadius: "10px" }} />
+    <Skeleton variant="rounded" width="100%" height={28} sx={{ borderRadius: "8px" }} />
   </div>
 );
 
 const BentoFlockCardSkeleton = ({ index }: { index: number }) => {
   const cardClasses = {
-    1: "col-span-1 sm:col-span-2 lg:col-span-4 lg:row-span-2 h-[210px] sm:h-[300px] lg:h-[370px]",
-    2: "col-span-1 lg:col-span-3 h-[210px] sm:h-[300px] lg:h-[170px]",
-    3: "col-span-1 lg:col-span-3 h-[210px] sm:h-[300px] lg:h-[170px]",
-    4: "col-span-1 sm:col-span-1 lg:col-span-2 lg:row-span-2 h-[210px] sm:h-[300px] lg:h-[370px]",
-    5: "col-span-1 sm:col-span-2 lg:col-span-6 h-[210px] sm:h-[300px] lg:h-[170px]",
+    1: "col-span-1 sm:col-span-2 lg:col-span-4 lg:row-span-2 h-[270px] sm:h-[355px] lg:h-[370px]",
+    2: "col-span-1 lg:col-span-3 h-[270px] sm:h-[355px] lg:h-[170px]",
+    3: "col-span-1 lg:col-span-3 h-[270px] sm:h-[355px] lg:h-[170px]",
+    4: "col-span-1 sm:col-span-1 lg:col-span-2 lg:row-span-2 h-[270px] sm:h-[355px] lg:h-[370px]",
+    5: "col-span-1 sm:col-span-2 lg:col-span-6 h-[270px] sm:h-[355px] lg:h-[170px]",
   };
   const classKey = ((index % 5) + 1) as 1 | 2 | 3 | 4 | 5;
   const classes = cardClasses[classKey] ?? "";
@@ -71,7 +71,7 @@ export const ResponsiveCardListSkeleton = () => (
   <>
     <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
       {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
+        <div key={index} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
           <CardSkeleton />
         </div>
       ))}
@@ -89,7 +89,7 @@ export const ResponsiveBentoFlockListSkeleton = () => (
   <>
     <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
       {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className="h-[210px] sm:h-[300px] lg:h-[370px] min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%]">
+        <div key={index} className="h-[270px] sm:h-[355px] w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
           <BentoFlockCardSkeleton index={index} />
         </div>
       ))}

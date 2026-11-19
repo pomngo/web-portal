@@ -31,6 +31,8 @@ const ActivitiesDetails = () => {
 
   const [isJoinPopupOpen, setIsJoinPopupOpen] = useState(false);
   const [joinPopupMessage, setJoinPopupMessage] = useState("");
+  const [coverAspect, setCoverAspect] = useState<"vertical" | "horizontal" | null>(null);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
 
   const handleActionClick = (label: string) => {
     setJoinPopupMessage(`Join us first then you can see ${label.toLowerCase()} and all things`);
@@ -59,8 +61,18 @@ const ActivitiesDetails = () => {
   const actDesc =
     actData?.description ||
     "Join us for an exciting local community activity. Connect with members and enjoy the experience!";
+  const MAX_DESC_CHARS = 240;
+  const isLongDesc = actDesc.length > MAX_DESC_CHARS;
+  const displayDesc = isDescExpanded || !isLongDesc ? actDesc : `${actDesc.slice(0, MAX_DESC_CHARS).trim()}...`;
   const actLocation = getLocation(actData, "Location N/A");
   const actJoinedCount = getMemberCount(actData);
+
+  const isFree = !actData?.price && !actData?.entry_fee;
+  const priceDisplay = isFree
+    ? "Free RSVP"
+    : (actData?.price && !isNaN(Number(actData?.price)))
+      ? `₹${actData.price}`
+      : actData?.price || actData?.entry_fee;
 
   const coverImageUrl =
     selected_activities?.cover_image?.[0] ||
@@ -167,20 +179,18 @@ const ActivitiesDetails = () => {
       {/* <DetailsTopNav /> */}
 
       {/* MOBILE FULL WIDTH COVER BANNER WITH INSIDE OVERLAY BACK BUTTON (< lg) */}
-      <div className="relative w-full h-56 sm:h-72 overflow-hidden lg:hidden">
+      <div className="relative flex items-center justify-center w-full h-64 sm:h-80 overflow-hidden bg-slate-900/10 lg:hidden">
+        {/* Ambient Blur Backdrop */}
         <img
           src={coverImageUrl || images.default_flock_banner}
-          alt={actName}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            (e.target as HTMLImageElement).src = images.default_flock_banner;
-          }}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 select-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/20" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/30" />
 
         {/* Back Arrow Overlay inside banner */}
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-4 left-4 z-20">
           <button
             onClick={handleBack}
             className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition cursor-pointer text-white shadow-md"
@@ -189,19 +199,61 @@ const ActivitiesDetails = () => {
             <ChevronLeft className="h-5 w-5 stroke-[2.5]" />
           </button>
         </div>
+
+        {/* Main Cover Image */}
+        <img
+          src={coverImageUrl || images.default_flock_banner}
+          alt={actName}
+          onLoad={(e) => {
+            const { naturalWidth, naturalHeight } = e.currentTarget;
+            setCoverAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
+          }}
+          className={`relative z-10 transition-all duration-300 ${
+            coverAspect === "vertical"
+              ? "h-full w-auto max-w-full object-contain mx-auto"
+              : coverAspect === "horizontal"
+              ? "w-full h-auto max-h-full object-contain my-auto"
+              : "max-h-full max-w-full object-contain"
+          }`}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            (e.target as HTMLImageElement).src = images.default_flock_banner;
+          }}
+        />
       </div>
 
       {/* Hero Section Container for DESKTOP (Soft warm peach background #FFF6EE) */}
       <div className="hidden lg:block bg-[#FFF6EE] border-b border-[#FEEBD9] py-6 sm:py-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <div className="max-w-[1440px] mx-auto space-y-6">
-          {/* Desktop Back Action Row */}
+          {/* Desktop Breadcrumbs & Back Row */}
           <div className="flex items-center justify-between">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium">
+              <Link to="/" className="hover:text-btn01 transition">Home</Link>
+              <span>/</span>
+              <Link to="/activities" className="hover:text-btn01 transition">Activities</Link>
+              {flockName && (
+                <>
+                  <span>/</span>
+                  {flockId ? (
+                    <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:text-btn01 transition truncate max-w-[180px]">
+                      {flockName}
+                    </Link>
+                  ) : (
+                    <span className="truncate max-w-[180px]">{flockName}</span>
+                  )}
+                </>
+              )}
+              <span>/</span>
+              <span className="text-slate-800 font-semibold truncate max-w-[240px]">{actName}</span>
+            </nav>
+
             <button
               onClick={handleBack}
-              className="h-10 w-10 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center justify-center text-slate-700 transition cursor-pointer"
+              className="h-9 px-3.5 rounded-full bg-[#EFECE8] hover:bg-[#E2DFDA] flex items-center gap-1 text-xs font-semibold text-slate-700 transition cursor-pointer"
               title="Back"
             >
-              <ChevronLeft className="h-5 w-5 stroke-[2.5]" />
+              <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
+              <span>Back</span>
             </button>
           </div>
 
@@ -209,11 +261,30 @@ const ActivitiesDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Cover Image */}
             <div className="lg:col-span-6 xl:col-span-6">
-              <div className="relative rounded-[28px] overflow-hidden shadow-sm aspect-[1.4] sm:aspect-[1.5] w-full bg-orange-100">
+              <div className="relative flex items-center justify-center rounded-[28px] overflow-hidden shadow-sm aspect-[1.4] sm:aspect-[1.5] w-full bg-slate-900/5">
+                {/* Ambient Blur Backdrop */}
+                <img
+                  src={coverImageUrl || images.default_flock_banner}
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 select-none"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-black/5" />
+
                 <img
                   src={coverImageUrl || images.default_flock_banner}
                   alt={actName}
-                  className="w-full h-full object-cover"
+                  onLoad={(e) => {
+                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                    setCoverAspect(naturalHeight > naturalWidth ? "vertical" : "horizontal");
+                  }}
+                  className={`relative z-10 transition-all duration-300 drop-shadow-sm ${
+                    coverAspect === "vertical"
+                      ? "h-full w-auto max-w-full object-contain mx-auto"
+                      : coverAspect === "horizontal"
+                      ? "w-full h-auto max-h-full object-contain my-auto"
+                      : "max-h-full max-w-full object-contain"
+                  }`}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     (e.target as HTMLImageElement).src = images.default_flock_banner;
@@ -224,37 +295,65 @@ const ActivitiesDetails = () => {
 
             {/* Right Info Details */}
             <div className="lg:col-span-6 xl:col-span-6 space-y-4">
-              {/* Flock Name Context Badge Link */}
-              {flockName && (
-                <div className="flex items-center gap-2 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-3 py-1 rounded-full w-fit border border-[#FEEBD9]">
-                  <Users className="h-3.5 w-3.5 shrink-0 text-[#E75B28]" />
-                  {flockId ? (
-                    <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline flex items-center gap-1">
-                      <span className="text-slate-500 font-semibold"></span>
-                      <span className="font-extrabold text-[#E75B28]">{flockName}</span>
-                    </Link>
-                  ) : (
-                    <span> {flockName}</span>
-                  )}
-                </div>
-              )}
+              {/* Flock Name Context Badge Link & Price Tag */}
+              <div className="flex flex-wrap items-center gap-2">
+                {flockName && (
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-3 py-1 rounded-full w-fit border border-[#FEEBD9]">
+                    <Users className="h-3.5 w-3.5 shrink-0 text-[#E75B28]" />
+                    {flockId ? (
+                      <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline flex items-center gap-1">
+                        <span className="font-extrabold text-[#E75B28]">{flockName}</span>
+                      </Link>
+                    ) : (
+                      <span>{flockName}</span>
+                    )}
+                  </div>
+                )}
+                {priceDisplay && (
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    {priceDisplay}
+                  </span>
+                )}
+              </div>
 
               {/* Title */}
               <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
                 {actName}
               </h1>
 
-              {/* Description */}
-              <p className="text-[#555555] text-sm sm:text-base font-medium leading-relaxed max-w-xl">
-                {actDesc}
-              </p>
+              {/* Description with Expand/Collapse Text Protection */}
+              <div className="space-y-1.5 max-w-xl">
+                <p className="text-[#555555] text-sm sm:text-base font-medium leading-relaxed break-words">
+                  {displayDesc}
+                </p>
+                {isLongDesc && (
+                  <button
+                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                    className="text-[#E75B28] text-xs sm:text-sm font-bold hover:underline cursor-pointer transition inline-block pt-0.5"
+                  >
+                    {isDescExpanded ? "Show less" : "Read more"}
+                  </button>
+                )}
+              </div>
 
               {/* Activity Metadata Rows */}
               <div className="space-y-3 pt-3 text-sm font-semibold text-[#444444] border-t border-slate-100/60">
-                {/* Location */}
-                <div className="flex items-center gap-2 text-slate-700">
-                  <MapPin className="h-4.5 w-4.5 text-[#E75B28] shrink-0" />
-                  <span>{actLocation}</span>
+                {/* Location with Directions link */}
+                <div className="flex items-center justify-between text-slate-700">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4.5 w-4.5 text-[#E75B28] shrink-0" />
+                    <span>{actLocation}</span>
+                  </div>
+                  {actLocation && actLocation !== "Location N/A" && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(actLocation)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold text-[#E75B28] hover:underline"
+                    >
+                      Directions ↗
+                    </a>
+                  )}
                 </div>
 
                 {/* Timing */}
@@ -316,9 +415,39 @@ const ActivitiesDetails = () => {
 
       {/* MOBILE INFO & METADATA SECTION (< lg) */}
       <div className="lg:hidden px-4 py-5 space-y-4 bg-white border-b border-slate-100">
+        <div className="flex flex-wrap items-center gap-2">
+          {flockName && (
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#E75B28] bg-orange-50/90 px-2.5 py-0.5 rounded-full border border-[#FEEBD9]">
+              <Users className="h-3 w-3 shrink-0 text-[#E75B28]" />
+              {flockId ? (
+                <Link to={`/flocks/${encodeId(flockId)}/detail`} className="hover:underline">
+                  <span className="font-bold text-[#E75B28]">{flockName}</span>
+                </Link>
+              ) : (
+                <span>{flockName}</span>
+              )}
+            </div>
+          )}
+          {priceDisplay && (
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {priceDisplay}
+            </span>
+          )}
+        </div>
+
         <h1 className="text-2xl font-bold text-[#222222] tracking-tight">{actName}</h1>
 
-        <p className="text-slate-600 text-xs leading-relaxed">{actDesc}</p>
+        <div className="space-y-1">
+          <p className="text-slate-600 text-xs leading-relaxed break-words">{displayDesc}</p>
+          {isLongDesc && (
+            <button
+              onClick={() => setIsDescExpanded(!isDescExpanded)}
+              className="text-[#E75B28] text-xs font-bold hover:underline cursor-pointer transition inline-block pt-0.5"
+            >
+              {isDescExpanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </div>
 
         <div className="space-y-2 pt-2 text-xs font-semibold text-slate-700 border-t border-slate-100">
           <div className="flex items-center gap-2">

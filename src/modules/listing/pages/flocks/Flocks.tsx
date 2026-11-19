@@ -156,13 +156,11 @@ const Flocks = () => {
           <>
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyFlocks.slice(0, 5).map((flock) => (
-                <Link
-                  key={flock.id}
-                  to={`/flocks/${encodeId(flock.id)}/detail`}
-                  className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]"
-                >
-                  <NearbyFlock flock={flock} />
-                </Link>
+                <div key={flock.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
+                  <Link to={`/flocks/${encodeId(flock.id)}/detail`} className="block h-full">
+                    <NearbyFlock flock={flock} />
+                  </Link>
+                </div>
               ))}
             </div>
 
@@ -211,7 +209,7 @@ const Flocks = () => {
             {/* Mobile Carousel */}
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:hidden">
               {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <div key={flock.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%]">
+                <div key={flock.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
                   <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
                 </div>
               ))}
