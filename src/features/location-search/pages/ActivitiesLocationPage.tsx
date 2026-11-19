@@ -23,14 +23,10 @@ const ActivitiesLocationPage: React.FC = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useLocationActivities(norm.query, 6);
+  } = useLocationActivities(norm.query, 10);
 
   const activityList = data?.pages.flatMap((page) => page.items) || [];
   const isFallback = data?.pages.some((page) => page.isFallback) ?? false;
-
-  const skeletonCount = isFetchingNextPage
-    ? activityList.length % 2 !== 0 ? 3 : 2
-    : hasNextPage && activityList.length % 2 !== 0 ? 1 : 0;
 
   // SEO metadata calculation
   const seoTitle = isFallback
@@ -96,10 +92,43 @@ const ActivitiesLocationPage: React.FC = () => {
         {isFallback ? `Upcoming Activities and Events` : `Upcoming Activities in ${norm.displayName}`}
       </h1>
 
-      <section>
+      <section className="space-y-6">
         <PageHeader
           title={isFallback ? "Recommended Activities" : `Activities in ${norm.displayName}`}
         />
+
+        {/* City Location Hero Showcase */}
+        {!isFallback && (
+          <div className="rounded-3xl bg-gradient-to-r from-orange-50 via-white to-amber-50/50 p-6 sm:p-8 border border-orange-100 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-btn01 uppercase tracking-wider bg-orange-100/70 px-2.5 py-0.5 rounded-full">
+                  City Hub
+                </span>
+                <span className="text-xs font-semibold text-slate-500">📍 {norm.displayName}</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
+                Activities & Gatherings in {norm.displayName}
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm max-w-xl">
+                Discover spontaneous meetups, fitness runs, workshops, and gatherings hosted by local communities in {norm.displayName}.
+              </p>
+            </div>
+
+            {/* Dual Mode Switcher Pill */}
+            <div className="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl w-fit shrink-0">
+              <span className="bg-white text-slate-800 shadow-xs font-bold text-xs sm:text-sm px-4 py-2 rounded-xl">
+                ⚡ Activities ({activityList.length})
+              </span>
+              <Link
+                to={`/flocks/location/${norm.canonicalSlug}`}
+                className="text-slate-500 hover:text-slate-800 font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl transition"
+              >
+                👥 Flocks
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Fallback Notice: Shown when backend returns fallback recommendations */}
         {isFallback && !isLoading && (
@@ -127,7 +156,12 @@ const ActivitiesLocationPage: React.FC = () => {
             dataLength={activityList.length}
             next={fetchNextPage}
             hasMore={Boolean(hasNextPage)}
-            loader={null}
+            scrollThreshold={0.8}
+            loader={
+              <div className="my-8 flex justify-center items-center py-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-200 border-t-[#E75B28]" />
+              </div>
+            }
             endMessage={
               <p className="text-secondary/70 my-8 py-4 text-center text-xs sm:text-sm font-medium">
                 {isFallback
@@ -141,13 +175,15 @@ const ActivitiesLocationPage: React.FC = () => {
                 <Link
                   key={activity.id}
                   to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}
+                  className="block h-full"
                 >
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
-              {Array.from({ length: skeletonCount }).map((_, i) => (
-                <CardSkeleton key={`skeleton-${i}`} />
-              ))}
+              {isFetchingNextPage &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <CardSkeleton key={`skeleton-loading-${i}`} />
+                ))}
             </div>
           </InfiniteScroll>
         )}

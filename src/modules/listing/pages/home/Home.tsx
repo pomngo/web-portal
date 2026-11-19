@@ -145,7 +145,7 @@ const Home = () => {
   const filteredExploreActivities = exploreActivities;
 
   return (
-    <main className="flex min-h-screen flex-col gap-16 px-4 py-10 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <main className="flex min-h-screen flex-col gap-8 sm:gap-16 px-4 pt-4 pb-4 sm:px-6 sm:py-10 md:px-8 lg:px-12 xl:px-16">
       <SEOHead
         title="FlocknGo Events | Discover Events & Activities Near You"
         description="Discover upcoming events, local activities, workshops and community gatherings near you or across India. Explore event details and ticket options on FlocknGo."
@@ -155,13 +155,61 @@ const Home = () => {
         schemaData={{ faqs: HOME_FAQS }}
       />
       <h1 className="sr-only">FlocknGo Events</h1>
+      {/* Community Flocks */}
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] sm:text-xs font-bold tracking-wider text-btn01 uppercase">Local Hubs</span>
+            <TitleText title={isFlockFiltered ? "Filtered Communities" : "Communities"} />
+            <p className="text-secondary text-xs sm:text-sm md:text-base mt-0.5">
+              Discover and join interest-based micro-communities meeting regularly.
+            </p>
+          </div>
+
+          <div>
+            <GradientLinkButton to="/flocks/community-flocks" />
+          </div>
+        </div>
+
+        {isCommunityFlocksFallback && (
+          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
+            No flocks match your current search/location. Showing recommendations:
+          </p>
+        )}
+
+        {flockLoading ? (
+          <ResponsiveBentoFlockListSkeleton />
+        ) : filteredCommunityFlocks.length === 0 ? (
+          <EmptyState message="No flocks found" />
+        ) : (
+          <>
+            {/* Mobile Carousel */}
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
+              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
+                <div key={flock.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
+                  <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Grid */}
+            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
+              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
+                <CommunityFlocksCard key={flock.id} card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+
       {/* Nearby Activities */}
       <section className="">
         {/* Heading */}
         <div className="mb-4 flex justify-between">
           <div className="">
+            <span className="text-[10px] sm:text-xs font-bold tracking-wider text-btn01 uppercase">Happening Soon</span>
             <TitleText title={isActivityFiltered ? "Filtered Activities" : "Nearby Activities"} />
-            <p className="text-secondary text-base">Enable your location to get personalized results.</p>
+            <p className="text-secondary text-xs sm:text-sm md:text-base mt-0.5">Instant RSVP gatherings and activities happening near you.</p>
           </div>
           <div className="">
             <GradientLinkButton to="/activities/nearby-activities" />
@@ -182,8 +230,8 @@ const Home = () => {
           <>
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredNearbyActivities.map((activity) => (
-                <div key={activity.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
+                <div key={activity.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
+                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`} className="block h-full">
                     <NearbyActivities activity={activity} />
                   </Link>
                 </div>
@@ -208,56 +256,14 @@ const Home = () => {
         />
       </section>
 
-      {/* Community Flocks */}
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <TitleText title={isFlockFiltered ? "Filtered Communities" : "Communities"} />
-          </div>
-
-          <div>
-            <GradientLinkButton to="/flocks/community-flocks" />
-          </div>
-        </div>
-
-        {isCommunityFlocksFallback && (
-          <p className="text-btn01 text-xs font-semibold mb-4 bg-orange-50/50 border border-orange-100 rounded-xl px-4 py-2.5 w-fit">
-            No flocks match your current search/location. Showing recommendations:
-          </p>
-        )}
-
-        {flockLoading ? (
-          <ResponsiveBentoFlockListSkeleton />
-        ) : filteredCommunityFlocks.length === 0 ? (
-          <EmptyState message="No flocks found" />
-        ) : (
-          <>
-            {/* Mobile Carousel */}
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
-              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <div key={flock.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%]">
-                  <CommunityFlocksCard card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop Grid */}
-            <div className="hidden auto-rows-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-12">
-              {filteredCommunityFlocks.slice(0, 5).map((flock, index) => (
-                <CommunityFlocksCard key={flock.id} card={flock} index={index} isUniform={filteredCommunityFlocks.length < 5} />
-              ))}
-            </div>
-          </>
-        )}
-      </section>
-
       {/* Explore Activities */}
-      <section className="mb-20 lg:mb-0">
+      <section className="mb-8 lg:mb-0">
         <div className="mb-4 flex justify-between">
           <div className="">
+            <span className="text-[10px] sm:text-xs font-bold tracking-wider text-btn01 uppercase">Discover</span>
             <TitleText title="Explore Activities" />
-            <p className="text-secondary text-xs sm:text-sm md:text-base">
-              Explore these amazing flocks and fetch your interest
+            <p className="text-secondary text-xs sm:text-sm md:text-base mt-0.5">
+              Explore diverse experiences and find activities matching your passions.
             </p>
           </div>
           <div className="">
@@ -273,8 +279,8 @@ const Home = () => {
             {/* Mobile Carousel */}
             <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:hidden">
               {filteredExploreActivities.slice(0, 5).map((activity) => (
-                <div key={activity.id} className="min-w-[45%] flex-shrink-0 snap-start sm:min-w-[65%] md:min-w-[45%]">
-                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
+                <div key={activity.id} className="w-[calc(50%-6px)] min-w-[calc(50%-6px)] max-w-[calc(50%-6px)] flex-shrink-0 snap-start sm:w-auto sm:min-w-[240px] sm:max-w-[280px]">
+                  <Link to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`} className="block h-full">
                     <ExploreActivitiesCard activity={activity} />
                   </Link>
                 </div>
@@ -294,7 +300,7 @@ const Home = () => {
       </section>
 
       {/* Platform Overview & Frequently Asked Questions */}
-      <section className="hidden mb-20 lg:mb-8 border-t border-slate-200/60 pt-10">
+      <section className="hidden lg:block mb-8 border-t border-slate-200/60 pt-10">
         <div className="mb-6">
           <h2 className="text-primary-dark text-xl sm:text-2xl font-bold tracking-tight">
             Frequently Asked Questions

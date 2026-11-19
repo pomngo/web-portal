@@ -87,21 +87,15 @@ const AllActivities = () => {
     fetchNextPage,
     hasNextPage,
     refetch,
-  } = useInfiniteActivities(activityQueryString, 5);
+  } = useInfiniteActivities(activityQueryString, 10);
 
   const activityList = data?.pages.flatMap((page) => page.items) || [];
 
   const filteredActivityList = activityList;
 
-  const skeletonCount = isFetchingNextPage
-    ? (filteredActivityList.length % 2 !== 0 ? 3 : 2)
-    : (hasNextPage && filteredActivityList.length % 2 !== 0 ? 1 : 0);
-
   const handleRetry = () => {
     refetch();
   };
-
-
 
   if (error && activityList.length === 0) {
     return (
@@ -124,27 +118,47 @@ const AllActivities = () => {
       <section className="">
         <PageHeader slug={search_by} />
 
+        {/* Discovery Subtitle & Counter */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 text-xs sm:text-sm text-slate-500">
+          <p>Discover spontaneous meetups, workshops, fitness runs, and gatherings hosted by trusted local flocks.</p>
+          {filteredActivityList.length > 0 && (
+            <span className="font-semibold text-btn01 bg-orange-50 px-2.5 py-1 rounded-full text-xs">
+              {filteredActivityList.length}+ gatherings
+            </span>
+          )}
+        </div>
+
         {loading && activityList.length === 0 ? (
           <HomeLoader type="all-activities" />
-         ) : (
+        ) : (
           <InfiniteScroll
             dataLength={filteredActivityList.length}
             next={fetchNextPage}
-            hasMore={!!hasNextPage}
-            loader={null}
+            hasMore={Boolean(hasNextPage)}
+            scrollThreshold={0.8}
+            loader={
+              <div className="my-8 flex justify-center items-center py-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-200 border-t-[#E75B28]" />
+              </div>
+            }
             endMessage={
               <p className="text-secondary my-6 py-4 text-center text-sm font-medium">No more activities to load.</p>
             }
           >
             <div className="grid grid-cols-2 gap-2.5 gap-y-8 sm:gap-4 sm:gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
               {filteredActivityList.map((activity) => (
-                <Link key={activity.id} to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
+                <Link
+                  key={activity.id}
+                  to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}
+                  className="block h-full"
+                >
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}
-              {Array.from({ length: skeletonCount }).map((_, i) => (
-                <CardSkeleton key={`skeleton-${i}`} />
-              ))}
+              {isFetchingNextPage &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <CardSkeleton key={`skeleton-loading-${i}`} />
+                ))}
             </div>
           </InfiniteScroll>
         )}
