@@ -175,6 +175,7 @@ const ActivitiesLocationPage: React.FC = () => {
                 <Link
                   key={activity.id}
                   to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}
+                  className="block h-full"
                 >
                   <NearbyActivities activity={activity} />
                 </Link>

@@ -147,7 +147,11 @@ const AllActivities = () => {
           >
             <div className="grid grid-cols-2 gap-2.5 gap-y-8 sm:gap-4 sm:gap-y-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
               {filteredActivityList.map((activity) => (
-                <Link key={activity.id} to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}>
+                <Link
+                  key={activity.id}
+                  to={`/flocks/${encodeId(activity.flock_id || activity.id)}/activities/${encodeId(activity.id)}/detail`}
+                  className="block h-full"
+                >
                   <NearbyActivities activity={activity} />
                 </Link>
               ))}

@@ -29,9 +29,9 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
   const description = (flock?.description || flock?.about || "").trim();
 
   return (
-    <div className="group flex h-full w-full cursor-pointer flex-col justify-between gap-2 sm:gap-2.5 rounded-2xl bg-white p-2.5 sm:p-3 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 active:scale-98 border border-slate-100/90">
+    <div className="group flex h-[270px] sm:h-[355px] w-full cursor-pointer flex-col justify-between rounded-2xl bg-white p-2.5 sm:p-3 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 active:scale-98 border border-slate-100/90">
       {/* Full Size Image on Card - Strictly Uniform */}
-      <div className="relative h-28 xs:h-32 sm:h-48 w-full overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100">
+      <div className="relative h-28 sm:h-44 w-full shrink-0 overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100">
         <img
           src={imageUrl}
           alt={flockName}
@@ -45,17 +45,21 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
         />
 
         {/* Floating Community Pill */}
-        <div className="absolute top-2 left-2 z-10 rounded-md bg-black/55 backdrop-blur-md px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-white shadow-xs">
+        <div className="absolute top-2 left-2 z-10 rounded-md bg-black/55 backdrop-blur-md px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-white shadow-xs">
           Community
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col justify-between gap-1 mt-0.5">
+      <div className="flex flex-1 flex-col justify-between overflow-hidden pt-1.5">
         <div>
-          <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold text-[#EF7F23] truncate block max-w-full leading-none h-3 uppercase tracking-wider">
+            Community Hub
+          </span>
+
+          <div className="flex items-center gap-1.5 h-4.5 sm:h-5 mt-0.5">
             <h2
-              className="line-clamp-1 text-xs sm:text-[15px] font-bold text-slate-800 transition-colors group-hover:text-btn01"
+              className="line-clamp-1 text-xs sm:text-[14px] font-bold text-slate-800 transition-colors group-hover:text-btn01 leading-snug"
               title={flockName}
             >
               {flockName}
@@ -65,23 +69,20 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
             </span>
           </div>
 
-          {description && (
-            <p className="mt-1 line-clamp-2 text-[10px] sm:text-[11px] text-slate-500 leading-snug break-words">
-              {description.slice(0, 85)}
-              {description.length > 85 ? "..." : ""}
-            </p>
-          )}
+          <p className="mt-0.5 line-clamp-2 text-[10px] sm:text-[11px] text-slate-500 leading-snug break-words h-7 sm:h-8">
+            {description ? (description.length > 70 ? `${description.slice(0, 70)}...` : description) : "\u00A0"}
+          </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-1 pt-1 border-t border-slate-100/70 text-[10px] sm:text-[12px] text-slate-500">
+        <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-100/70 text-[10px] sm:text-[11px] text-slate-500 h-5 shrink-0">
           <p className="flex items-center gap-1 truncate max-w-[55%]">
-            <Icons.map className="h-3 w-3 sm:h-[13px] sm:w-[13px] text-[#EF7F23] flex-shrink-0" />
+            <Icons.map className="h-3 w-3 sm:h-[13px] sm:w-[13px] text-[#EF7F23] shrink-0" />
             <span className="truncate">{location}</span>
           </p>
 
-          <p className="flex items-center gap-1 flex-shrink-0">
-            <Icons.users className="h-3 w-3 sm:h-[13px] sm:w-[13px] text-[#EF7F23] flex-shrink-0" />
-            <span>{members} members</span>
+          <p className="flex items-center gap-1 shrink-0">
+            <Icons.users className="h-3 w-3 sm:h-[13px] sm:w-[13px] text-[#EF7F23] shrink-0" />
+            <span>{members}</span>
           </p>
         </div>
       </div>
@@ -93,7 +94,7 @@ const NearbyFlock = ({ flock }: NearbyFlockProps) => {
           e.stopPropagation();
           handleExternalRedirect(flock?.dynamic_url || flock?.invite_link);
         }}
-        className="from-btn02 to-btn01 text-white font-semibold text-[11px] sm:text-xs mt-1 w-full cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2.5 py-1.5 sm:py-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
+        className="from-btn02 to-btn01 text-white font-semibold text-[11px] sm:text-xs h-7 sm:h-8 shrink-0 mt-1 w-full flex items-center justify-center cursor-pointer rounded-lg sm:rounded-xl bg-linear-to-tr to-75% px-2 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-xs"
       >
         Join Now
       </button>

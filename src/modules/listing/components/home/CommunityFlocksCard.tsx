@@ -27,40 +27,40 @@ const cardClasses = {
     col-span-12
     md:col-span-6
     lg:col-span-4 lg:row-span-2
-    h-[210px] sm:h-[300px] lg:h-[370px]
+    h-[270px] sm:h-[355px] lg:h-[370px]
   `,
 
   2: `
     col-span-12
     md:col-span-6
     lg:col-span-3
-    h-[210px] sm:h-[300px] lg:h-[170px]
+    h-[270px] sm:h-[355px] lg:h-[170px]
   `,
   3: `
     col-span-12
     md:col-span-6
     lg:col-span-3
-    h-[210px] sm:h-[300px] lg:h-[170px]
+    h-[270px] sm:h-[355px] lg:h-[170px]
   `,
 
   5: `
     col-span-12
     md:col-span-6
     lg:col-span-6
-    h-[210px] sm:h-[300px] lg:h-[170px]
+    h-[270px] sm:h-[355px] lg:h-[170px]
   `,
 
   4: `
     col-span-12
     md:col-span-6
     lg:col-span-2 lg:row-span-2
-    h-[210px] sm:h-[300px] lg:h-[370px]
+    h-[270px] sm:h-[355px] lg:h-[370px]
   `,
 };
 const CommunityFlocksCard = ({ card, index = 1, isUniform = false }: CommunityFlocksCardProps) => {
   const classKey = ((index % 5) + 1) as 1 | 2 | 3 | 4 | 5;
   const classes = isUniform
-    ? "col-span-12 md:col-span-6 lg:col-span-4 h-[210px] sm:h-[300px] lg:h-[370px]"
+    ? "col-span-12 md:col-span-6 lg:col-span-4 h-[270px] sm:h-[355px] lg:h-[370px]"
     : (cardClasses[classKey] ?? "");
   const description = card.description?.toString() ?? "";
   return (
