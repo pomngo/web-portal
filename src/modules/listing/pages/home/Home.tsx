@@ -138,7 +138,7 @@ const Home = () => {
   // Fallback Logic
   const isNearbyActivitiesFallback = nearbyActivities.some((act: any) => act.is_fallback);
   const filteredNearbyActivities = nearbyActivities;
-  
+
   const isCommunityFlocksFallback = flockList.some((flock: any) => flock.is_fallback);
   const filteredCommunityFlocks = flockList;
 
@@ -300,7 +300,7 @@ const Home = () => {
       </section>
 
       {/* Platform Overview & Frequently Asked Questions */}
-      <section className="hidden lg:block mb-8 border-t border-slate-200/60 pt-10">
+      <section className="hidden mb-8 border-t border-slate-200/60 pt-10">
         <div className="mb-6">
           <h2 className="text-primary-dark text-xl sm:text-2xl font-bold tracking-tight">
             Frequently Asked Questions
