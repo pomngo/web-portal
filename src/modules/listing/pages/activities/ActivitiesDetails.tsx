@@ -67,12 +67,13 @@ const ActivitiesDetails = () => {
   const actLocation = getLocation(actData, "Location N/A");
   const actJoinedCount = getMemberCount(actData);
 
-  const isFree = !actData?.price && !actData?.entry_fee;
-  const priceDisplay = isFree
-    ? "Free RSVP"
-    : (actData?.price && !isNaN(Number(actData?.price)))
-      ? `₹${actData.price}`
-      : actData?.price || actData?.entry_fee;
+  const rawPrice = actData?.price ?? actData?.entry_fee;
+  const priceDisplay =
+    rawPrice && !isNaN(Number(rawPrice)) && Number(rawPrice) > 0
+      ? `₹${rawPrice}`
+      : typeof rawPrice === "string" && !rawPrice.toLowerCase().includes("free") && rawPrice.trim() !== "" && rawPrice !== "0"
+        ? rawPrice
+        : null;
 
   const coverImageUrl =
     selected_activities?.cover_image?.[0] ||
@@ -338,22 +339,10 @@ const ActivitiesDetails = () => {
 
               {/* Activity Metadata Rows */}
               <div className="space-y-3 pt-3 text-sm font-semibold text-[#444444] border-t border-slate-100/60">
-                {/* Location with Directions link */}
-                <div className="flex items-center justify-between text-slate-700">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4.5 w-4.5 text-[#E75B28] shrink-0" />
-                    <span>{actLocation}</span>
-                  </div>
-                  {actLocation && actLocation !== "Location N/A" && (
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(actLocation)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-semibold text-[#E75B28] hover:underline"
-                    >
-                      Directions ↗
-                    </a>
-                  )}
+                {/* Location */}
+                <div className="flex items-center gap-2 text-slate-700">
+                  <MapPin className="h-4.5 w-4.5 text-[#E75B28] shrink-0" />
+                  <span>{actLocation}</span>
                 </div>
 
                 {/* Timing */}

@@ -38,9 +38,9 @@ const HOME_FAQS = [
       "Browse any public community or activity listing on FlocknGo to review schedules, venue locations, and member details. Click 'Join Activity' or 'Join Community' to participate and connect directly with organizers and members.",
   },
   {
-    question: "Is FlocknGo free for visitors to discover events?",
+    question: "How can visitors discover events on FlocknGo?",
     answer:
-      "Yes, discovering local community flocks, browsing upcoming public activities, and exploring event schedules on FlocknGo is completely free.",
+      "Discovering local community flocks, browsing upcoming public activities, and exploring event schedules on FlocknGo is open to everyone without any subscription.",
   },
 ];
 
