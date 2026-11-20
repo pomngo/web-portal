@@ -47,12 +47,13 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
 
   const dateStr = activity?.start_date_time || activity?.start_date || activity?.activity_date || activity?.date;
   const formattedDate = dateStr && dayjs(dateStr).isValid() ? dayjs(dateStr).format("D MMM") : null;
-  const isFree = !activity?.price && !activity?.entry_fee;
-  const priceDisplay = isFree
-    ? "FREE"
-    : (activity?.price && !isNaN(Number(activity.price)))
-      ? `₹${activity.price}`
-      : activity?.price || activity?.entry_fee;
+  const rawPrice = activity?.price ?? activity?.entry_fee;
+  const priceDisplay =
+    rawPrice && !isNaN(Number(rawPrice)) && Number(rawPrice) > 0
+      ? `₹${rawPrice}`
+      : typeof rawPrice === "string" && !rawPrice.toLowerCase().includes("free") && rawPrice.trim() !== "" && rawPrice !== "0"
+        ? rawPrice
+        : null;
 
   return (
     <div className="group flex h-[270px] sm:h-[355px] w-full cursor-pointer flex-col justify-between rounded-2xl bg-white p-2.5 sm:p-3 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 active:scale-98 border border-slate-100/90">
@@ -78,11 +79,7 @@ const ExploreActivitiesCard = ({ activity }: ExploreActivitiesCardProps) => {
         )}
 
         {priceDisplay && (
-          <div
-            className={`absolute top-2 right-2 z-10 rounded-md px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold shadow-xs ${
-              isFree ? "bg-emerald-500 text-white" : "bg-black/60 backdrop-blur-md text-white"
-            }`}
-          >
+          <div className="absolute top-2 right-2 z-10 rounded-md px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold shadow-xs bg-black/60 backdrop-blur-md text-white">
             {priceDisplay}
           </div>
         )}
